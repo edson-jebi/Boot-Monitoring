@@ -83,6 +83,9 @@ config_map_revpi = {
     'LedScreen': "LedScreen",
 }
 
+# Parameter for revPi
+device_map_path = "/home/pi/jebi-switchboard/config/strict_log_config.json"
+
 
 def get_config(environment: Optional[str] = None) -> Config:
     """Get configuration based on environment."""

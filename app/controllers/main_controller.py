@@ -1,7 +1,7 @@
 """
 Main controller for home and general routes.
 """
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, redirect, url_for
 from app.auth import login_required
 from .base_controller import BaseController
 
@@ -16,9 +16,8 @@ class MainController(BaseController):
     
     @login_required
     def home(self):
-        """Home page route."""
-        self.log_user_action("accessed home page")
-        return render_template('home.html', result=None)
+        """Home page route - redirects to service monitor."""
+        return redirect(url_for('main.service_monitor'))
     
     @login_required
     def execute_command(self):

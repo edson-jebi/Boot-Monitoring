@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Service Monitor - {{ super() }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #005596;
+        min-height: 100vh;
+    }
+    .header {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+        max-height: 50px;
+        height: auto;
+    }
+    .user-info {
+        color: #005596;
+        font-weight: bold;
+    }
+    .logout-button {
+        background-color: #e74a3b;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        margin-left: 15px;
+    }
+    .logout-button:hover {
+        background-color: #c0392b;
+        text-decoration: none;
+        color: white;
+    }
+    .nav-tabs {
+        background-color: white;
+        padding: 0;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .tab-button {
+        flex: 1;
+        padding: 15px 20px;
+        background-color: white;
+        color: #005596;
+        text-decoration: none;
+        text-align: center;
+        font-weight: bold;
+        border-right: 1px solid #e3e6f0;
+        transition: all 0.3s;
+    }
+    .tab-button:last-child {
+        border-right: none;
+    }
+    .tab-button:hover {
+        background-color: #f8f9fc;
+        text-decoration: none;
+        color: #005596;
+    }
+    .tab-button.active {
+        background-color: #005596;
+        color: white;
+    }
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    .title {
+        color: #005596;
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .service-card {
+        background-color: #f8f9fc;
+        border: 2px solid #e3e6f0;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        transition: all 0.3s;
+    }
+    .service-card.active {
+        border-color: #28a745;
+        background-color: #f8fff9;
+    }
+    .service-card.inactive {
+        border-color: #dc3545;
+        background-color: #fff8f8;
+    }
+    .service-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #005596;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .status-item {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #e3e6f0;
+        text-align: center;
+    }
+    .status-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .status-value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #2d3436;
+    }
+    .status-indicator {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .status-active {
+        background-color: #28a745;
+        animation: pulse 2s infinite;
+    }
+    .status-inactive {
+        background-color: #dc3545;
+    }
+    .status-unknown {
+        background-color: #ffc107;
+    }
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+    .last-updated {
+        text-align: center;
+        color: #6c757d;
+        font-size: 14px;
+        margin-top: 20px;
+    }
+    .service-actions {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .action-button {
+        background-color: #005596;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin: 0 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .action-button:hover {
+        background-color: #004080;
+        transform: translateY(-1px);
+    }
+    .action-button.restart {
+        background-color: #ffc107;
+        color: #000;
+    }
+    .action-button.restart:hover {
+        background-color: #e6ac00;
+    }
+    .action-button.stop {
+        background-color: #dc3545;
+    }
+    .action-button.stop:hover {
+        background-color: #c82333;
+    }
+    .action-button.start {
+        background-color: #28a745;
+    }
+    .action-button.start:hover {
+        background-color: #218838;
+    }
+    .loading {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    <div>
+        <span class="user-info">Welcome, {{ session.username }}!</span>
+        <a href="{{ url_for('auth.logout') }}" class="logout-button">Logout</a>
+    </div>
+</div>
+
+<div class="nav-tabs">
+    <a href="{{ url_for('main.service_monitor') }}" class="tab-button active">Service Monitor</a>
+    <a href="{{ url_for('main.revpi_control') }}" class="tab-button">RevPi Control</a>
+    <a href="{{ url_for('main.config_editor') }}" class="tab-button">Config Editor</a>
+</div>
+
+<div class="container">
+    <h1 class="title">Service Monitor</h1>
+    
+    <div id="service-container">
+        <div class="service-card" id="service-card">
+            <div class="service-name">jebi-switchboard-guard.service</div>
+            <div class="loading" id="loading">Loading service status...</div>
+            
+            <div id="service-status" style="display: none;">
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">Status</div>
+                        <div class="status-value">
+                            <span class="status-indicator" id="status-indicator"></span>
+                            <span id="status-text">Unknown</span>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active</div>
+                        <div class="status-value" id="active-status">Unknown</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Enabled</div>
+                        <div class="status-value" id="enabled-status">Unknown</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Uptime</div>
+                        <div class="status-value" id="uptime">N/A</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Memory Usage</div>
+                        <div class="status-value" id="memory-usage">N/A</div>
+                    </div>
+                </div>
+                
+                <div class="status-item" style="margin-top: 15px;">
+                    <div class="status-label">Last Log Entry</div>
+                    <div class="status-value" id="last-log" style="font-size: 12px; word-break: break-all;">N/A</div>
+                </div>
+                
+                <div class="service-actions">
+                    <button class="action-button start" onclick="controlService('start')" id="start-btn">Start Service</button>
+                    <button class="action-button stop" onclick="controlService('stop')" id="stop-btn">Stop Service</button>
+                    <button class="action-button restart" onclick="controlService('restart')" id="restart-btn">Restart Service</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="last-updated" id="last-updated">
+        Last updated: Never
+    </div>
+</div>
+
+<script>
+let lastUpdateTime = null;
+
+function updateServiceStatus() {
+    fetch('/service-status')
+        .then(response => response.json())
+        .then(data => {
+            const loading = document.getElementById('loading');
+            const serviceStatus = document.getElementById('service-status');
+            const serviceCard = document.getElementById('service-card');
+            
+            loading.style.display = 'none';
+            serviceStatus.style.display = 'block';
+            
+            if (data.success) {
+                // Update status indicator
+                const statusIndicator = document.getElementById('status-indicator');
+                const statusText = document.getElementById('status-text');
+                
+                statusText.textContent = data.status;
+                
+                // Update card style and indicator based on status
+                serviceCard.className = 'service-card';
+                statusIndicator.className = 'status-indicator';
+                
+                if (data.active && data.status === 'active') {
+                    serviceCard.classList.add('active');
+                    statusIndicator.classList.add('status-active');
+                } else if (data.status === 'inactive' || data.status === 'failed') {
+                    serviceCard.classList.add('inactive');
+                    statusIndicator.classList.add('status-inactive');
+                } else {
+                    statusIndicator.classList.add('status-unknown');
+                }
+                
+                // Update other status fields
+                document.getElementById('active-status').textContent = data.active ? 'Yes' : 'No';
+                document.getElementById('enabled-status').textContent = data.enabled ? 'Yes' : 'No';
+                document.getElementById('uptime').textContent = data.uptime || 'N/A';
+                document.getElementById('memory-usage').textContent = data.memory_usage || 'N/A';
+                document.getElementById('last-log').textContent = data.last_log || 'N/A';
+                
+                lastUpdateTime = new Date();
+                document.getElementById('last-updated').textContent = 
+                    `Last updated: ${lastUpdateTime.toLocaleTimeString()}`;
+            } else {
+                // Handle error
+                serviceCard.classList.add('inactive');
+                document.getElementById('status-text').textContent = 'Error';
+                document.getElementById('status-indicator').classList.add('status-inactive');
+                console.error('Error fetching service status:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Network error:', error);
+            const loading = document.getElementById('loading');
+            loading.textContent = 'Error loading service status';
+            loading.style.color = '#dc3545';
+        });
+}
+
+function controlService(action) {
+    const buttons = ['start-btn', 'stop-btn', 'restart-btn'];
+    const actionBtn = document.getElementById(action + '-btn');
+    
+    // Disable all buttons during operation
+    buttons.forEach(btnId => {
+        document.getElementById(btnId).disabled = true;
+    });
+    
+    // Show loading state
+    const originalText = actionBtn.textContent;
+    actionBtn.textContent = action.charAt(0).toUpperCase() + action.slice(1) + 'ing...';
+    
+    fetch('/service-control', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            action: action,
+            service_name: 'jebi-switchboard-guard.service'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Service ${action} successful: ${data.message}`);
+            // Refresh status immediately
+            updateServiceStatus();
+        } else {
+            alert(`Service ${action} failed: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error controlling service:', error);
+        alert(`Network error during service ${action}`);
+    })
+    .finally(() => {
+        // Re-enable buttons and restore text
+        buttons.forEach(btnId => {
+            document.getElementById(btnId).disabled = false;
+        });
+        actionBtn.textContent = originalText;
+    });
+}
+
+// Update immediately and then every 10 seconds
+updateServiceStatus();
+setInterval(updateServiceStatus, 10000);
+</script>
+{% endblock %}

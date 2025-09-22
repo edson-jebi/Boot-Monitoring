@@ -5,6 +5,7 @@ from typing import Dict, Any
 from .base_service import DeviceServiceInterface
 from .revpi_service import RevPiService
 from .command_service import CommandService
+from .systemd_service import SystemdService
 
 
 class ServiceFactory:
@@ -26,6 +27,12 @@ class ServiceFactory:
         if 'command' not in self._services:
             self._services['command'] = CommandService(self.config)
         return self._services['command']
+    
+    def get_systemd_service(self) -> SystemdService:
+        """Get or create systemd service instance."""
+        if 'systemd' not in self._services:
+            self._services['systemd'] = SystemdService(self.config)
+        return self._services['systemd']
     
     def register_device_service(self, name: str, service: DeviceServiceInterface):
         """Register a new device service for future expansion."""

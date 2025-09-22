@@ -154,25 +154,10 @@
 </div>
 
 <div class="nav-tabs">
-    <a href="{{ url_for('main.home') }}" class="tab-button active">Command Execution</a>
+    <a href="{{ url_for('main.service_monitor') }}" class="tab-button active">Service Monitor</a>
     <a href="{{ url_for('main.revpi_control') }}" class="tab-button">RevPi Control</a>
+    <a href="{{ url_for('main.config_editor') }}" class="tab-button">Config Editor</a>
 </div>
 
-<div class="container">
-    <h1 class="title">{{ config.APP_NAME }}</h1>
-    
-    {% if not result %}
-    <p class="description">Click the button below to execute the piTest command</p>
-    <div class="button-container">
-        <a href="{{ url_for('main.execute_command') }}" class="button">Execute piTest -w LedProcessor,1</a>
-    </div>
-    {% else %}
-    <h3 style="color: #005596; text-align: center;">Command Output:</h3>
-    <div class="result">{{ result }}</div>
-    <div class="button-container">
-        <a href="{{ url_for('main.home') }}" class="button back-button">Back to Home</a>
-        <a href="{{ url_for('main.execute_command') }}" class="button">Execute Again</a>
-    </div>
-    {% endif %}
-</div>
+
 {% endblock %}

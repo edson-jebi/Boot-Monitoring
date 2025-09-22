@@ -6,6 +6,11 @@ from typing import Dict, Any, List
 from enum import Enum
 
 
+class BaseService(ABC):
+    """Base service class for all services."""
+    pass
+
+
 class DeviceAction(Enum):
     """Device action enumeration."""
     ON = "on"
