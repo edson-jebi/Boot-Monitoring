@@ -1,0 +1,34 @@
+"""
+Requirements file for JEBI Web Application.
+Run: pip install -r requirements.txt
+"""
+# Flask and core dependencies
+Flask==3.1.2
+Werkzeug==3.1.2
+Jinja2==3.1.4
+MarkupSafe==3.0.2
+itsdangerous==2.2.0
+click==8.1.8
+
+# Utilities and extensions
+python-dotenv==1.0.1
+
+# Development and testing (optional)
+pytest==8.3.3
+pytest-flask==1.3.0
+pytest-cov==6.0.0
+
+# Code quality tools (optional)
+flake8==7.1.1
+black==24.10.0
+mypy==1.13.0
+
+# Production server (optional)
+gunicorn==23.0.0
+waitress==3.0.1
+Werkzeug==3.1.3
+Jinja2==3.1.6
+click>=8.1.3
+itsdangerous>=2.2.0
+MarkupSafe>=2.1.1
+blinker>=1.9.0

@@ -1,0 +1,82 @@
+body{
+    background-color: #005596;
+}
+.colorside{
+    background-color: #005596 !important;
+}
+.colortop{
+    background-color: #005596 !important;
+}
+.colorcard{
+    background-color: #005596 !important;
+}
+.colorcard2{
+    background-color: #C6C8DE !important;
+}
+.colorcard3{
+    background-color: #6D73AC !important;
+}
+.colorcard4{
+    background-color: #005596 !important;
+}
+.colorcard5{
+    background-color: white !important;
+}
+.text-title{
+    color: #F3CB3C !important;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+}
+.text-title2{
+    color: #005596 !important;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+}
+.text-second{
+    font-family:'Raleway', sans-serif;
+}
+.text-second2{
+    font-family:'Raleway', sans-serif;
+    color:white !important;
+}
+
+.text-second-title{
+    font-family:'Oswald', sans-serif;
+    font-size: 30px;
+    color: #005596 !important;
+    text-align: center;
+}
+
+.text-user{
+    color: white !important;
+}
+
+.text-user2{
+    color: #005596 !important;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.text-login{
+    color: red !important;
+    font-family:'Raleway', sans-serif;
+    text-align: center;
+}
+
+.text2-login{
+    color: white !important;
+    font-family:'Raleway', sans-serif;
+    text-align: center;
+}
+
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited .btn-primary.active{
+    color: white;
+    background-color:#005596 !important;
+    border-color: #005596 !important;
+
+}
+
+.nav-tabs .nav-link:not(.active) {
+    border-color: transparent !important;
+}

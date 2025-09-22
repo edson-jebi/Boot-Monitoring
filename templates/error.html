@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }} - {{ super() }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #005596;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .error-container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+    }
+    .error-code {
+        font-size: 72px;
+        font-weight: bold;
+        color: #e74a3b;
+        margin-bottom: 20px;
+    }
+    .error-message {
+        font-size: 24px;
+        color: #005596;
+        margin-bottom: 30px;
+    }
+    .error-description {
+        font-size: 16px;
+        color: #5a5c69;
+        margin-bottom: 30px;
+    }
+    .button {
+        padding: 15px 30px;
+        font-size: 18px;
+        background-color: #005596;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .button:hover {
+        background-color: #004080;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="error-container">
+    <div class="error-code">{{ error_code }}</div>
+    <div class="error-message">{{ error_message }}</div>
+    <div class="error-description">
+        {% if error_code == 404 %}
+        The page you are looking for could not be found.
+        {% elif error_code == 401 %}
+        You need to log in to access this page.
+        {% elif error_code == 403 %}
+        You don't have permission to access this resource.
+        {% elif error_code == 429 %}
+        You have made too many requests. Please wait and try again.
+        {% else %}
+        Something went wrong. Please try again later.
+        {% endif %}
+    </div>
+    <a href="javascript:history.back()" class="button">Go Back</a>
+    <a href="{{ url_for('main.home') }}" class="button" style="margin-left: 10px;">Home</a>
+</div>
+{% endblock %}
