@@ -36,3 +36,5 @@ main_bp.add_url_rule('/service-control', 'service_control', service_monitor_cont
 main_bp.add_url_rule('/config-editor', 'config_editor', config_editor_controller.config_editor, methods=['GET'])
 main_bp.add_url_rule('/config-data', 'config_data', config_editor_controller.config_data, methods=['GET'])
 main_bp.add_url_rule('/config-save', 'config_save', config_editor_controller.config_save, methods=['POST'])
+main_bp.add_url_rule('/log-directory', 'log_directory', config_editor_controller.log_directory, methods=['GET'])
+main_bp.add_url_rule('/download-log-file/<filename>', 'download_log_file', config_editor_controller.download_log_file, methods=['GET'])

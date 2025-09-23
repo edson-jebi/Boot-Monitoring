@@ -86,6 +86,8 @@ config_map_revpi = {
 # Parameter for revPi
 device_map_path = "/home/pi/jebi-switchboard/config/strict_log_config.json"
 
+# Path for log directory of jebi-switchboard service
+log_path = "/var/log/jebi-switchboard"
 
 def get_config(environment: Optional[str] = None) -> Config:
     """Get configuration based on environment."""
