@@ -21,7 +21,7 @@ class Config:
     DEBUG: bool = os.environ.get('DEBUG', 'False').lower() == 'true'
     
     # Application settings
-    APP_NAME: str = "JEBI Control Panel"
+    APP_NAME: str = "BRADKEN"
     SESSION_TIMEOUT: int = int(os.environ.get('SESSION_TIMEOUT') or 3600)  # 1 hour
     
     # Command settings
