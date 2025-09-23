@@ -52,11 +52,20 @@ class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
     
+    def __init__(self):
+        super().__init__()
+        # Override SECRET_KEY from environment
+        if os.environ.get('SECRET_KEY'):
+            self.SECRET_KEY = os.environ.get('SECRET_KEY')
+    
     @classmethod
     def validate(cls) -> None:
-        super().validate()
         if not os.environ.get('SECRET_KEY'):
             raise ValueError("SECRET_KEY environment variable must be set in production!")
+        
+        port = int(os.environ.get('PORT') or 5000)
+        if port < 1 or port > 65535:
+            raise ValueError("PORT must be between 1 and 65535")
 
 
 class TestingConfig(Config):
