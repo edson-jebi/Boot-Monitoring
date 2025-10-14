@@ -3,7 +3,7 @@ Configuration Editor controller for managing JSON configuration files.
 """
 import json
 import os
-from flask import render_template, jsonify, request, send_file
+from flask import render_template, jsonify, request, send_file, redirect, url_for
 from app.auth import login_required
 from .base_controller import BaseController
 from config import device_map_path, log_path
@@ -11,7 +11,7 @@ from config import device_map_path, log_path
 
 class ConfigEditorController(BaseController):
     """Controller for configuration file editing."""
-    
+
     def _register_routes(self):
         """Register configuration editor routes."""
         self.blueprint.add_url_rule('/config-editor', 'config_editor', self.config_editor, methods=['GET'])
@@ -19,12 +19,12 @@ class ConfigEditorController(BaseController):
         self.blueprint.add_url_rule('/config-save', 'config_save', self.config_save, methods=['POST'])
         self.blueprint.add_url_rule('/log-directory', 'log_directory', self.log_directory, methods=['GET'])
         self.blueprint.add_url_rule('/download-log-file/<filename>', 'download_log_file', self.download_log_file, methods=['GET'])
-    
+
     @login_required
     def config_editor(self):
-        """Configuration editor page route."""
-        self.log_user_action("accessed config editor page")
-        return render_template('config_editor.html', config_path=device_map_path)
+        """Configuration editor page route - now redirects to service monitor."""
+        self.log_user_action("redirected from config editor to service monitor")
+        return redirect(url_for('main.service_monitor'))
     
     @login_required
     def config_data(self):

@@ -216,9 +216,8 @@
 </div>
 
 <div class="nav-tabs">
-    <a href="{{ url_for('main.service_monitor') }}" class="tab-button">Service Monitor</a>
+    <a href="{{ url_for('main.service_monitor') }}" class="tab-button">Service Monitor & Config</a>
     <a href="{{ url_for('main.revpi_control') }}" class="tab-button active">RevPi Control</a>
-    <a href="{{ url_for('main.config_editor') }}" class="tab-button">Config Editor</a>
 </div>
 
 <div class="container">
@@ -252,23 +251,37 @@
         • Turn ON: piTest -w DeviceName,0<br>
         • Turn OFF: piTest -w DeviceName,1<br>
         • Get Status: piTest -r DeviceName<br>
-        • Status updates automatically every 3 seconds<br>
+        • Status updates automatically every 15 seconds<br>
         • All actions are logged for security
     </div>
 </div>
 
 <script>
-// Start status monitoring when page loads
+// Start status monitoring when page loads with delay to prevent race conditions
+let statusUpdateInProgress = false;
+
 document.addEventListener('DOMContentLoaded', function() {
-    updateStatus();
-    // Update status every 10 seconds
-    setInterval(updateStatus, 10000);
+    // Delay initial status check to allow page to fully load
+    setTimeout(() => {
+        updateStatus();
+    }, 500);
+    
+    // Update status every 15 seconds (increased interval to reduce load)
+    setInterval(updateStatus, 15000);
 });
 
 function updateStatus() {
+    // Prevent multiple simultaneous status requests
+    if (statusUpdateInProgress) {
+        return;
+    }
+    
+    statusUpdateInProgress = true;
+    
     fetch('/revpi-status')
     .then(response => response.json())
     .then(data => {
+        statusUpdateInProgress = false;
         Object.keys(data).forEach(device => {
             const bullet = document.getElementById(`bullet-${device}`);
             const statusText = document.getElementById(`status-text-${device}`);
@@ -290,6 +303,7 @@ function updateStatus() {
         });
     })
     .catch(error => {
+        statusUpdateInProgress = false;
         console.error('Status update error:', error);
     });
 }
