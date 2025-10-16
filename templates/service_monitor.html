@@ -756,12 +756,20 @@ function updateServiceStatus() {
 }
 
 function controlService(action) {
-    const buttons = ['start-btn', 'stop-btn', 'restart-btn'];
+    const buttons = ['start-btn', 'stop-btn']; // Removed restart-btn since it's commented out
     const actionBtn = document.getElementById(action + '-btn');
+    
+    if (!actionBtn) {
+        console.error(`Button with ID ${action}-btn not found`);
+        return;
+    }
     
     // Disable all buttons during operation
     buttons.forEach(btnId => {
-        document.getElementById(btnId).disabled = true;
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.disabled = true;
+        }
     });
     
     // Show loading state
@@ -778,7 +786,12 @@ function controlService(action) {
             service_name: 'jebi-switchboard-guard.service'
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert(`Service ${action} successful: ${data.message}`);
@@ -790,12 +803,15 @@ function controlService(action) {
     })
     .catch(error => {
         console.error('Error controlling service:', error);
-        alert(`Network error during service ${action}`);
+        alert(`Network error during service ${action}: ${error.message}`);
     })
     .finally(() => {
         // Re-enable buttons and restore text
         buttons.forEach(btnId => {
-            document.getElementById(btnId).disabled = false;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = false;
+            }
         });
         actionBtn.textContent = originalText;
     });

@@ -52,7 +52,10 @@ class ServiceMonitorController(BaseController):
         """Control systemd service (start/stop/restart)."""
         try:
             data = request.get_json()
+            self.logger.info(f"Service control request received: {data}")
+            
             if not data:
+                self.logger.error("No JSON data provided in service control request")
                 return jsonify({
                     'success': False,
                     'error': 'No JSON data provided'
@@ -62,12 +65,14 @@ class ServiceMonitorController(BaseController):
             service_name = data.get('service_name', 'jebi-switchboard-guard.service')
             
             if action not in ['start', 'stop', 'restart']:
+                self.logger.error(f"Invalid action received: {action}")
                 return jsonify({
                     'success': False,
                     'error': 'Invalid action. Must be start, stop, or restart'
                 }), 400
             
             self.log_user_action(f"requested service {action} for {service_name}")
+            self.logger.info(f"Executing {action} action on service {service_name}")
             
             systemd_service = self.service_factory.get_systemd_service()
             
@@ -78,6 +83,8 @@ class ServiceMonitorController(BaseController):
             elif action == 'restart':
                 result = systemd_service.restart_service(service_name)
             
+            self.logger.info(f"Service {action} result: {result}")
+            
             if result['success']:
                 return jsonify({
                     'success': True,
@@ -86,7 +93,7 @@ class ServiceMonitorController(BaseController):
             else:
                 return jsonify({
                     'success': False,
-                    'error': result['error']
+                    'error': result.get('message', result.get('error', 'Unknown error occurred'))
                 }), 500
                 
         except Exception as e:

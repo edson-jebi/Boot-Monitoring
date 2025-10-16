@@ -129,16 +129,26 @@ class SystemdService(BaseService):
             )
             
             success = result.returncode == 0
+            error_msg = result.stderr.strip() if result.stderr else "Unknown error"
             return {
                 'success': success,
-                'message': 'Service started successfully' if success else result.stderr,
-                'output': result.stdout
+                'message': 'Service started successfully' if success else f'Failed to start service: {error_msg}',
+                'output': result.stdout,
+                'error': error_msg if not success else None
+            }
+        except subprocess.TimeoutExpired:
+            return {
+                'success': False,
+                'message': 'Timeout error: Service start command took too long',
+                'output': '',
+                'error': 'Command timeout'
             }
         except Exception as e:
             return {
                 'success': False,
                 'message': f'Error starting service: {str(e)}',
-                'output': ''
+                'output': '',
+                'error': str(e)
             }
     
     def stop_service(self, service_name: str) -> Dict[str, Any]:
@@ -150,16 +160,26 @@ class SystemdService(BaseService):
             )
             
             success = result.returncode == 0
+            error_msg = result.stderr.strip() if result.stderr else "Unknown error"
             return {
                 'success': success,
-                'message': 'Service stopped successfully' if success else result.stderr,
-                'output': result.stdout
+                'message': 'Service stopped successfully' if success else f'Failed to stop service: {error_msg}',
+                'output': result.stdout,
+                'error': error_msg if not success else None
+            }
+        except subprocess.TimeoutExpired:
+            return {
+                'success': False,
+                'message': 'Timeout error: Service stop command took too long',
+                'output': '',
+                'error': 'Command timeout'
             }
         except Exception as e:
             return {
                 'success': False,
                 'message': f'Error stopping service: {str(e)}',
-                'output': ''
+                'output': '',
+                'error': str(e)
             }
     
     def restart_service(self, service_name: str) -> Dict[str, Any]:
@@ -171,14 +191,24 @@ class SystemdService(BaseService):
             )
             
             success = result.returncode == 0
+            error_msg = result.stderr.strip() if result.stderr else "Unknown error"
             return {
                 'success': success,
-                'message': 'Service restarted successfully' if success else result.stderr,
-                'output': result.stdout
+                'message': 'Service restarted successfully' if success else f'Failed to restart service: {error_msg}',
+                'output': result.stdout,
+                'error': error_msg if not success else None
+            }
+        except subprocess.TimeoutExpired:
+            return {
+                'success': False,
+                'message': 'Timeout error: Service restart command took too long',
+                'output': '',
+                'error': 'Command timeout'
             }
         except Exception as e:
             return {
                 'success': False,
                 'message': f'Error restarting service: {str(e)}',
-                'output': ''
+                'output': '',
+                'error': str(e)
             }
