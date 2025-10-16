@@ -203,6 +203,174 @@
         margin-bottom: 10px;
         font-weight: bold;
     }
+    .schedule-container {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f0f8ff;
+        border-radius: 8px;
+        border: 1px solid #005596;
+    }
+    .schedule-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #005596;
+        margin-bottom: 15px;
+        text-align: center;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        position: relative;
+        user-select: none;
+    }
+    .schedule-title:hover {
+        background-color: #e7f3ff;
+        color: #003d6b;
+    }
+    .schedule-title::after {
+        content: '▼';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12px;
+        transition: transform 0.3s ease;
+    }
+    .schedule-title.collapsed::after {
+        transform: translateY(-50%) rotate(-90deg);
+    }
+    .schedule-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        max-height: 1000px;
+        opacity: 1;
+    }
+    .schedule-controls.collapsed {
+        max-height: 0;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+    }
+    .time-input-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .time-input {
+        width: 70px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        text-align: center;
+        font-size: 12px;
+    }
+    .time-label {
+        font-size: 12px;
+        color: #005596;
+        font-weight: bold;
+        min-width: 60px;
+    }
+    .schedule-button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 12px;
+        transition: all 0.3s;
+        margin: 2px;
+    }
+    .schedule-button.enable {
+        background-color: #28a745;
+        color: white;
+    }
+    .schedule-button.enable:hover {
+        background-color: #218838;
+    }
+    .schedule-button.disable {
+        background-color: #dc3545;
+        color: white;
+    }
+    .schedule-button.disable:hover {
+        background-color: #c82333;
+    }
+    .schedule-button.save {
+        background-color: #007bff;
+        color: white;
+    }
+    .schedule-button.save:hover {
+        background-color: #0056b3;
+    }
+    .schedule-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .schedule-status {
+        font-size: 12px;
+        text-align: center;
+        margin-top: 8px;
+        padding: 5px;
+        border-radius: 3px;
+        min-height: 20px;
+    }
+    .schedule-status.active {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .schedule-status.inactive {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+    }
+    .schedule-status.warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    .current-schedule {
+        font-size: 11px;
+        color: #005596;
+        background-color: #e7f3ff;
+        padding: 8px;
+        border-radius: 4px;
+        margin-top: 8px;
+        border-left: 3px solid #005596;
+    }
+    .day-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+        margin: 10px 0;
+    }
+    .day-checkbox {
+        display: none;
+    }
+    .day-label {
+        padding: 4px 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: bold;
+        color: #6c757d;
+        transition: all 0.3s;
+    }
+    .day-checkbox:checked + .day-label {
+        background-color: #005596;
+        color: white;
+        border-color: #005596;
+    }
+    .day-label:hover {
+        background-color: #e9ecef;
+    }
 </style>
 {% endblock %}
 
@@ -241,6 +409,65 @@
                     Turn OFF
                 </button>
             </div>
+            
+            {% if device_key == 'RelayLight' %}
+            <div class="schedule-container">
+                <div class="schedule-title" onclick="toggleScheduleVisibility('{{ device_key }}')">Daily Schedule</div>
+                <div class="schedule-controls" id="schedule-controls-{{ device_key }}">
+                    <div class="day-selector">
+                        <input type="checkbox" id="day-mon-{{ device_key }}" class="day-checkbox" checked>
+                        <label for="day-mon-{{ device_key }}" class="day-label">Mon</label>
+                        
+                        <input type="checkbox" id="day-tue-{{ device_key }}" class="day-checkbox" checked>
+                        <label for="day-tue-{{ device_key }}" class="day-label">Tue</label>
+                        
+                        <input type="checkbox" id="day-wed-{{ device_key }}" class="day-checkbox" checked>
+                        <label for="day-wed-{{ device_key }}" class="day-label">Wed</label>
+                        
+                        <input type="checkbox" id="day-thu-{{ device_key }}" class="day-checkbox" checked>
+                        <label for="day-thu-{{ device_key }}" class="day-label">Thu</label>
+                        
+                        <input type="checkbox" id="day-fri-{{ device_key }}" class="day-checkbox" checked>
+                        <label for="day-fri-{{ device_key }}" class="day-label">Fri</label>
+                        
+                        <input type="checkbox" id="day-sat-{{ device_key }}" class="day-checkbox">
+                        <label for="day-sat-{{ device_key }}" class="day-label">Sat</label>
+                        
+                        <input type="checkbox" id="day-sun-{{ device_key }}" class="day-checkbox">
+                        <label for="day-sun-{{ device_key }}" class="day-label">Sun</label>
+                    </div>
+                    
+                    <div class="time-input-group">
+                        <span class="time-label">Start:</span>
+                        <input type="time" class="time-input" id="start-time-{{ device_key }}" value="08:00">
+                        <span class="time-label">End:</span>
+                        <input type="time" class="time-input" id="end-time-{{ device_key }}" value="18:00">
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button class="schedule-button save" onclick="saveSchedule('{{ device_key }}')" id="save-schedule-{{ device_key }}">
+                            Save Schedule
+                        </button>
+                        <button class="schedule-button enable" onclick="enableSchedule('{{ device_key }}')" id="enable-schedule-{{ device_key }}">
+                            Enable
+                        </button>
+                        <button class="schedule-button disable" onclick="disableSchedule('{{ device_key }}')" id="disable-schedule-{{ device_key }}" disabled>
+                            Disable
+                        </button>
+                    </div>
+                    
+                    <div class="schedule-status inactive" id="schedule-status-{{ device_key }}">
+                        Schedule Inactive
+                    </div>
+                    
+                    <div class="current-schedule" id="current-schedule-{{ device_key }}" style="display: none;">
+                        <strong>Current Schedule:</strong><br>
+                        <span id="schedule-details-{{ device_key }}">No schedule set</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             <div class="status-message" id="status-{{ device_key }}"></div>
         </div>
         {% endfor %}
@@ -252,6 +479,8 @@
         • Turn OFF: piTest -w DeviceName,1<br>
         • Get Status: piTest -r DeviceName<br>
         • Status updates automatically every 15 seconds<br>
+        • <strong>RelayLight Daily Schedule:</strong> Set daily ON/OFF times for specific weekdays<br>
+        • Schedule runs automatically based on system time<br>
         • All actions are logged for security
     </div>
 </div>
@@ -368,6 +597,378 @@ function toggleDevice(device, action) {
         }, 5000);
     });
 }
-</script>
+
+// Daily schedule functionality
+let deviceSchedules = {};
+let scheduleCheckers = {};
+let scheduleVisibility = {}; // Track visibility state for each device
+
+// Toggle schedule visibility
+function toggleScheduleVisibility(device) {
+    const scheduleControls = document.getElementById(`schedule-controls-${device}`);
+    const scheduleTitle = document.querySelector(`#schedule-controls-${device}`).previousElementSibling;
+    
+    if (!scheduleControls || !scheduleTitle) return;
+    
+    // Toggle visibility state
+    const isCurrentlyVisible = !scheduleVisibility[device];
+    scheduleVisibility[device] = isCurrentlyVisible;
+    
+    if (isCurrentlyVisible) {
+        // Show schedule controls
+        scheduleControls.classList.remove('collapsed');
+        scheduleTitle.classList.remove('collapsed');
+    } else {
+        // Hide schedule controls
+        scheduleControls.classList.add('collapsed');
+        scheduleTitle.classList.add('collapsed');
+    }
+    
+    // Save visibility state to localStorage
+    localStorage.setItem('schedule_visibility', JSON.stringify(scheduleVisibility));
+}
+
+// Load saved visibility state
+function loadScheduleVisibility() {
+    const savedVisibility = localStorage.getItem('schedule_visibility');
+    if (savedVisibility) {
+        try {
+            scheduleVisibility = JSON.parse(savedVisibility);
+            
+            // Apply saved visibility states
+            Object.keys(scheduleVisibility).forEach(device => {
+                const scheduleControls = document.getElementById(`schedule-controls-${device}`);
+                const scheduleTitle = document.querySelector(`#schedule-controls-${device}`)?.previousElementSibling;
+                
+                if (scheduleControls && scheduleTitle) {
+                    if (scheduleVisibility[device]) {
+                        // Show
+                        scheduleControls.classList.remove('collapsed');
+                        scheduleTitle.classList.remove('collapsed');
+                    } else {
+                        // Hide
+                        scheduleControls.classList.add('collapsed');
+                        scheduleTitle.classList.add('collapsed');
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('Error loading schedule visibility:', e);
+            scheduleVisibility = {};
+        }
+    }
+    
+    // Set default visibility for devices not in saved state
+    const allScheduleContainers = document.querySelectorAll('[id^="schedule-controls-"]');
+    allScheduleContainers.forEach(container => {
+        const device = container.id.replace('schedule-controls-', '');
+        if (scheduleVisibility[device] === undefined) {
+            scheduleVisibility[device] = true; // Default to visible
+        }
+    });
+}
+
+// Load saved schedules from localStorage on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Load visibility state first
+    loadScheduleVisibility();
+    // Then load and initialize any saved schedules
+    loadSavedSchedules();
+});
+
+function loadSavedSchedules() {
+    const savedSchedules = localStorage.getItem('revpi_schedules');
+    if (savedSchedules) {
+        try {
+            deviceSchedules = JSON.parse(savedSchedules);
+            // Restore UI state for each saved schedule
+            Object.keys(deviceSchedules).forEach(device => {
+                const schedule = deviceSchedules[device];
+                if (schedule && schedule.enabled) {
+                    restoreScheduleUI(device, schedule);
+                    enableSchedule(device, false); // false = don't save again
+                }
+            });
+        } catch (e) {
+            console.error('Error loading saved schedules:', e);
+            deviceSchedules = {};
+        }
+    }
+}
+
+function restoreScheduleUI(device, schedule) {
+    // Restore day checkboxes
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    days.forEach(day => {
+        const checkbox = document.getElementById(`day-${day}-${device}`);
+        if (checkbox && schedule.days) {
+            checkbox.checked = schedule.days.includes(day);
+        }
+    });
+    
+    // Restore time inputs
+    const startTimeInput = document.getElementById(`start-time-${device}`);
+    const endTimeInput = document.getElementById(`end-time-${device}`);
+    if (startTimeInput && schedule.startTime) startTimeInput.value = schedule.startTime;
+    if (endTimeInput && schedule.endTime) endTimeInput.value = schedule.endTime;
+    
+    // Update schedule display
+    updateScheduleDisplay(device, schedule);
+}
+
+function saveSchedule(device) {
+    const startTime = document.getElementById(`start-time-${device}`).value;
+    const endTime = document.getElementById(`end-time-${device}`).value;
+    const statusDiv = document.getElementById(`schedule-status-${device}`);
+    
+    // Validate times
+    if (!startTime || !endTime) {
+        alert('Please set both start and end times');
+        return;
+    }
+    
+    if (startTime >= endTime) {
+        alert('End time must be after start time');
+        return;
+    }
+    
+    // Get selected days
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const selectedDays = days.filter(day => 
+        document.getElementById(`day-${day}-${device}`).checked
+    );
+    
+    if (selectedDays.length === 0) {
+        alert('Please select at least one day');
+        return;
+    }
+    
+    // Save schedule
+    const schedule = {
+        days: selectedDays,
+        startTime: startTime,
+        endTime: endTime,
+        enabled: false
+    };
+    
+    deviceSchedules[device] = schedule;
+    localStorage.setItem('revpi_schedules', JSON.stringify(deviceSchedules));
+    
+    // Update UI
+    statusDiv.className = 'schedule-status warning';
+    statusDiv.textContent = 'Schedule Saved - Click Enable to activate';
+    updateScheduleDisplay(device, schedule);
+    
+    // Clear message after 3 seconds
+    setTimeout(() => {
+        if (!schedule.enabled) {
+            statusDiv.className = 'schedule-status inactive';
+            statusDiv.textContent = 'Schedule Inactive';
+        }
+    }, 3000);
+}
+
+function enableSchedule(device, shouldSave = true) {
+    const schedule = deviceSchedules[device];
+    if (!schedule) {
+        alert('Please save a schedule first');
+        return;
+    }
+    
+    const enableBtn = document.getElementById(`enable-schedule-${device}`);
+    const disableBtn = document.getElementById(`disable-schedule-${device}`);
+    const statusDiv = document.getElementById(`schedule-status-${device}`);
+    
+    // Update schedule state
+    schedule.enabled = true;
+    if (shouldSave) {
+        localStorage.setItem('revpi_schedules', JSON.stringify(deviceSchedules));
+    }
+    
+    // Update UI
+    enableBtn.disabled = true;
+    disableBtn.disabled = false;
+    statusDiv.className = 'schedule-status active';
+    statusDiv.textContent = 'Schedule Enabled - Checking...';
+    
+    // Start schedule checker
+    startScheduleChecker(device);
+    
+    // Initial status update (immediate)
+    setTimeout(() => {
+        updateScheduleStatus(device);
+    }, 1000);
+}
+
+function disableSchedule(device) {
+    const schedule = deviceSchedules[device];
+    if (!schedule) return;
+    
+    const enableBtn = document.getElementById(`enable-schedule-${device}`);
+    const disableBtn = document.getElementById(`disable-schedule-${device}`);
+    const statusDiv = document.getElementById(`schedule-status-${device}`);
+    
+    // Update schedule state
+    schedule.enabled = false;
+    localStorage.setItem('revpi_schedules', JSON.stringify(deviceSchedules));
+    
+    // Stop schedule checker
+    if (scheduleCheckers[device]) {
+        clearInterval(scheduleCheckers[device]);
+        delete scheduleCheckers[device];
+    }
+    
+    // Update UI
+    enableBtn.disabled = false;
+    disableBtn.disabled = true;
+    statusDiv.className = 'schedule-status inactive';
+    statusDiv.textContent = 'Schedule Disabled';
+}
+
+function startScheduleChecker(device) {
+    // Clear existing checker
+    if (scheduleCheckers[device]) {
+        clearInterval(scheduleCheckers[device]);
+    }
+    
+    // Start with frequent checks (every 30 seconds) for the first 5 minutes
+    // then reduce to every minute for ongoing monitoring
+    let checkCount = 0;
+    const maxFrequentChecks = 10; // 5 minutes worth at 30-second intervals
+    
+    scheduleCheckers[device] = setInterval(() => {
+        updateScheduleStatus(device);
+        checkCount++;
+        
+        // After frequent checks, switch to less frequent checking
+        if (checkCount >= maxFrequentChecks) {
+            clearInterval(scheduleCheckers[device]);
+            // Switch to minute-based checking
+            scheduleCheckers[device] = setInterval(() => {
+                updateScheduleStatus(device);
+            }, 60000);
+        }
+    }, 30000); // Check every 30 seconds initially
+}
+
+function updateScheduleStatus(device) {
+    const schedule = deviceSchedules[device];
+    if (!schedule || !schedule.enabled) return;
+    
+    const now = new Date();
+    const currentDay = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][now.getDay()];
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0');
+    
+    const statusDiv = document.getElementById(`schedule-status-${device}`);
+    
+    // Check if today is a scheduled day
+    if (!schedule.days.includes(currentDay)) {
+        statusDiv.textContent = `Schedule Active - Off day (${currentDay.toUpperCase()})`;
+        // Turn off on non-scheduled days
+        executeScheduleAction(device, 'off');
+        return;
+    }
+    
+    // Check if current time is within schedule
+    const isInSchedule = currentTime >= schedule.startTime && currentTime < schedule.endTime;
+    
+    if (isInSchedule) {
+        statusDiv.textContent = `Schedule Active - ON period (${schedule.startTime}-${schedule.endTime})`;
+        // Auto-turn on during scheduled time
+        executeScheduleAction(device, 'on');
+    } else {
+        statusDiv.textContent = `Schedule Active - OFF period (${schedule.startTime}-${schedule.endTime})`;
+        // Auto-turn off outside scheduled time
+        executeScheduleAction(device, 'off');
+    }
+}
+
+function executeScheduleAction(device, action) {
+    // Get current device status to avoid unnecessary toggles
+    const currentStatusElement = document.getElementById(`status-text-${device}`);
+    const currentStatus = currentStatusElement ? currentStatusElement.textContent : '';
+    const statusDiv = document.getElementById(`schedule-status-${device}`);
+    
+    // Only execute if we need to change the state
+    const shouldExecute = (action === 'on' && currentStatus !== 'ON') || 
+                         (action === 'off' && currentStatus !== 'OFF');
+    
+    if (shouldExecute) {
+        // Show that action is being taken
+        const originalText = statusDiv.textContent;
+        statusDiv.textContent = `Executing: Turning ${action.toUpperCase()}...`;
+        
+        // Use a simplified version of toggleDevice that doesn't interfere with UI
+        fetch('/revpi-toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                device: device,
+                action: action
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log(`Schedule executed: ${device} turned ${action.toUpperCase()}`);
+                // Update status immediately
+                setTimeout(updateStatus, 1000);
+                
+                // Restore status message after action
+                setTimeout(() => {
+                    if (statusDiv.textContent.includes('Executing:')) {
+                        updateScheduleStatus(device);
+                    }
+                }, 2000);
+            } else {
+                console.error(`Schedule execution failed for ${device}: ${data.message}`);
+                statusDiv.textContent = `Error: ${data.message}`;
+                // Restore original status after error
+                setTimeout(() => {
+                    statusDiv.textContent = originalText;
+                }, 3000);
+            }
+        })
+        .catch(error => {
+            console.error(`Schedule execution error for ${device}:`, error);
+            statusDiv.textContent = 'Error: Connection failed';
+            // Restore original status after error
+            setTimeout(() => {
+                statusDiv.textContent = originalText;
+            }, 3000);
+        });
+    }
+}
+
+function updateScheduleDisplay(device, schedule) {
+    const scheduleDiv = document.getElementById(`current-schedule-${device}`);
+    const detailsSpan = document.getElementById(`schedule-details-${device}`);
+    
+    if (schedule && schedule.days && schedule.startTime && schedule.endTime) {
+        const dayNames = {
+            'mon': 'Mon', 'tue': 'Tue', 'wed': 'Wed', 'thu': 'Thu',
+            'fri': 'Fri', 'sat': 'Sat', 'sun': 'Sun'
+        };
+        
+        const dayStr = schedule.days.map(day => dayNames[day]).join(', ');
+        detailsSpan.textContent = `${dayStr}: ${schedule.startTime} - ${schedule.endTime}`;
+        scheduleDiv.style.display = 'block';
+    } else {
+        detailsSpan.textContent = 'No schedule set';
+        scheduleDiv.style.display = 'none';
+    }
+}
+
+// Stop all schedule checkers when page is unloaded
+window.addEventListener('beforeunload', function() {
+    Object.keys(scheduleCheckers).forEach(device => {
+        if (scheduleCheckers[device]) {
+            clearInterval(scheduleCheckers[device]);
+        }
+    });
+});
 </script>
 {% endblock %}
