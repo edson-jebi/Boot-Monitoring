@@ -22,6 +22,6 @@ logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     app = create_app('development')
-    logger.info("Starting JEBI Web Application on 0.0.0.0:5000")
+    logger.info("Starting JEBI Web Application on 0.0.0.0:5001")
     logger.info(f"Debug mode: {app.config['DEBUG']}")
     app.run(host='0.0.0.0', port=5010, debug=True)

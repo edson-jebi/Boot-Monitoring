@@ -524,7 +524,7 @@
                     <div class="service-actions">
                         <button class="action-button start" onclick="controlService('start')" id="start-btn">Start Service</button>
                         <button class="action-button stop" onclick="controlService('stop')" id="stop-btn">Stop Service</button>
-                        <button class="action-button restart" onclick="controlService('restart')" id="restart-btn">Restart Service</button>
+                        <!--<button class="action-button restart" onclick="controlService('restart')" id="restart-btn">Restart Service</button>-->
                     </div>
                 </div>
             </div>
@@ -637,7 +637,7 @@
                     <div class="form-row">
                         <label for="logDirectory">Log Directory:</label>
                         <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
-                            <input type="text" id="logDirectory" class="form-control" value="/var/log/jebi-switchboard" readonly style="flex: 1;">
+                            <!--<input type="text" id="logDirectory" class="form-control" value="/var/log/jebi-switchboard" readonly style="flex: 1;">-->
                             <button type="button" class="action-button" onclick="openLogDirectory()" id="browse-logs-btn">
                                 Browse Files
                             </button>
@@ -645,10 +645,10 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                 <div class="form-group">
                     <div class="form-row">
-                        <label for="logFile">Log File Path:</label>
-                        <input type="text" id="logFile" class="form-control" value="/var/log/jebi-switchboard/check_alive_strict.log" style="display: none;">
+                        <!--<label for="logFile">Log File Path:</label>
+                        <input type="text" id="logFile" class="form-control" value="/var/log/jebi-switchboard/check_alive_strict.log" style="display: none;">-->
                     </div>
                 </div>
 
@@ -828,45 +828,66 @@ function setButtonsEnabled(enabled) {
 }
 
 function populateForm(config) {
+    // Helper function to safely set element value
+    function setElementValue(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = value;
+        } else {
+            console.warn(`Element with ID '${id}' not found`);
+        }
+    }
+
     // Device configurations
     if (config.RelayProcessor) {
-        document.getElementById('relayProcessorName').value = config.RelayProcessor.name || '';
-        document.getElementById('relayProcessorIp').value = config.RelayProcessor.ip || '';
+        setElementValue('relayProcessorName', config.RelayProcessor.name || '');
+        setElementValue('relayProcessorIp', config.RelayProcessor.ip || '');
     }
     if (config.RelayScreen) {
-        document.getElementById('relayScreenName').value = config.RelayScreen.name || '';
-        document.getElementById('relayScreenIp').value = config.RelayScreen.ip || '';
+        setElementValue('relayScreenName', config.RelayScreen.name || '');
+        setElementValue('relayScreenIp', config.RelayScreen.ip || '');
     }
 
     // System settings
-    document.getElementById('checkInterval').value = config.CHECK_INTERVAL_SEC || 10;
-    document.getElementById('failWindow').value = config.FAIL_WINDOW || 3;
-    document.getElementById('offSeconds').value = config.OFF_SECONDS || 10;
-    document.getElementById('rebootWait').value = config.REBOOT_WAIT_SEC || 70;
-    document.getElementById('maxPowerCycles').value = config.MAX_POWER_CYCLES || 3;
-    document.getElementById('logLevel').value = config.LOG_LEVEL || 'INFO';
-    document.getElementById('logFile').value = config.LOG_FILE || '';
-    document.getElementById('startupDelay').value = config.STARTUP_DELAY_SEC || 15;
+    setElementValue('checkInterval', config.CHECK_INTERVAL_SEC || 10);
+    setElementValue('failWindow', config.FAIL_WINDOW || 3);
+    setElementValue('offSeconds', config.OFF_SECONDS || 10);
+    setElementValue('rebootWait', config.REBOOT_WAIT_SEC || 70);
+    setElementValue('maxPowerCycles', config.MAX_POWER_CYCLES || 3);
+    setElementValue('logLevel', config.LOG_LEVEL || 'INFO');
+    setElementValue('logFile', config.LOG_FILE || '');
+    setElementValue('startupDelay', config.STARTUP_DELAY_SEC || 15);
 }
 
 function collectFormData() {
+    // Helper function to safely get element value
+    function getElementValue(id, defaultValue = '') {
+        const element = document.getElementById(id);
+        if (element) {
+            return element.value;
+        } else {
+            console.warn(`Element with ID '${id}' not found`);
+            return defaultValue;
+        }
+    }
+
     return {
         "RelayProcessor": {
-            "name": document.getElementById('relayProcessorName').value,
-            "ip": document.getElementById('relayProcessorIp').value
+            "name": getElementValue('relayProcessorName'),
+            "ip": getElementValue('relayProcessorIp')
         },
         "RelayScreen": {
-            "name": document.getElementById('relayScreenName').value,
-            "ip": document.getElementById('relayScreenIp').value
+            "name": getElementValue('relayScreenName'),
+            "ip": getElementValue('relayScreenIp')
         },
-        "CHECK_INTERVAL_SEC": parseInt(document.getElementById('checkInterval').value),
-        "FAIL_WINDOW": parseInt(document.getElementById('failWindow').value),
-        "OFF_SECONDS": parseInt(document.getElementById('offSeconds').value),
-        "REBOOT_WAIT_SEC": parseInt(document.getElementById('rebootWait').value),
-        "MAX_POWER_CYCLES": parseInt(document.getElementById('maxPowerCycles').value),
-        "LOG_LEVEL": document.getElementById('logLevel').value,
-        "LOG_FILE": document.getElementById('logFile').value,
-        "STARTUP_DELAY_SEC": parseInt(document.getElementById('startupDelay').value)
+        "CHECK_INTERVAL_SEC": parseInt(getElementValue('checkInterval', '10')),
+        "FAIL_WINDOW": parseInt(getElementValue('failWindow', '3')),
+        "OFF_SECONDS": parseInt(getElementValue('offSeconds', '10')),
+        "REBOOT_WAIT_SEC": parseInt(getElementValue('rebootWait', '70')),
+        "MAX_POWER_CYCLES": parseInt(getElementValue('maxPowerCycles', '3')),
+        "LOG_LEVEL": getElementValue('logLevel', 'INFO'),
+        "LOG_FILE": getElementValue('logFile'),
+        "STARTUP_DELAY_SEC": parseInt(getElementValue('startupDelay', '15'))
     };
 }
 
@@ -1061,6 +1082,8 @@ window.onclick = function(event) {
 }
 
 // Load configuration on page load
-loadConfig();
+document.addEventListener('DOMContentLoaded', function() {
+    loadConfig();
+});
 </script>
 {% endblock %}

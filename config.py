@@ -90,6 +90,8 @@ config_map_revpi = {
     'RelayScreen': "RelayScreen",
     'LedProcessor': "LedProcessor",
     'LedScreen': "LedScreen",
+    'RelayLight': "RelayLight",
+    'LedLight': "LedLight",
 }
 
 # Parameter for revPi
