@@ -38,3 +38,4 @@ main_bp.add_url_rule('/config-data', 'config_data', config_editor_controller.con
 main_bp.add_url_rule('/config-save', 'config_save', config_editor_controller.config_save, methods=['POST'])
 main_bp.add_url_rule('/log-directory', 'log_directory', config_editor_controller.log_directory, methods=['GET'])
 main_bp.add_url_rule('/download-log-file/<filename>', 'download_log_file', config_editor_controller.download_log_file, methods=['GET'])
+main_bp.add_url_rule('/download-selected-logs', 'download_selected_logs', config_editor_controller.download_selected_logs, methods=['POST'])

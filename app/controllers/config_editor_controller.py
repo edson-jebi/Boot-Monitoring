@@ -3,6 +3,8 @@ Configuration Editor controller for managing JSON configuration files.
 """
 import json
 import os
+import zipfile
+import tempfile
 from flask import render_template, jsonify, request, send_file, redirect, url_for
 from app.auth import login_required
 from .base_controller import BaseController
@@ -19,6 +21,7 @@ class ConfigEditorController(BaseController):
         self.blueprint.add_url_rule('/config-save', 'config_save', self.config_save, methods=['POST'])
         self.blueprint.add_url_rule('/log-directory', 'log_directory', self.log_directory, methods=['GET'])
         self.blueprint.add_url_rule('/download-log-file/<filename>', 'download_log_file', self.download_log_file, methods=['GET'])
+        self.blueprint.add_url_rule('/download-selected-logs', 'download_selected_logs', self.download_selected_logs, methods=['POST'])
 
     @login_required
     def config_editor(self):
@@ -206,4 +209,77 @@ class ConfigEditorController(BaseController):
             return jsonify({
                 'success': False,
                 'error': f'Failed to download file: {str(e)}'
+            }), 500
+
+    @login_required
+    def download_selected_logs(self):
+        """Download multiple selected log files as a ZIP archive."""
+        try:
+            files = request.form.getlist('files[]')
+            
+            if not files:
+                return jsonify({
+                    'success': False,
+                    'error': 'No files selected'
+                }), 400
+            
+            self.log_user_action(f"downloading selected log files: {', '.join(files)}")
+            
+            # Security check: prevent path traversal for all files
+            for filename in files:
+                if '..' in filename or '/' in filename or '\\' in filename:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Invalid filename: {filename}'
+                    }), 400
+            
+            # Create a temporary zip file
+            temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix='.zip')
+            temp_zip.close()
+            
+            try:
+                with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                    added_files = []
+                    for filename in files:
+                        file_path = os.path.join(log_path, filename)
+                        
+                        if os.path.exists(file_path) and os.path.isfile(file_path):
+                            try:
+                                zipf.write(file_path, filename)
+                                added_files.append(filename)
+                            except Exception as e:
+                                self.logger.warning(f"Could not add file {filename} to zip: {e}")
+                        else:
+                            self.logger.warning(f"File not found: {filename}")
+                
+                if not added_files:
+                    os.unlink(temp_zip.name)
+                    return jsonify({
+                        'success': False,
+                        'error': 'No valid files found to download'
+                    }), 404
+                
+                # Generate a descriptive filename for the zip
+                from datetime import datetime
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                zip_filename = f"log_files_{timestamp}.zip"
+                
+                return send_file(
+                    temp_zip.name,
+                    as_attachment=True,
+                    download_name=zip_filename,
+                    mimetype='application/zip'
+                )
+                
+            except Exception as e:
+                # Clean up temp file on error
+                if os.path.exists(temp_zip.name):
+                    os.unlink(temp_zip.name)
+                raise e
+                
+        except Exception as e:
+            self.logger.error(f"Error creating zip download: {e}")
+            return jsonify({
+                'success': False,
+                'error': f'Failed to create download: {str(e)}'
             }), 500
