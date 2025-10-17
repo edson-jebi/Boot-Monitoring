@@ -6,6 +6,7 @@ from .base_service import DeviceServiceInterface
 from .revpi_service import RevPiService
 from .command_service import CommandService
 from .systemd_service import SystemdService
+from .schedule_service import ScheduleService
 
 
 class ServiceFactory:
@@ -33,6 +34,12 @@ class ServiceFactory:
         if 'systemd' not in self._services:
             self._services['systemd'] = SystemdService(self.config)
         return self._services['systemd']
+    
+    def get_schedule_service(self) -> ScheduleService:
+        """Get or create schedule service instance."""
+        if 'schedule' not in self._services:
+            self._services['schedule'] = ScheduleService(self.config)
+        return self._services['schedule']
     
     def register_device_service(self, name: str, service: DeviceServiceInterface):
         """Register a new device service for future expansion."""

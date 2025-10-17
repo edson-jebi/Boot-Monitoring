@@ -73,6 +73,46 @@ class Database:
                     )
                 ''')
                 
+                # Create schedule tables for device scheduling
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS device_schedules (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        device_id TEXT NOT NULL,
+                        start_time TEXT NOT NULL,
+                        end_time TEXT NOT NULL,
+                        enabled BOOLEAN DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        user_id INTEGER,
+                        FOREIGN KEY (user_id) REFERENCES users (id)
+                    )
+                ''')
+                
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS schedule_days (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        schedule_id INTEGER NOT NULL,
+                        day_of_week TEXT NOT NULL,
+                        FOREIGN KEY (schedule_id) REFERENCES device_schedules (id) ON DELETE CASCADE
+                    )
+                ''')
+                
+                # Create indexes for better performance
+                cursor.execute('''
+                    CREATE INDEX IF NOT EXISTS idx_device_schedules_device_id 
+                    ON device_schedules (device_id)
+                ''')
+                
+                cursor.execute('''
+                    CREATE INDEX IF NOT EXISTS idx_device_schedules_enabled 
+                    ON device_schedules (enabled)
+                ''')
+                
+                cursor.execute('''
+                    CREATE INDEX IF NOT EXISTS idx_schedule_days_schedule_id 
+                    ON schedule_days (schedule_id)
+                ''')
+                
                 conn.commit()
                 logger.info("Database initialized successfully")
                 
@@ -184,6 +224,176 @@ class User:
             logger.error(f"Failed to create default user: {e}")
 
 
+class Schedule:
+    """Schedule model for device scheduling."""
+    
+    def __init__(self, db: Database = None):
+        self.db = db or Database()
+    
+    def save_schedule(self, device_id: str, start_time: str, end_time: str, 
+                     days: list, enabled: bool = False, user_id: int = None) -> bool:
+        """Save or update a device schedule."""
+        try:
+            with self.db.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Check if schedule already exists for this device
+                cursor.execute(
+                    'SELECT id FROM device_schedules WHERE device_id = ?',
+                    (device_id,)
+                )
+                existing = cursor.fetchone()
+                
+                if existing:
+                    # Update existing schedule
+                    schedule_id = existing['id']
+                    cursor.execute('''
+                        UPDATE device_schedules 
+                        SET start_time = ?, end_time = ?, enabled = ?, 
+                            updated_at = CURRENT_TIMESTAMP, user_id = ?
+                        WHERE id = ?
+                    ''', (start_time, end_time, enabled, user_id, schedule_id))
+                    
+                    # Delete existing days
+                    cursor.execute('DELETE FROM schedule_days WHERE schedule_id = ?', (schedule_id,))
+                else:
+                    # Create new schedule
+                    cursor.execute('''
+                        INSERT INTO device_schedules (device_id, start_time, end_time, enabled, user_id)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', (device_id, start_time, end_time, enabled, user_id))
+                    schedule_id = cursor.lastrowid
+                
+                # Insert days
+                for day in days:
+                    cursor.execute('''
+                        INSERT INTO schedule_days (schedule_id, day_of_week)
+                        VALUES (?, ?)
+                    ''', (schedule_id, day))
+                
+                conn.commit()
+                logger.info(f"Schedule saved for device '{device_id}': {start_time}-{end_time}, days: {days}")
+                return True
+                
+        except (DatabaseError, sqlite3.Error) as e:
+            logger.error(f"Failed to save schedule for device '{device_id}': {e}")
+            return False
+    
+    def get_schedule(self, device_id: str) -> Optional[Dict[str, Any]]:
+        """Get schedule for a specific device."""
+        try:
+            with self.db.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Get schedule details
+                cursor.execute('''
+                    SELECT id, device_id, start_time, end_time, enabled, 
+                           created_at, updated_at, user_id
+                    FROM device_schedules 
+                    WHERE device_id = ?
+                ''', (device_id,))
+                schedule_row = cursor.fetchone()
+                
+                if not schedule_row:
+                    return None
+                
+                schedule = dict(schedule_row)
+                
+                # Get days for this schedule
+                cursor.execute('''
+                    SELECT day_of_week 
+                    FROM schedule_days 
+                    WHERE schedule_id = ?
+                ''', (schedule['id'],))
+                days_rows = cursor.fetchall()
+                schedule['days'] = [row['day_of_week'] for row in days_rows]
+                
+                return schedule
+                
+        except (DatabaseError, sqlite3.Error) as e:
+            logger.error(f"Failed to get schedule for device '{device_id}': {e}")
+            return None
+    
+    def get_all_schedules(self) -> Dict[str, Dict[str, Any]]:
+        """Get all device schedules."""
+        try:
+            with self.db.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Get all schedules
+                cursor.execute('''
+                    SELECT id, device_id, start_time, end_time, enabled, 
+                           created_at, updated_at, user_id
+                    FROM device_schedules
+                ''')
+                schedule_rows = cursor.fetchall()
+                
+                schedules = {}
+                for schedule_row in schedule_rows:
+                    schedule = dict(schedule_row)
+                    device_id = schedule['device_id']
+                    
+                    # Get days for this schedule
+                    cursor.execute('''
+                        SELECT day_of_week 
+                        FROM schedule_days 
+                        WHERE schedule_id = ?
+                    ''', (schedule['id'],))
+                    days_rows = cursor.fetchall()
+                    schedule['days'] = [row['day_of_week'] for row in days_rows]
+                    
+                    schedules[device_id] = schedule
+                
+                return schedules
+                
+        except (DatabaseError, sqlite3.Error) as e:
+            logger.error(f"Failed to get all schedules: {e}")
+            return {}
+    
+    def enable_schedule(self, device_id: str, enabled: bool = True) -> bool:
+        """Enable or disable a schedule."""
+        try:
+            with self.db.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    UPDATE device_schedules 
+                    SET enabled = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE device_id = ?
+                ''', (enabled, device_id))
+                
+                if cursor.rowcount > 0:
+                    conn.commit()
+                    status = "enabled" if enabled else "disabled"
+                    logger.info(f"Schedule {status} for device '{device_id}'")
+                    return True
+                else:
+                    logger.warning(f"No schedule found for device '{device_id}' to enable/disable")
+                    return False
+                    
+        except (DatabaseError, sqlite3.Error) as e:
+            logger.error(f"Failed to enable/disable schedule for device '{device_id}': {e}")
+            return False
+    
+    def delete_schedule(self, device_id: str) -> bool:
+        """Delete a schedule for a device."""
+        try:
+            with self.db.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('DELETE FROM device_schedules WHERE device_id = ?', (device_id,))
+                
+                if cursor.rowcount > 0:
+                    conn.commit()
+                    logger.info(f"Schedule deleted for device '{device_id}'")
+                    return True
+                else:
+                    logger.warning(f"No schedule found for device '{device_id}' to delete")
+                    return False
+                    
+        except (DatabaseError, sqlite3.Error) as e:
+            logger.error(f"Failed to delete schedule for device '{device_id}': {e}")
+            return False
+
+
 # Initialize database and create default user
 def init_app_database():
     """Initialize application database."""
@@ -194,3 +404,7 @@ def init_app_database():
     except Exception as e:
         logger.error(f"Failed to initialize application database: {e}")
         raise
+
+
+# Export classes for external use
+__all__ = ['Database', 'User', 'Schedule', 'DatabaseError', 'init_app_database']
