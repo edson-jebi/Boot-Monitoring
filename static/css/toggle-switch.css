@@ -1,0 +1,251 @@
+/* Modern Toggle Switch Styles */
+/* Works with both Bradken and Jebi brand themes */
+
+.toggle-switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 80px;
+    height: 40px;
+    display: inline-block;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #dc3545;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 32px;
+    width: 32px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* OFF state text */
+.toggle-slider:after {
+    content: 'OFF';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* Checked (ON) state */
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #28a745;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(40px);
+}
+
+/* ON state text */
+.toggle-switch input:checked + .toggle-slider:after {
+    content: 'ON';
+    left: 10px;
+    right: auto;
+}
+
+/* Disabled state */
+.toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #6c757d;
+}
+
+.toggle-switch input:disabled + .toggle-slider:after {
+    content: '...';
+}
+
+/* Hover effects - Bradken style */
+[data-brand="BRADKEN"] .toggle-switch input:not(:disabled) + .toggle-slider:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-brand="BRADKEN"] .toggle-switch input:checked:not(:disabled) + .toggle-slider {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+[data-brand="BRADKEN"] .toggle-switch input:not(:checked):not(:disabled) + .toggle-slider {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+/* Hover effects - Jebi dark spectral style */
+[data-brand="JEBI"] .toggle-switch input:not(:disabled) + .toggle-slider:hover {
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4), 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+[data-brand="JEBI"] .toggle-switch input:checked:not(:disabled) + .toggle-slider {
+    background: linear-gradient(135deg, #10b981 0%, #00d4ff 100%);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4), 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+[data-brand="JEBI"] .toggle-switch input:not(:checked):not(:disabled) + .toggle-slider {
+    background: linear-gradient(135deg, #ef4444 0%, #7b2cbf 100%);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+}
+
+/* Neon glow effect for Jebi on hover */
+[data-brand="JEBI"] .toggle-switch input:checked:not(:disabled) + .toggle-slider:hover {
+    background: linear-gradient(135deg, #00d4ff 0%, #00f5ff 100%);
+    box-shadow: 0 6px 24px rgba(0, 245, 255, 0.6), 0 0 40px rgba(0, 245, 255, 0.4);
+}
+
+[data-brand="JEBI"] .toggle-switch input:not(:checked):not(:disabled) + .toggle-slider:hover {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ef4444 100%);
+    box-shadow: 0 6px 24px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239, 68, 68, 0.4);
+}
+
+/* Toggle label */
+.toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    user-select: none;
+}
+
+[data-brand="JEBI"] .toggle-label {
+    color: #a0aec0;
+    text-shadow: 0 0 5px rgba(0, 212, 255, 0.2);
+}
+
+/* Status indicator next to toggle */
+.toggle-status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+}
+
+.toggle-status-indicator.on {
+    background-color: #28a745;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.6);
+}
+
+.toggle-status-indicator.off {
+    background-color: #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.6);
+}
+
+.toggle-status-indicator.loading {
+    background-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.6);
+    animation: pulse 1.5s infinite;
+}
+
+/* Jebi neon glow for status indicator */
+[data-brand="JEBI"] .toggle-status-indicator.on {
+    background-color: #10b981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 30px rgba(0, 212, 255, 0.4);
+}
+
+[data-brand="JEBI"] .toggle-status-indicator.off {
+    background-color: #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+}
+
+[data-brand="JEBI"] .toggle-status-indicator.loading {
+    background-color: #f59e0b;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .toggle-switch {
+        width: 70px;
+        height: 36px;
+    }
+
+    .toggle-slider:before {
+        height: 28px;
+        width: 28px;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(34px);
+    }
+
+    .toggle-slider:after {
+        font-size: 10px;
+    }
+}
+
+/* Integration with device cards */
+.device-card .toggle-switch-container {
+    padding: 10px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 15px -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+[data-brand="JEBI"] .device-card .toggle-switch-container {
+    border-top: 1px solid rgba(0, 212, 255, 0.2);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+/* Loading state overlay for toggle */
+.toggle-switch.loading {
+    pointer-events: none;
+}
+
+.toggle-switch.loading .toggle-slider {
+    opacity: 0.7;
+}
+
+.toggle-switch.loading .toggle-slider:before {
+    animation: slide 1s infinite alternate;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(40px);
+    }
+}

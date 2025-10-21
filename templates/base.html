@@ -1,16 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="{{ config.APP_BRAND }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="app-brand" content="{{ config.APP_BRAND }}">
     <title>{% block title %}{{ config.APP_NAME }}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='core.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='color.css') }}">
+
+    <!-- Core Styles - Brand Specific -->
+    {% if config.APP_BRAND == 'JEBI' %}
+    <link id="core-css" rel="stylesheet" href="{{ url_for('static', filename='core_jebi.css') }}">
+    <link id="color-css" rel="stylesheet" href="{{ url_for('static', filename='color_jebi.css') }}">
+    {% else %}
+    <link id="core-css" rel="stylesheet" href="{{ url_for('static', filename='core.css') }}">
+    <link id="color-css" rel="stylesheet" href="{{ url_for('static', filename='color.css') }}">
+    {% endif %}
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body data-brand="{{ config.APP_BRAND }}">
     {% block body %}{% endblock %}
-    
+
+    <!-- Core JavaScript Plugins -->
+    <script src="{{ url_for('static', filename='js/ui-plugins.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme-manager.js') }}"></script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

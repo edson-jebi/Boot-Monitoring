@@ -21,7 +21,9 @@ class Config:
     DEBUG: bool = os.environ.get('DEBUG', 'False').lower() == 'true'
     
     # Application settings
-    APP_NAME: str = "BRADKEN"
+    APP_BRAND: str = os.environ.get('APP_BRAND') or "BRADKEN"  # Brand theme: BRADKEN or JEBI
+    # APP_NAME automatically matches APP_BRAND unless explicitly overridden
+    APP_NAME: str = os.environ.get('APP_NAME') or os.environ.get('APP_BRAND') or "BRADKEN"
     SESSION_TIMEOUT: int = int(os.environ.get('SESSION_TIMEOUT') or 3600)  # 1 hour
     
     # Command settings

@@ -1,0 +1,323 @@
+/**
+ * Bradken Brand Theme
+ * Primary Brand Colors: Navy Blue (#005596) and Gold (#F3CB3C)
+ * Modern, professional, industrial aesthetic
+ */
+
+:root {
+    /* Primary Brand Colors */
+    --brand-primary: #005596;
+    --brand-secondary: #F3CB3C;
+    --brand-accent: #003d6b;
+
+    /* UI Colors */
+    --bg-primary: #005596;
+    --bg-secondary: #003d6b;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8f9fa;
+    --bg-sidebar: #005596;
+    --bg-topbar: #005596;
+
+    /* Text Colors */
+    --text-primary: #005596;
+    --text-secondary: #6c757d;
+    --text-light: #ffffff;
+    --text-accent: #F3CB3C;
+    --text-muted: #939598;
+
+    /* Status Colors */
+    --status-success: #28a745;
+    --status-error: #e74a3b;
+    --status-warning: #ffc107;
+    --status-info: #17a2b8;
+
+    /* Card Variants */
+    --card-primary: #005596;
+    --card-secondary: #C6C8DE;
+    --card-tertiary: #6D73AC;
+    --card-light: #ffffff;
+
+    /* Shadows and Borders */
+    --shadow-sm: 0 2px 4px rgba(0, 85, 150, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 85, 150, 0.15);
+    --shadow-lg: 0 8px 16px rgba(0, 85, 150, 0.2);
+    --border-color: #e3e6f0;
+    --border-radius: 8px;
+
+    /* Fonts */
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Raleway', sans-serif;
+    --font-system: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Body and Background */
+body {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+    font-family: var(--font-body);
+    color: var(--text-secondary);
+}
+
+/* Sidebar Styling */
+.colorside {
+    background: var(--bg-sidebar) !important;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Topbar Styling */
+.colortop {
+    background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-accent) 100%) !important;
+    box-shadow: var(--shadow-md);
+}
+
+/* Card Variants */
+.colorcard {
+    background: var(--card-primary) !important;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.colorcard:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.colorcard2 {
+    background: var(--card-secondary) !important;
+    border-radius: var(--border-radius);
+}
+
+.colorcard3 {
+    background: var(--card-tertiary) !important;
+    border-radius: var(--border-radius);
+}
+
+.colorcard4 {
+    background: var(--card-primary) !important;
+    border-radius: var(--border-radius);
+}
+
+.colorcard5 {
+    background: var(--card-light) !important;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Text Styles */
+.text-title {
+    color: var(--text-accent) !important;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.text-title2 {
+    color: var(--text-primary) !important;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.text-second {
+    font-family: var(--font-body);
+    color: var(--text-secondary);
+}
+
+.text-second2 {
+    font-family: var(--font-body);
+    color: var(--text-light) !important;
+}
+
+.text-second-title {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary) !important;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.text-user {
+    color: var(--text-light) !important;
+    font-weight: 500;
+}
+
+.text-user2 {
+    color: var(--text-primary) !important;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.text-login {
+    color: var(--status-error) !important;
+    font-family: var(--font-body);
+    text-align: center;
+}
+
+.text2-login {
+    color: var(--text-light) !important;
+    font-family: var(--font-body);
+    text-align: center;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:visited,
+.btn-primary.active {
+    color: white;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%) !important;
+    border: none !important;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--brand-secondary) !important;
+    border-color: var(--brand-secondary) !important;
+    color: var(--brand-primary) !important;
+    font-weight: 600;
+}
+
+/* Navigation Tabs */
+.nav-tabs .nav-link:not(.active) {
+    border-color: transparent !important;
+    color: var(--text-muted);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--brand-primary) !important;
+    border-bottom: 3px solid var(--brand-secondary) !important;
+    font-weight: 600;
+}
+
+/* Service Status Card */
+.service-card {
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.service-card.active {
+    border-color: var(--status-success);
+    background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
+}
+
+.service-card.inactive {
+    border-color: var(--status-error);
+    background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+}
+
+/* Status Indicators */
+.status-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+.status-active {
+    background-color: var(--status-success);
+    animation: pulse-success 2s ease-in-out infinite;
+}
+
+.status-inactive {
+    background-color: var(--status-error);
+}
+
+.status-unknown {
+    background-color: var(--status-warning);
+}
+
+@keyframes pulse-success {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 16px rgba(40, 167, 69, 0.8);
+    }
+}
+
+/* Form Controls */
+input, select, textarea {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(0, 85, 150, 0.1);
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+    color: white;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Loading Spinner - Bradken Style */
+.spinner-border-bradken {
+    border-color: var(--brand-secondary);
+    border-right-color: transparent;
+}
+
+/* Badges */
+.badge-primary {
+    background-color: var(--brand-primary) !important;
+}
+
+.badge-secondary {
+    background-color: var(--brand-secondary) !important;
+    color: var(--brand-primary) !important;
+}
+
+/* Sidebar Brand */
+.sidebar-brand {
+    background: var(--brand-accent);
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--brand-secondary);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--brand-primary);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-accent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .text-second-title {
+        font-size: 24px;
+    }
+}
