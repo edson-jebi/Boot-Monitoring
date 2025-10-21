@@ -150,6 +150,22 @@ else
     exit 1
 fi
 
+# Configure firewall to allow port 5000
+print_info "Configuring firewall to allow port 5000..."
+if command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active --quiet firewalld; then
+    print_info "Firewalld detected, adding port 5000..."
+    firewall-cmd --add-port=5000/tcp --permanent
+    firewall-cmd --reload
+    print_success "Port 5000 added to firewall"
+elif command -v ufw >/dev/null 2>&1; then
+    print_info "UFW detected, adding port 5000..."
+    ufw allow 5000/tcp
+    print_success "Port 5000 added to UFW firewall"
+else
+    print_info "No supported firewall detected (firewalld/ufw)"
+    print_info "You may need to manually configure your firewall to allow port 5000"
+fi
+
 print_success "Installation completed!"
 echo
 echo "════════════════════════════════════════════════"
@@ -161,6 +177,7 @@ echo "   • Virtual environment: $VENV_DIR"
 echo "   • Gunicorn WSGI server (2 workers)"
 echo "   • Secure environment configuration"
 echo "   • Systemd service management"
+echo "   • Firewall configured for port 5000"
 echo
 echo "🔧 Service Management:"
 echo "   Status:  systemctl status $SERVICE_NAME"
@@ -168,6 +185,11 @@ echo "   Logs:    journalctl -fu $SERVICE_NAME"
 echo "   Stop:    systemctl stop $SERVICE_NAME"
 echo "   Start:   systemctl start $SERVICE_NAME"
 echo "   Restart: systemctl restart $SERVICE_NAME"
+echo
+echo "🔥 Firewall Management:"
+echo "   List rules: firewall-cmd --list-all"
+echo "   Remove port: firewall-cmd --remove-port=5000/tcp --permanent && firewall-cmd --reload"
+echo "   Add port: firewall-cmd --add-port=5000/tcp --permanent && firewall-cmd --reload"
 echo
 echo " Application Access:"
 echo "   URL: http://$(hostname -I | awk '{print $1}'):5000"
