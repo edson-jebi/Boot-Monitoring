@@ -1,9 +1,14 @@
 """
 Application factory for JEBI Web Application.
+
+This module implements the Flask application factory pattern, providing
+a centralized way to create and configure the application instance with
+proper security headers, database initialization, and blueprint registration.
 """
 import logging
 from datetime import timedelta
-from flask import Flask, g
+from typing import Optional
+from flask import Flask
 from config import get_config
 from app.logging_config import setup_logging
 from app.error_handlers import register_error_handlers
@@ -13,8 +18,28 @@ from app.routes import auth_bp, main_bp
 logger = logging.getLogger(__name__)
 
 
-def create_app(environment: str = None) -> Flask:
-    """Application factory function with enhanced validation and error handling."""
+def create_app(environment: Optional[str] = None) -> Flask:
+    """
+    Application factory function with enhanced validation and error handling.
+
+    Creates and configures a Flask application instance with:
+    - Logging configuration
+    - Database initialization
+    - Security headers
+    - Blueprint registration
+    - Error handlers
+
+    Args:
+        environment: Environment name ('development', 'production', 'testing')
+                    If None, uses FLASK_ENV from environment or 'default'
+
+    Returns:
+        Flask: Configured Flask application instance
+
+    Raises:
+        ValueError: If configuration validation fails
+        Exception: If database initialization fails
+    """
     
     # Initialize logging first
     setup_logging("jebi_web", "INFO")

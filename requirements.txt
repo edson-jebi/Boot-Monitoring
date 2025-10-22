@@ -10,6 +10,7 @@ click==8.1.8
 
 # Utilities and extensions
 python-dotenv==1.0.1
+bcrypt==4.2.1  # Secure password hashing
 
 # Development and testing (optional)
 pytest==8.3.3

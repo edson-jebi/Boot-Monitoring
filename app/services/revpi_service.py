@@ -68,7 +68,7 @@ class RevPiService(DeviceServiceInterface):
             if result.returncode == 0:
                 output = result.stdout.strip()
                 first_line = output.split('\n')[0] if output else ''
-                print(first_line)
+                logger.debug(f"piTest output for {device_id}: {first_line}")
                 try:
                     value = int(first_line.split(":")[1])
                     return {

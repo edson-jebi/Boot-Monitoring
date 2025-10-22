@@ -28,7 +28,6 @@ class SystemdService(BaseService):
         Returns:
             Dictionary with service status information
         """
-        print("tem,ptemp")
         try:
             status_info = {
                 'status': 'unknown',

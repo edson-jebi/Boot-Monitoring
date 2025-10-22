@@ -3,11 +3,19 @@ Database models for JEBI Web Application.
 Handles user management and database operations.
 """
 import sqlite3
-import hashlib
 import logging
+import hashlib
 from typing import Optional, Dict, Any
 from contextlib import contextmanager
 from config import get_config
+
+# Try to import bcrypt, fall back to SHA-256 if not available
+try:
+    import bcrypt
+    BCRYPT_AVAILABLE = True
+except ImportError:
+    BCRYPT_AVAILABLE = False
+    logging.warning("bcrypt not available - using legacy SHA-256 hashing. Install bcrypt: pip install bcrypt==4.2.1")
 
 logger = logging.getLogger(__name__)
 config = get_config()
@@ -129,10 +137,58 @@ class User:
     
     @staticmethod
     def hash_password(password: str) -> str:
-        """Hash password using SHA-256 with salt."""
-        # In production, use bcrypt or Argon2 instead
-        salt = "jebi_salt_2025"  # Should be random and stored securely
-        return hashlib.sha256((password + salt).encode()).hexdigest()
+        """
+        Hash password using bcrypt (preferred) or SHA-256 (fallback).
+
+        Args:
+            password: Plain text password to hash
+
+        Returns:
+            str: Bcrypt hashed password (if available) or SHA-256 hash
+        """
+        if BCRYPT_AVAILABLE:
+            # Generate salt and hash password in one step
+            # bcrypt automatically generates a random salt and includes it in the hash
+            password_bytes = password.encode('utf-8')
+            hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt(rounds=12))
+            return hashed.decode('utf-8')
+        else:
+            # Fallback to SHA-256 with static salt (legacy mode)
+            logger.warning("Using legacy SHA-256 password hashing. Install bcrypt for better security!")
+            salt = "jebi_salt_2025"
+            return hashlib.sha256((password + salt).encode()).hexdigest()
+
+    @staticmethod
+    def verify_password(password: str, password_hash: str) -> bool:
+        """
+        Verify a password against its hash.
+        Supports both bcrypt and legacy SHA-256 hashes for backward compatibility.
+
+        Args:
+            password: Plain text password to verify
+            password_hash: Stored password hash (bcrypt or SHA-256)
+
+        Returns:
+            bool: True if password matches, False otherwise
+        """
+        try:
+            # Check if it's a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+            if password_hash.startswith('$2'):
+                if not BCRYPT_AVAILABLE:
+                    logger.error("Password is bcrypt but bcrypt module not installed!")
+                    return False
+                password_bytes = password.encode('utf-8')
+                hash_bytes = password_hash.encode('utf-8')
+                return bcrypt.checkpw(password_bytes, hash_bytes)
+            else:
+                # Legacy SHA-256 hash verification
+                logger.debug("Using legacy SHA-256 verification")
+                salt = "jebi_salt_2025"
+                computed_hash = hashlib.sha256((password + salt).encode()).hexdigest()
+                return computed_hash == password_hash
+        except Exception as e:
+            logger.error(f"Password verification error: {e}")
+            return False
     
     def create_user(self, username: str, password: str) -> bool:
         """Create a new user."""
@@ -157,34 +213,48 @@ class User:
             return False
     
     def verify_user(self, username: str, password: str) -> Optional[Dict[str, Any]]:
-        """Verify user credentials and return user data."""
+        """
+        Verify user credentials and return user data.
+
+        Args:
+            username: Username to verify
+            password: Plain text password to verify
+
+        Returns:
+            Optional[Dict]: User data if authenticated, None otherwise
+        """
         try:
-            password_hash = self.hash_password(password)
-            
             with self.db.get_connection() as conn:
                 cursor = conn.cursor()
+                # First, retrieve the user and their password hash
                 cursor.execute(
-                    '''SELECT id, username, created_at, last_login 
-                       FROM users 
-                       WHERE username = ? AND password_hash = ? AND is_active = 1''',
-                    (username, password_hash)
+                    '''SELECT id, username, password_hash, created_at, last_login
+                       FROM users
+                       WHERE username = ? AND is_active = 1''',
+                    (username,)
                 )
                 user_row = cursor.fetchone()
-                
+
                 if user_row:
-                    # Update last login
-                    cursor.execute(
-                        'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
-                        (user_row['id'],)
-                    )
-                    conn.commit()
-                    
-                    logger.info(f"User '{username}' authenticated successfully")
-                    return dict(user_row)
-                
+                    # Verify password using bcrypt
+                    password_hash = user_row['password_hash']
+                    if self.verify_password(password, password_hash):
+                        # Update last login
+                        cursor.execute(
+                            'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
+                            (user_row['id'],)
+                        )
+                        conn.commit()
+
+                        logger.info(f"User '{username}' authenticated successfully")
+                        # Return user data without password hash
+                        user_data = dict(user_row)
+                        del user_data['password_hash']
+                        return user_data
+
                 logger.warning(f"Authentication failed for user '{username}'")
                 return None
-                
+
         except DatabaseError as e:
             logger.error(f"Authentication error for user '{username}': {e}")
             return None
