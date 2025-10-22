@@ -4,16 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="app-brand" content="{{ config.APP_BRAND }}">
+    
+    <!-- Cache control for security - prevent back button issues after logout -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>{% block title %}{{ config.APP_NAME }}{% endblock %}</title>
 
-    <!-- Core Styles - Brand Specific -->
+    <!-- Design System - Load First -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+    <!-- Brand Theme - Load After Design System -->
     {% if config.APP_BRAND == 'JEBI' %}
-    <link id="core-css" rel="stylesheet" href="{{ url_for('static', filename='core_jebi.css') }}">
-    <link id="color-css" rel="stylesheet" href="{{ url_for('static', filename='color_jebi.css') }}">
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/theme-jebi.css') }}">
     {% else %}
-    <link id="core-css" rel="stylesheet" href="{{ url_for('static', filename='core.css') }}">
-    <link id="color-css" rel="stylesheet" href="{{ url_for('static', filename='color.css') }}">
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/theme-bradken.css') }}">
     {% endif %}
+
+    <!-- Toggle Switch Component -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toggle-switch.css') }}">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -24,8 +35,10 @@
     {% block body %}{% endblock %}
 
     <!-- Core JavaScript Plugins -->
+    <script src="{{ url_for('static', filename='js/design-system.js') }}"></script>
     <script src="{{ url_for('static', filename='js/ui-plugins.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/security.js') }}"></script>
 
     {% block scripts %}{% endblock %}
 </body>

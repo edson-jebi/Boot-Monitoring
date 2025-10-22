@@ -3,33 +3,47 @@
 {% block title %}RevPi Control - {{ super() }}{% endblock %}
 
 {% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/toggle-switch.css') }}">
 <style>
+    /* Body and Background */
     body {
-        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         margin: 0;
-        padding: 15px;
-        background-color: #f8f9fa;
+        padding: 20px;
+        background-color: #005596;
         min-height: 100vh;
     }
-    .header {
+
+    /* Top Header - Logo and User Info */
+    .top-header {
         background-color: white;
-        padding: 10px 15px;
-        border-radius: 6px;
-        margin-bottom: 15px;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
     .logo {
-        max-height: 40px;
+        max-height: 50px;
         height: auto;
     }
+
+    .user-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
     .user-info {
         color: #005596;
-        font-weight: bold;
+        font-weight: var(--font-bold);
+        font-size: var(--text-base);
     }
+
     .logout-button {
         background-color: #e74a3b;
         color: white;
@@ -38,495 +52,529 @@
         border-radius: 5px;
         text-decoration: none;
         font-size: 14px;
-        margin-left: 15px;
+        font-weight: var(--font-medium);
+        transition: all 0.2s ease;
     }
+
     .logout-button:hover {
         background-color: #c0392b;
         text-decoration: none;
         color: white;
     }
-    .nav-tabs {
+
+    /* Navigation Tabs - Minimalist Style */
+    .nav-tabs-minimal {
         background-color: white;
         padding: 0;
         border-radius: 10px;
         margin-bottom: 20px;
+        display: flex;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         overflow: hidden;
     }
-    .tab-button {
-        background-color: transparent;
-        border: none;
-        padding: 15px 30px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
+
+    .nav-tab-minimal {
+        flex: 1;
+        padding: 15px 20px;
+        background-color: white;
         color: #005596;
         text-decoration: none;
-        display: inline-block;
-        transition: background-color 0.3s;
+        text-align: center;
+        font-weight: var(--font-semibold);
+        font-size: var(--text-base);
+        border-right: 1px solid #e3e6f0;
+        transition: all 0.2s ease;
     }
-    .tab-button.active {
+
+    .nav-tab-minimal:last-child {
+        border-right: none;
+    }
+
+    .nav-tab-minimal:hover {
+        background-color: #f8f9fc;
+        text-decoration: none;
+        color: #005596;
+    }
+
+    .nav-tab-minimal.active {
         background-color: #005596;
         color: white;
     }
-    .tab-button:hover {
-        background-color: #F3CB3C;
-        color: #005596;
-        text-decoration: none;
-    }
-    .container {
-        max-width: 1000px;
+
+    /* Minimalist RevPi Control Styles */
+    .revpi-container {
+        max-width: 1200px;
         margin: 0 auto;
+        padding: var(--space-6);
         background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     }
-    .title {
-        color: #2c3e50;
-        font-size: 24px;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 20px;
+
+    /* Page Header - Clean and Simple */
+    .page-header {
+        margin-bottom: var(--space-8);
     }
+
+    .page-title {
+        font-size: var(--text-3xl);
+        font-weight: var(--font-bold);
+        margin: 0 0 var(--space-2) 0;
+    }
+
+    .page-subtitle {
+        font-size: var(--text-base);
+        opacity: 0.7;
+        margin: 0;
+    }
+
+    /* Device Grid - Minimalist Layout */
     .device-grid {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 20px;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: var(--space-6);
+        margin-bottom: var(--space-8);
     }
-    .device-card {
-        background-color: #f8f9fc;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 15px;
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
-        flex: 1;
-        min-width: 200px;
-        max-width: 280px;
-    }
-    .device-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    .device-name {
-        font-size: 16px;
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 12px;
-    }
-    .toggle-container {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        margin-bottom: 10px;
-    }
-    .toggle-button {
-        padding: 6px 12px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-        font-size: 12px;
-        transition: all 0.2s;
-        min-width: 60px;
-    }
-    .toggle-button.on {
-        background-color: #28a745;
-        color: white;
-    }
-    .toggle-button.off {
-        background-color: #dc3545;
-        color: white;
-    }
-    .toggle-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    .status-message {
-        margin-top: 8px;
-        padding: 6px;
-        border-radius: 4px;
-        font-size: 12px;
-        min-height: 16px;
-    }
-    .status-message.success {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    .status-message.error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    .status-message.loading {
-        background-color: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    .back-button {
-        background-color: #6c757d;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 14px;
-        display: inline-block;
-        margin-bottom: 15px;
-        transition: background-color 0.2s;
-    }
-    .back-button:hover {
-        background-color: #5a6268;
-        text-decoration: none;
-        color: white;
-    }
-    .status-bullet {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 6px;
-        vertical-align: middle;
-    }
-    .status-bullet.on {
-        background-color: #28a745;
-        box-shadow: 0 0 10px rgba(40, 167, 69, 0.6);
-    }
-    .status-bullet.off {
-        background-color: #dc3545;
-        box-shadow: 0 0 10px rgba(220, 53, 69, 0.6);
-    }
-    .status-bullet.error {
-        background-color: #6c757d;
-        box-shadow: 0 0 10px rgba(108, 117, 125, 0.6);
-    }
-    .status-text {
-        font-size: 14px;
-        color: #005596;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-    .schedule-container {
-        margin-top: 15px;
-        padding: 15px;
-        background-color: #f0f8ff;
-        border-radius: 8px;
-        border: 1px solid #005596;
-    }
-    .schedule-title {
-        font-size: 14px;
-        font-weight: bold;
-        color: #005596;
-        margin-bottom: 15px;
-        text-align: center;
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 4px;
+
+    /* Minimalist Device Card */
+    .device-card-minimal {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: var(--space-6);
         transition: all 0.3s ease;
-        position: relative;
-        user-select: none;
     }
-    .schedule-title:hover {
-        background-color: #e7f3ff;
-        color: #003d6b;
+
+    .device-card-minimal:hover {
+        box-shadow: var(--shadow-md);
     }
-    .schedule-title::after {
-        content: '▼';
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 12px;
-        transition: transform 0.3s ease;
+
+    /* Device Header - Simplified */
+    .device-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-6);
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--border-color);
     }
-    .schedule-title.collapsed::after {
-        transform: translateY(-50%) rotate(-90deg);
+
+    .device-title {
+        font-size: var(--text-xl);
+        font-weight: var(--font-semibold);
+        margin: 0;
     }
-    .schedule-controls {
+
+    /* Control Section - Clean Toggle */
+    .control-section {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        align-items: center;
+        gap: var(--space-4);
+        margin-bottom: var(--space-6);
+    }
+
+    /* Status Display - Minimal */
+    .status-display {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+    }
+
+    /* Schedule Section - Collapsible */
+    .schedule-section {
+        margin-top: var(--space-6);
+        padding-top: var(--space-6);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .schedule-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3);
+        cursor: pointer;
+        border-radius: var(--border-radius);
+        transition: background-color 0.2s;
+        user-select: none;
+    }
+
+    .schedule-header:hover {
+        background-color: var(--bg-card-hover);
+    }
+
+    .schedule-header-title {
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+        margin: 0;
+    }
+
+    .schedule-toggle-icon {
+        transition: transform 0.3s ease;
+        font-size: var(--text-sm);
+        opacity: 0.6;
+    }
+
+    .schedule-toggle-icon.collapsed {
+        transform: rotate(-90deg);
+    }
+
+    /* Schedule Content */
+    .schedule-content {
         overflow: hidden;
         transition: max-height 0.3s ease, opacity 0.3s ease;
         max-height: 1000px;
         opacity: 1;
+        margin-top: var(--space-4);
     }
-    .schedule-controls.collapsed {
+
+    .schedule-content.collapsed {
         max-height: 0;
         opacity: 0;
-        margin: 0;
-        padding: 0;
+        margin-top: 0;
     }
-    .time-input-group {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    .time-input {
-        width: 70px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        text-align: center;
-        font-size: 12px;
-    }
-    .time-label {
-        font-size: 12px;
-        color: #005596;
-        font-weight: bold;
-        min-width: 60px;
-    }
-    .schedule-button {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 12px;
-        transition: all 0.3s;
-        margin: 2px;
-    }
-    .schedule-button.enable {
-        background-color: #28a745;
-        color: white;
-    }
-    .schedule-button.enable:hover {
-        background-color: #218838;
-    }
-    .schedule-button.disable {
-        background-color: #dc3545;
-        color: white;
-    }
-    .schedule-button.disable:hover {
-        background-color: #c82333;
-    }
-    .schedule-button.save {
-        background-color: #007bff;
-        color: white;
-    }
-    .schedule-button.save:hover {
-        background-color: #0056b3;
-    }
-    .schedule-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    .schedule-status {
-        font-size: 12px;
-        text-align: center;
-        margin-top: 8px;
-        padding: 5px;
-        border-radius: 3px;
-        min-height: 20px;
-    }
-    .schedule-status.active {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    .schedule-status.inactive {
-        background-color: #f8f9fa;
-        color: #6c757d;
-        border: 1px solid #dee2e6;
-    }
-    .schedule-status.warning {
-        background-color: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    .current-schedule {
-        font-size: 11px;
-        color: #005596;
-        background-color: #e7f3ff;
-        padding: 8px;
-        border-radius: 4px;
-        margin-top: 8px;
-        border-left: 3px solid #005596;
-    }
-    .day-selector {
+
+    /* Day Selector - Clean Pills */
+    .day-selector-minimal {
         display: flex;
         flex-wrap: wrap;
-        gap: 4px;
+        gap: var(--space-2);
         justify-content: center;
-        margin: 10px 0;
+        margin-bottom: var(--space-4);
     }
+
     .day-checkbox {
         display: none;
     }
-    .day-label {
-        padding: 4px 8px;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 3px;
+
+    .day-pill {
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-xs);
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wide);
+        border: 1px solid var(--border-color);
+        border-radius: 9999px;
         cursor: pointer;
-        font-size: 11px;
-        font-weight: bold;
-        color: #6c757d;
-        transition: all 0.3s;
+        transition: all 0.2s ease;
+        background-color: var(--bg-card);
     }
-    .day-checkbox:checked + .day-label {
-        background-color: #005596;
+
+    .day-pill:hover {
+        background-color: var(--bg-card-hover);
+    }
+
+    .day-checkbox:checked + .day-pill {
+        background-color: var(--brand-primary);
         color: white;
-        border-color: #005596;
-    }
-    .day-label:hover {
-        background-color: #e9ecef;
+        border-color: var(--brand-primary);
     }
 
-    /* Responsive design for horizontal layout */
+    /* Time Inputs - Minimal */
+    .time-inputs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    .time-group {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .time-label-minimal {
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        font-weight: var(--font-semibold);
+        opacity: 0.7;
+        letter-spacing: var(--tracking-wide);
+    }
+
+    .time-input-minimal {
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        font-size: var(--text-sm);
+        width: 100px;
+        text-align: center;
+    }
+
+    .time-input-minimal:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Schedule Actions - Simplified Buttons */
+    .schedule-actions {
+        display: flex;
+        gap: var(--space-2);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Schedule Status - Minimal Indicator */
+    .schedule-status-minimal {
+        margin-top: var(--space-4);
+        padding: var(--space-3);
+        border-radius: var(--border-radius);
+        font-size: var(--text-xs);
+        text-align: center;
+        font-weight: var(--font-medium);
+    }
+
+    .schedule-status-minimal.active {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--status-success);
+    }
+
+    .schedule-status-minimal.inactive {
+        background-color: var(--bg-card-hover);
+        opacity: 0.7;
+    }
+
+    /* Schedule Info Display - Compact */
+    .schedule-info {
+        margin-top: var(--space-3);
+        padding: var(--space-3);
+        background-color: var(--bg-card-hover);
+        border-radius: var(--border-radius);
+        font-size: var(--text-xs);
+        text-align: center;
+    }
+
+    /* Feedback Messages - Toast-like */
+    .feedback-message {
+        margin-top: var(--space-3);
+        padding: var(--space-3);
+        border-radius: var(--border-radius);
+        font-size: var(--text-sm);
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .feedback-message.visible {
+        opacity: 1;
+    }
+
+    .feedback-message.success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--status-success);
+    }
+
+    .feedback-message.error {
+        background-color: rgba(231, 74, 59, 0.1);
+        color: var(--status-error);
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-        .device-grid {
+        body {
+            padding: 10px;
+        }
+
+        .top-header {
             flex-direction: column;
-            align-items: center;
+            gap: var(--space-3);
+            text-align: center;
         }
-        .device-card {
-            max-width: 100%;
+
+        .user-section {
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .logo {
+            max-height: 40px;
+        }
+
+        .nav-tabs-minimal {
+            flex-direction: column;
+        }
+
+        .nav-tab-minimal {
+            border-right: none;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .nav-tab-minimal:last-child {
+            border-bottom: none;
+        }
+
+        .revpi-container {
+            padding: var(--space-4);
+        }
+
+        .page-title {
+            font-size: var(--text-2xl);
+        }
+
+        .page-subtitle {
+            font-size: var(--text-sm);
+        }
+
+        .device-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .time-inputs {
+            flex-direction: column;
+        }
+
+        .schedule-actions {
+            flex-direction: column;
+        }
+
+        .schedule-actions .btn {
             width: 100%;
-            min-width: 250px;
-        }
-        .container {
-            max-width: 95%;
-            padding: 15px;
         }
     }
 
-    @media (min-width: 769px) and (max-width: 1024px) {
-        .device-card {
-            min-width: 200px;
-            flex: 0 1 calc(50% - 8px);
-        }
+    /* Remove visual clutter */
+    .minimal-border {
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
-    @media (min-width: 1025px) {
-        .device-card {
-            flex: 0 1 calc(33.333% - 10px);
-        }
+    /* Breathing room */
+    .spacious {
+        padding: var(--space-8);
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="header">
+<!-- Top Header with Logo and User Info -->
+<div class="top-header">
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-    <div>
+    <div class="user-section">
         <span class="user-info">Welcome, {{ session.username }}!</span>
         <a href="{{ url_for('auth.logout') }}" class="logout-button">Logout</a>
     </div>
 </div>
 
-<div class="nav-tabs">
-    <a href="{{ url_for('main.service_monitor') }}" class="tab-button">Service Monitor & Config</a>
-    <a href="{{ url_for('main.revpi_control') }}" class="tab-button active">RevPi Control</a>
+<!-- Navigation Tabs -->
+<div class="nav-tabs-minimal">
+    <a href="{{ url_for('main.service_monitor') }}" class="nav-tab-minimal">Service Monitor & Config</a>
+    <a href="{{ url_for('main.revpi_control') }}" class="nav-tab-minimal active">RevPi Control</a>
 </div>
 
-<div class="container">
-    <a href="{{ url_for('main.home') }}" class="back-button">← Back to Home</a>
-    
-    <h1 class="title">RevPi Device Control</h1>
-    
+<div class="revpi-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Device Control</h1>
+        <p class="page-subtitle">Manage and schedule your RevPi devices</p>
+    </div>
+
+    <!-- Device Grid -->
     <div class="device-grid">
         {% for device_key, device_name in devices.items() %}
-        <div class="device-card">
-            <div class="device-name">{{ device_name }}</div>
-            <div class="status-text">
-                <span class="status-bullet error" id="bullet-{{ device_key }}"></span>
-                <span id="status-text-{{ device_key }}">Loading...</span>
+        <div class="device-card-minimal">
+            <!-- Device Header -->
+            <div class="device-header">
+                <h2 class="device-title">{{ device_name }}</h2>
+                <span class="status-display">
+                    <span class="status-dot status-dot-unknown" id="bullet-{{ device_key }}"></span>
+                    <span id="status-text-{{ device_key }}">Loading</span>
+                </span>
             </div>
-            <div class="toggle-switch-container">
+
+            <!-- Control Section -->
+            <div class="control-section">
                 <label class="toggle-switch" id="switch-{{ device_key }}">
                     <input type="checkbox" id="toggle-{{ device_key }}" onchange="handleToggleSwitch('{{ device_key }}', this.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span class="toggle-status-indicator loading" id="indicator-{{ device_key }}"></span>
             </div>
-            
+
+            <!-- Feedback Message -->
+            <div class="feedback-message" id="status-{{ device_key }}"></div>
+
+            <!-- Schedule Section (only for RelayLight) -->
             {% if device_key == 'RelayLight' %}
-            <div class="schedule-container">
-                <div class="schedule-title" onclick="toggleScheduleVisibility('{{ device_key }}')">Daily Schedule</div>
-                <div class="schedule-controls" id="schedule-controls-{{ device_key }}">
-                    <div class="day-selector">
+            <div class="schedule-section">
+                <div class="schedule-header" onclick="toggleScheduleVisibility('{{ device_key }}')">
+                    <h3 class="schedule-header-title">Schedule</h3>
+                    <span class="schedule-toggle-icon" id="schedule-icon-{{ device_key }}">▼</span>
+                </div>
+
+                <div class="schedule-content" id="schedule-controls-{{ device_key }}">
+                    <!-- Day Selector -->
+                    <div class="day-selector-minimal">
                         <input type="checkbox" id="day-mon-{{ device_key }}" class="day-checkbox" checked>
-                        <label for="day-mon-{{ device_key }}" class="day-label">Mon</label>
-                        
+                        <label for="day-mon-{{ device_key }}" class="day-pill">Mon</label>
+
                         <input type="checkbox" id="day-tue-{{ device_key }}" class="day-checkbox" checked>
-                        <label for="day-tue-{{ device_key }}" class="day-label">Tue</label>
-                        
+                        <label for="day-tue-{{ device_key }}" class="day-pill">Tue</label>
+
                         <input type="checkbox" id="day-wed-{{ device_key }}" class="day-checkbox" checked>
-                        <label for="day-wed-{{ device_key }}" class="day-label">Wed</label>
-                        
+                        <label for="day-wed-{{ device_key }}" class="day-pill">Wed</label>
+
                         <input type="checkbox" id="day-thu-{{ device_key }}" class="day-checkbox" checked>
-                        <label for="day-thu-{{ device_key }}" class="day-label">Thu</label>
-                        
+                        <label for="day-thu-{{ device_key }}" class="day-pill">Thu</label>
+
                         <input type="checkbox" id="day-fri-{{ device_key }}" class="day-checkbox" checked>
-                        <label for="day-fri-{{ device_key }}" class="day-label">Fri</label>
-                        
+                        <label for="day-fri-{{ device_key }}" class="day-pill">Fri</label>
+
                         <input type="checkbox" id="day-sat-{{ device_key }}" class="day-checkbox">
-                        <label for="day-sat-{{ device_key }}" class="day-label">Sat</label>
-                        
+                        <label for="day-sat-{{ device_key }}" class="day-pill">Sat</label>
+
                         <input type="checkbox" id="day-sun-{{ device_key }}" class="day-checkbox">
-                        <label for="day-sun-{{ device_key }}" class="day-label">Sun</label>
+                        <label for="day-sun-{{ device_key }}" class="day-pill">Sun</label>
                     </div>
-                    
-                    <div class="time-input-group">
-                        <span class="time-label">Start:</span>
-                        <input type="time" class="time-input" id="start-time-{{ device_key }}" value="08:00">
-                        <span class="time-label">End:</span>
-                        <input type="time" class="time-input" id="end-time-{{ device_key }}" value="18:00">
+
+                    <!-- Time Inputs -->
+                    <div class="time-inputs">
+                        <div class="time-group">
+                            <span class="time-label-minimal">Start</span>
+                            <input type="time" class="time-input-minimal" id="start-time-{{ device_key }}" value="08:00">
+                        </div>
+                        <div class="time-group">
+                            <span class="time-label-minimal">End</span>
+                            <input type="time" class="time-input-minimal" id="end-time-{{ device_key }}" value="18:00">
+                        </div>
                     </div>
-                    
-                    <div style="text-align: center; margin-top: 10px;">
-                        <button class="schedule-button save" onclick="saveSchedule('{{ device_key }}')" id="save-schedule-{{ device_key }}">
-                            Save Schedule
+
+                    <!-- Schedule Actions -->
+                    <div class="schedule-actions">
+                        <button class="btn btn-primary btn-sm" onclick="saveSchedule('{{ device_key }}')" id="save-schedule-{{ device_key }}">
+                            Save
                         </button>
-                        <button class="schedule-button enable" onclick="enableSchedule('{{ device_key }}')" id="enable-schedule-{{ device_key }}">
+                        <button class="btn btn-primary btn-sm" onclick="enableSchedule('{{ device_key }}')" id="enable-schedule-{{ device_key }}">
                             Enable
                         </button>
-                        <button class="schedule-button disable" onclick="disableSchedule('{{ device_key }}')" id="disable-schedule-{{ device_key }}" disabled>
+                        <button class="btn btn-secondary btn-sm" onclick="disableSchedule('{{ device_key }}')" id="disable-schedule-{{ device_key }}" disabled>
                             Disable
                         </button>
                     </div>
-                    
-                    <div class="schedule-status inactive" id="schedule-status-{{ device_key }}">
-                        Schedule Inactive
+
+                    <!-- Schedule Status -->
+                    <div class="schedule-status-minimal inactive" id="schedule-status-{{ device_key }}">
+                        Inactive
                     </div>
-                    
-                    <div class="current-schedule" id="current-schedule-{{ device_key }}" style="display: none;">
-                        <strong>Current Schedule:</strong><br>
-                        <span id="schedule-details-{{ device_key }}">No schedule set</span>
+
+                    <!-- Schedule Info -->
+                    <div class="schedule-info" id="current-schedule-{{ device_key }}" style="display: none;">
+                        <span id="schedule-details-{{ device_key }}">No schedule</span>
                     </div>
-                    
-                    <div class="current-schedule" id="device-time-{{ device_key }}" style="display: none; margin-top: 8px;">
-                        <strong>Device Time:</strong><br>
+
+                    <!-- Device Time Display -->
+                    <div class="schedule-info" id="device-time-{{ device_key }}" style="display: none;">
                         <span id="device-time-display-{{ device_key }}">Loading...</span>
                     </div>
                 </div>
             </div>
             {% endif %}
-            
-            <div class="status-message" id="status-{{ device_key }}"></div>
         </div>
         {% endfor %}
-    </div>
-    
-    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fc; border-radius: 8px; border-left: 4px solid #005596;">
-        <strong>Commands:</strong><br>
-        • Turn ON: piTest -w DeviceName,0<br>
-        • Turn OFF: piTest -w DeviceName,1<br>
-        • Get Status: piTest -r DeviceName<br>
-        • Status updates automatically every 15 seconds<br>
-        • <strong>RelayLight Daily Schedule:</strong> Set daily ON/OFF times for specific weekdays<br>
-        • Schedule runs automatically based on RevPi device system time<br>
-        • Device time is displayed when schedule is active<br>
-        • <strong>Schedules are saved permanently on the server</strong><br>
-        • All actions are logged for security
     </div>
 </div>
 
@@ -560,26 +608,22 @@ function updateStatus() {
             const bullet = document.getElementById(`bullet-${device}`);
             const statusText = document.getElementById(`status-text-${device}`);
             const toggleSwitch = document.getElementById(`toggle-${device}`);
-            const indicator = document.getElementById(`indicator-${device}`);
 
             if (bullet && statusText) {
                 const deviceData = data[device];
 
                 if (deviceData.status === 'ON') {
-                    bullet.className = 'status-bullet on';
+                    bullet.className = 'status-dot status-dot-active';
                     statusText.textContent = 'ON';
                     if (toggleSwitch) toggleSwitch.checked = true;
-                    if (indicator) indicator.className = 'toggle-status-indicator on';
                 } else if (deviceData.status === 'OFF') {
-                    bullet.className = 'status-bullet off';
+                    bullet.className = 'status-dot status-dot-inactive';
                     statusText.textContent = 'OFF';
                     if (toggleSwitch) toggleSwitch.checked = false;
-                    if (indicator) indicator.className = 'toggle-status-indicator off';
                 } else {
-                    bullet.className = 'status-bullet error';
-                    statusText.textContent = 'ERROR';
+                    bullet.className = 'status-dot status-dot-unknown';
+                    statusText.textContent = 'Unknown';
                     if (toggleSwitch) toggleSwitch.checked = false;
-                    if (indicator) indicator.className = 'toggle-status-indicator loading';
                 }
             }
         });
@@ -590,19 +634,19 @@ function updateStatus() {
     });
 }
 
-// New function to handle toggle switch changes
+// Handle toggle switch changes with minimalist feedback
 function handleToggleSwitch(device, isChecked) {
     const action = isChecked ? 'on' : 'off';
     const toggleSwitch = document.getElementById(`toggle-${device}`);
-    const indicator = document.getElementById(`indicator-${device}`);
     const statusDiv = document.getElementById(`status-${device}`);
 
-    // Disable toggle and show loading
+    // Disable toggle
     if (toggleSwitch) toggleSwitch.disabled = true;
-    if (indicator) indicator.className = 'toggle-status-indicator loading';
+
+    // Show feedback
     if (statusDiv) {
-        statusDiv.className = 'status-message loading';
-        statusDiv.textContent = `Turning ${action.toUpperCase()}...`;
+        statusDiv.className = 'feedback-message visible';
+        statusDiv.textContent = `Switching ${action.toUpperCase()}...`;
     }
 
     fetch('/revpi-toggle', {
@@ -622,56 +666,55 @@ function handleToggleSwitch(device, isChecked) {
 
         if (data.success) {
             if (statusDiv) {
-                statusDiv.className = 'status-message success';
-                statusDiv.textContent = data.message;
-            }
-
-            // Update indicator
-            if (indicator) {
-                indicator.className = `toggle-status-indicator ${action === 'on' ? 'on' : 'off'}`;
+                statusDiv.className = 'feedback-message success visible';
+                statusDiv.textContent = `Switched ${action.toUpperCase()}`;
             }
 
             // Update status immediately after successful toggle
             setTimeout(updateStatus, 500);
         } else {
             if (statusDiv) {
-                statusDiv.className = 'status-message error';
-                statusDiv.textContent = 'Error: ' + data.message;
+                statusDiv.className = 'feedback-message error visible';
+                statusDiv.textContent = data.message || 'Operation failed';
             }
 
             // Revert toggle switch on error
             if (toggleSwitch) toggleSwitch.checked = !isChecked;
-            if (indicator) indicator.className = 'toggle-status-indicator loading';
         }
 
-        // Clear message after 5 seconds
+        // Clear message after 3 seconds
         if (statusDiv) {
             setTimeout(() => {
-                statusDiv.textContent = '';
-                statusDiv.className = 'status-message';
-            }, 5000);
+                statusDiv.classList.remove('visible');
+                setTimeout(() => {
+                    statusDiv.textContent = '';
+                    statusDiv.className = 'feedback-message';
+                }, 300);
+            }, 3000);
         }
     })
     .catch(error => {
         // Re-enable toggle
         if (toggleSwitch) {
             toggleSwitch.disabled = false;
-            toggleSwitch.checked = !isChecked; // Revert on error
+            toggleSwitch.checked = !isChecked;
         }
 
         console.error('Error:', error);
         if (statusDiv) {
-            statusDiv.className = 'status-message error';
-            statusDiv.textContent = 'Error connecting to server';
+            statusDiv.className = 'feedback-message error visible';
+            statusDiv.textContent = 'Connection failed';
         }
-        if (indicator) indicator.className = 'toggle-status-indicator loading';
 
-        // Clear message after 5 seconds
+        // Clear message after 3 seconds
         if (statusDiv) {
             setTimeout(() => {
-                statusDiv.textContent = '';
-                statusDiv.className = 'status-message';
-            }, 5000);
+                statusDiv.classList.remove('visible');
+                setTimeout(() => {
+                    statusDiv.textContent = '';
+                    statusDiv.className = 'feedback-message';
+                }, 300);
+            }, 3000);
         }
     });
 }
@@ -742,27 +785,27 @@ let deviceSchedules = {};
 let scheduleCheckers = {};
 let scheduleVisibility = {}; // Track visibility state for each device
 
-// Toggle schedule visibility
+// Toggle schedule visibility with minimalist animation
 function toggleScheduleVisibility(device) {
     const scheduleControls = document.getElementById(`schedule-controls-${device}`);
-    const scheduleTitle = document.querySelector(`#schedule-controls-${device}`).previousElementSibling;
-    
-    if (!scheduleControls || !scheduleTitle) return;
-    
+    const scheduleIcon = document.getElementById(`schedule-icon-${device}`);
+
+    if (!scheduleControls) return;
+
     // Toggle visibility state
     const isCurrentlyVisible = !scheduleVisibility[device];
     scheduleVisibility[device] = isCurrentlyVisible;
-    
+
     if (isCurrentlyVisible) {
         // Show schedule controls
         scheduleControls.classList.remove('collapsed');
-        scheduleTitle.classList.remove('collapsed');
+        if (scheduleIcon) scheduleIcon.classList.remove('collapsed');
     } else {
         // Hide schedule controls
         scheduleControls.classList.add('collapsed');
-        scheduleTitle.classList.add('collapsed');
+        if (scheduleIcon) scheduleIcon.classList.add('collapsed');
     }
-    
+
     // Save visibility state to localStorage
     localStorage.setItem('schedule_visibility', JSON.stringify(scheduleVisibility));
 }
@@ -777,17 +820,17 @@ function loadScheduleVisibility() {
             // Apply saved visibility states
             Object.keys(scheduleVisibility).forEach(device => {
                 const scheduleControls = document.getElementById(`schedule-controls-${device}`);
-                const scheduleTitle = document.querySelector(`#schedule-controls-${device}`)?.previousElementSibling;
-                
-                if (scheduleControls && scheduleTitle) {
+                const scheduleIcon = document.getElementById(`schedule-icon-${device}`);
+
+                if (scheduleControls) {
                     if (scheduleVisibility[device]) {
                         // Show
                         scheduleControls.classList.remove('collapsed');
-                        scheduleTitle.classList.remove('collapsed');
+                        if (scheduleIcon) scheduleIcon.classList.remove('collapsed');
                     } else {
                         // Hide
                         scheduleControls.classList.add('collapsed');
-                        scheduleTitle.classList.add('collapsed');
+                        if (scheduleIcon) scheduleIcon.classList.add('collapsed');
                     }
                 }
             });
@@ -956,33 +999,33 @@ function saveSchedule(device) {
             };
             
             // Update UI
-            statusDiv.className = 'schedule-status warning';
-            statusDiv.textContent = 'Schedule Saved - Click Enable to activate';
+            statusDiv.className = 'schedule-status-minimal inactive';
+            statusDiv.textContent = 'Saved - Click Enable';
             updateScheduleDisplay(device, deviceSchedules[device]);
-            
+
             // Clear message after 3 seconds
             setTimeout(() => {
                 if (!deviceSchedules[device].enabled) {
-                    statusDiv.className = 'schedule-status inactive';
-                    statusDiv.textContent = 'Schedule Inactive';
+                    statusDiv.className = 'schedule-status-minimal inactive';
+                    statusDiv.textContent = 'Inactive';
                 }
             }, 3000);
         } else {
-            statusDiv.className = 'schedule-status warning';
+            statusDiv.className = 'schedule-status-minimal inactive';
             statusDiv.textContent = `Error: ${data.message}`;
             setTimeout(() => {
-                statusDiv.className = 'schedule-status inactive';
-                statusDiv.textContent = 'Schedule Inactive';
+                statusDiv.className = 'schedule-status-minimal inactive';
+                statusDiv.textContent = 'Inactive';
             }, 5000);
         }
     })
     .catch(error => {
         console.error('Error saving schedule:', error);
-        statusDiv.className = 'schedule-status warning';
-        statusDiv.textContent = 'Error: Failed to save schedule';
+        statusDiv.className = 'schedule-status-minimal inactive';
+        statusDiv.textContent = 'Save failed';
         setTimeout(() => {
-            statusDiv.className = 'schedule-status inactive';
-            statusDiv.textContent = 'Schedule Inactive';
+            statusDiv.className = 'schedule-status-minimal inactive';
+            statusDiv.textContent = 'Inactive';
         }, 5000);
     });
 }
@@ -1017,21 +1060,21 @@ function enableSchedule(device, shouldSave = true) {
             if (data.success) {
                 enableScheduleUI(device);
             } else {
-                statusDiv.className = 'schedule-status warning';
+                statusDiv.className = 'schedule-status-minimal inactive';
                 statusDiv.textContent = `Error: ${data.message}`;
                 setTimeout(() => {
-                    statusDiv.className = 'schedule-status inactive';
-                    statusDiv.textContent = 'Schedule Inactive';
+                    statusDiv.className = 'schedule-status-minimal inactive';
+                    statusDiv.textContent = 'Inactive';
                 }, 3000);
             }
         })
         .catch(error => {
             console.error('Error enabling schedule:', error);
-            statusDiv.className = 'schedule-status warning';
-            statusDiv.textContent = 'Error: Failed to enable schedule';
+            statusDiv.className = 'schedule-status-minimal inactive';
+            statusDiv.textContent = 'Enable failed';
             setTimeout(() => {
-                statusDiv.className = 'schedule-status inactive';
-                statusDiv.textContent = 'Schedule Inactive';
+                statusDiv.className = 'schedule-status-minimal inactive';
+                statusDiv.textContent = 'Inactive';
             }, 3000);
         });
     } else {
@@ -1052,18 +1095,18 @@ function enableScheduleUI(device) {
     // Update UI
     enableBtn.disabled = true;
     disableBtn.disabled = false;
-    statusDiv.className = 'schedule-status active';
-    statusDiv.textContent = 'Schedule Enabled - Checking...';
-    
+    statusDiv.className = 'schedule-status-minimal active';
+    statusDiv.textContent = 'Active';
+
     // Show device time display
     const deviceTimeDiv = document.getElementById(`device-time-${device}`);
     if (deviceTimeDiv) {
         deviceTimeDiv.style.display = 'block';
     }
-    
+
     // Start schedule checker
     startScheduleChecker(device);
-    
+
     // Initial status update (immediate)
     setTimeout(() => {
         updateScheduleStatus(device);
@@ -1096,21 +1139,21 @@ function disableSchedule(device) {
         if (data.success) {
             disableScheduleUI(device);
         } else {
-            statusDiv.className = 'schedule-status warning';
+            statusDiv.className = 'schedule-status-minimal active';
             statusDiv.textContent = `Error: ${data.message}`;
             setTimeout(() => {
-                statusDiv.className = 'schedule-status active';
-                statusDiv.textContent = 'Schedule Active';
+                statusDiv.className = 'schedule-status-minimal active';
+                statusDiv.textContent = 'Active';
             }, 3000);
         }
     })
     .catch(error => {
         console.error('Error disabling schedule:', error);
-        statusDiv.className = 'schedule-status warning';
-        statusDiv.textContent = 'Error: Failed to disable schedule';
+        statusDiv.className = 'schedule-status-minimal active';
+        statusDiv.textContent = 'Disable failed';
         setTimeout(() => {
-            statusDiv.className = 'schedule-status active';
-            statusDiv.textContent = 'Schedule Active';
+            statusDiv.className = 'schedule-status-minimal active';
+            statusDiv.textContent = 'Active';
         }, 3000);
     });
 }
@@ -1133,9 +1176,9 @@ function disableScheduleUI(device) {
     // Update UI
     enableBtn.disabled = false;
     disableBtn.disabled = true;
-    statusDiv.className = 'schedule-status inactive';
-    statusDiv.textContent = 'Schedule Disabled';
-    
+    statusDiv.className = 'schedule-status-minimal inactive';
+    statusDiv.textContent = 'Inactive';
+
     // Hide device time display
     const deviceTimeDiv = document.getElementById(`device-time-${device}`);
     if (deviceTimeDiv) {
@@ -1231,21 +1274,21 @@ function processScheduleLogic(device, schedule, currentDay, currentTime, statusD
     
     // Check if today is a scheduled day
     if (!schedule.days.includes(currentDay)) {
-        statusDiv.textContent = `Schedule Active - Off day (${currentDay.toUpperCase()})`;
+        statusDiv.textContent = `Off day`;
         // Turn off on non-scheduled days
         executeScheduleAction(device, 'off');
         return;
     }
-    
+
     // Check if current time is within schedule
     const isInSchedule = currentTime >= schedule.startTime && currentTime < schedule.endTime;
-    
+
     if (isInSchedule) {
-        statusDiv.textContent = `Schedule Active - ON period (${schedule.startTime}-${schedule.endTime})`;
+        statusDiv.textContent = `Active (${schedule.startTime}-${schedule.endTime})`;
         // Auto-turn on during scheduled time
         executeScheduleAction(device, 'on');
     } else {
-        statusDiv.textContent = `Schedule Active - OFF period (${schedule.startTime}-${schedule.endTime})`;
+        statusDiv.textContent = `Standby (${schedule.startTime}-${schedule.endTime})`;
         // Auto-turn off outside scheduled time
         executeScheduleAction(device, 'off');
     }

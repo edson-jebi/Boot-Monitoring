@@ -13,6 +13,7 @@ class MainController(BaseController):
         """Register main routes."""
         self.blueprint.add_url_rule('/', 'home', self.home, methods=['GET'])
         self.blueprint.add_url_rule('/execute', 'execute_command', self.execute_command, methods=['GET'])
+        self.blueprint.add_url_rule('/api/session-check', 'session_check', self.session_check, methods=['GET'])
     
     @login_required
     def home(self):
@@ -31,3 +32,13 @@ class MainController(BaseController):
             return render_template('home.html', result=result['output'])
         else:
             return render_template('home.html', result=result['error'])
+    
+    def session_check(self):
+        """API endpoint to check session validity."""
+        from app.auth import AuthManager
+        
+        auth_manager = AuthManager()
+        if auth_manager.is_authenticated():
+            return jsonify({'status': 'authenticated'}), 200
+        else:
+            return jsonify({'status': 'unauthenticated'}), 401
