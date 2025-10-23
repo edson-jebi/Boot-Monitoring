@@ -99,20 +99,46 @@ class Database:
                 
                 # Create indexes for better performance
                 cursor.execute('''
-                    CREATE INDEX IF NOT EXISTS idx_device_schedules_device_id 
+                    CREATE INDEX IF NOT EXISTS idx_device_schedules_device_id
                     ON device_schedules (device_id)
                 ''')
-                
+
                 cursor.execute('''
-                    CREATE INDEX IF NOT EXISTS idx_device_schedules_enabled 
+                    CREATE INDEX IF NOT EXISTS idx_device_schedules_enabled
                     ON device_schedules (enabled)
                 ''')
-                
+
                 cursor.execute('''
-                    CREATE INDEX IF NOT EXISTS idx_schedule_days_schedule_id 
+                    CREATE INDEX IF NOT EXISTS idx_schedule_days_schedule_id
                     ON schedule_days (schedule_id)
                 ''')
-                
+
+                # Create relay activation tracking table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS relay_activations (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        device_id TEXT NOT NULL,
+                        action TEXT NOT NULL,
+                        user_id INTEGER,
+                        username TEXT,
+                        is_automatic BOOLEAN DEFAULT 0,
+                        success BOOLEAN DEFAULT 1,
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users (id)
+                    )
+                ''')
+
+                # Create indexes for relay activations
+                cursor.execute('''
+                    CREATE INDEX IF NOT EXISTS idx_relay_activations_timestamp
+                    ON relay_activations (timestamp DESC)
+                ''')
+
+                cursor.execute('''
+                    CREATE INDEX IF NOT EXISTS idx_relay_activations_device_id
+                    ON relay_activations (device_id)
+                ''')
+
                 conn.commit()
                 logger.info("Database initialized successfully")
                 
@@ -406,5 +432,105 @@ def init_app_database():
         raise
 
 
+class RelayActivation:
+    """Relay activation event tracking model."""
+
+    def __init__(self, db: Database = None):
+        self.db = db or Database()
+
+    def log_activation(
+        self,
+        device_id: str,
+        action: str,
+        user_id: int = None,
+        username: str = None,
+        is_automatic: bool = False,
+        success: bool = True
+    ) -> bool:
+        """
+        Log a relay activation event.
+
+        Args:
+            device_id: Device identifier (e.g., 'RelayProcessor', 'LedScreen')
+            action: Action performed ('on' or 'off')
+            user_id: User ID who triggered the action (if manual)
+            username: Username who triggered the action (if manual)
+            is_automatic: True if triggered by schedule, False if manual
+            success: Whether the activation was successful
+
+        Returns:
+            True if logged successfully, False otherwise
+        """
+        try:
+            with self.db.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO relay_activations
+                    (device_id, action, user_id, username, is_automatic, success, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ''', (device_id, action, user_id, username, is_automatic, success))
+
+                conn.commit()
+                logger.debug(
+                    f"Logged relay activation: device={device_id}, action={action}, "
+                    f"user={username}, automatic={is_automatic}"
+                )
+                return True
+
+        except (DatabaseError, sqlite3.Error) as e:
+            logger.error(f"Failed to log relay activation: {e}")
+            return False
+
+    def get_activations(
+        self,
+        start_time: str = None,
+        end_time: str = None,
+        device_id: str = None,
+        limit: int = 2000
+    ) -> list:
+        """
+        Get relay activation events with optional filtering.
+
+        Args:
+            start_time: Start timestamp (ISO format or SQLite datetime)
+            end_time: End timestamp (ISO format or SQLite datetime)
+            device_id: Filter by specific device
+            limit: Maximum number of records to return
+
+        Returns:
+            List of activation event dictionaries
+        """
+        try:
+            with self.db.get_connection() as conn:
+                cursor = conn.cursor()
+
+                query = 'SELECT * FROM relay_activations WHERE 1=1'
+                params = []
+
+                if start_time:
+                    query += ' AND timestamp >= ?'
+                    params.append(start_time)
+
+                if end_time:
+                    query += ' AND timestamp <= ?'
+                    params.append(end_time)
+
+                if device_id:
+                    query += ' AND device_id = ?'
+                    params.append(device_id)
+
+                query += ' ORDER BY timestamp DESC LIMIT ?'
+                params.append(limit)
+
+                cursor.execute(query, params)
+                rows = cursor.fetchall()
+
+                return [dict(row) for row in rows]
+
+        except (DatabaseError, sqlite3.Error) as e:
+            logger.error(f"Failed to get relay activations: {e}")
+            return []
+
+
 # Export classes for external use
-__all__ = ['Database', 'User', 'Schedule', 'DatabaseError', 'init_app_database']
+__all__ = ['Database', 'User', 'Schedule', 'RelayActivation', 'DatabaseError', 'init_app_database']

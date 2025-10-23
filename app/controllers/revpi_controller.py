@@ -55,30 +55,83 @@ class RevPiController(BaseController):
             data = request.get_json()
             device_id = data.get('device')
             action_str = data.get('action')  # 'on' or 'off'
-            
+
             if not device_id or not action_str:
                 return jsonify({'success': False, 'message': 'Missing device or action'}), 400
-            
+
             try:
                 action = DeviceAction(action_str)
             except ValueError:
                 return jsonify({'success': False, 'message': 'Invalid action'}), 400
-            
+
             self.log_user_action(f"toggled device {device_id}", f"action: {action_str}")
-            
+
             revpi_service = self.service_factory.get_revpi_service()
             result = revpi_service.toggle_device(device_id, action)
-            
+
+            # Log activation to database
+            try:
+                from app.models import RelayActivation
+                relay_activation = RelayActivation()
+                relay_activation.log_activation(
+                    device_id=device_id,
+                    action=action_str,
+                    user_id=session.get('user_id'),
+                    username=session.get('username'),
+                    is_automatic=False,
+                    success=result.get('success', False)
+                )
+            except Exception as log_error:
+                self.logger.error(f"Failed to log activation: {log_error}")
+
             if result['success']:
                 return jsonify(result)
             else:
                 return jsonify(result), 500
-                
+
         except Exception as e:
             error_msg = f"Error toggling device: {str(e)}"
             self.logger.error(error_msg)
             return jsonify({'success': False, 'message': error_msg}), 500
     
+    def log_service_activation(self):
+        """
+        Log relay activation from jebi-switchboard service.
+        This endpoint does not require authentication as it's called by the system service.
+        """
+        try:
+            data = request.get_json()
+            device_id = data.get('device_id')
+            action_str = data.get('action')  # 'on' or 'off'
+
+            if not device_id or not action_str:
+                return jsonify({'success': False, 'message': 'Missing device_id or action'}), 400
+
+            # Log activation to database as automatic (from service)
+            try:
+                from app.models import RelayActivation
+                relay_activation = RelayActivation()
+                relay_activation.log_activation(
+                    device_id=device_id,
+                    action=action_str,
+                    user_id=None,
+                    username='jebi-switchboard',
+                    is_automatic=True,
+                    success=True
+                )
+
+                self.logger.info(f"Logged service activation: {device_id} {action_str}")
+                return jsonify({'success': True, 'message': 'Activation logged'})
+
+            except Exception as log_error:
+                self.logger.error(f"Failed to log service activation: {log_error}")
+                return jsonify({'success': False, 'message': 'Failed to log activation'}), 500
+
+        except Exception as e:
+            error_msg = f"Error logging service activation: {str(e)}"
+            self.logger.error(error_msg)
+            return jsonify({'success': False, 'message': error_msg}), 500
+
     @login_required
     def revpi_time(self):
         """Get current RevPi device time for schedule operations."""
@@ -117,7 +170,6 @@ class RevPiController(BaseController):
             enabled = data.get('enabled', False)
             
             # Get current user ID from session
-            user_id = session.get('user_id')
             user_id = session.get('user_id')
             
             schedule_service = self.service_factory.get_schedule_service()
