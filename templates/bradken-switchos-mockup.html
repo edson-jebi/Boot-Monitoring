@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bradken SwitchOS - Interactive Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #1f2937;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            font-size: 0.875rem;
+            color: #d1d5db;
+            margin-top: 0.125rem;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            color: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .header-btn:hover {
+            background-color: #374151;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #dc2626;
+            border: none;
+            color: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #b91c1c;
+        }
+
+        .back-btn {
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            color: white;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+        }
+
+        .back-btn:hover {
+            background-color: #374151;
+        }
+
+        /* Main Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background-color: #f9fafb;
+        }
+
+        .content-wrapper {
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .toggle-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-large {
+            width: 3.5rem;
+            height: 2rem;
+            background-color: #d1d5db;
+            border-radius: 9999px;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-large::after {
+            content: '';
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 9999px;
+            transition: transform 0.2s;
+        }
+
+        .toggle-input:checked + .toggle-large {
+            background-color: #2563eb;
+        }
+
+        .toggle-input:checked + .toggle-large::after {
+            transform: translateX(1.5rem);
+            border-color: white;
+        }
+
+        .toggle-small {
+            width: 2.75rem;
+            height: 1.5rem;
+            background-color: #d1d5db;
+            border-radius: 9999px;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-small::after {
+            content: '';
+            position: absolute;
+            top: 0.125rem;
+            left: 0.125rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 9999px;
+            transition: transform 0.2s;
+        }
+
+        .toggle-input:checked + .toggle-small {
+            background-color: #16a34a;
+        }
+
+        .toggle-input:checked + .toggle-small::after {
+            transform: translateX(1.25rem);
+            border-color: white;
+        }
+
+        .toggle-input:focus + .toggle-large,
+        .toggle-input:focus + .toggle-small {
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-success-icon {
+            color: #16a34a;
+            margin-top: 0.125rem;
+        }
+
+        .alert-success-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #166534;
+        }
+
+        .alert-success-text {
+            font-size: 0.75rem;
+            color: #15803d;
+            margin-top: 0.25rem;
+        }
+
+        .alert-info {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+
+        .alert-info-icon {
+            color: #2563eb;
+            margin-top: 0.125rem;
+        }
+
+        .alert-info-text {
+            font-size: 0.875rem;
+            color: #1e40af;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-error-icon {
+            color: #dc2626;
+            margin-top: 0.125rem;
+        }
+
+        .alert-error-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #991b1b;
+        }
+
+        .alert-error-text {
+            font-size: 0.75rem;
+            color: #b91c1c;
+            margin-top: 0.25rem;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            border: 1px solid #fde68a;
+        }
+
+        .alert-warning-icon {
+            color: #d97706;
+            margin-top: 0.125rem;
+        }
+
+        .alert-warning-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #92400e;
+        }
+
+        .alert-warning-text {
+            font-size: 0.75rem;
+            color: #b45309;
+            margin-top: 0.25rem;
+        }
+
+        /* Timeline Styles */
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .timeline-btn {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .timeline-btn.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .timeline-btn:not(.active) {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .timeline-btn:not(.active):hover {
+            background-color: #e5e7eb;
+        }
+
+        .timeline-svg-container {
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+        }
+
+        .timeline-legend {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 9999px;
+        }
+
+        .legend-dot-auto {
+            background-color: #2563eb;
+        }
+
+        .legend-dot-manual {
+            background-color: white;
+            border: 2px solid #2563eb;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .table-icon-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .table-icon {
+            color: #6b7280;
+        }
+
+        .table-label {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input:disabled,
+        .form-select:disabled {
+            background-color: #f9fafb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .form-help {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 28rem;
+            width: 100%;
+            margin: 0 1rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-message {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        /* Light Schedule Grid */
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .schedule-card {
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .schedule-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .schedule-label-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .schedule-time {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .schedule-period {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        /* Settings Styles */
+        .settings-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .edit-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Logs Styles */
+        .logs-preview {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .logs-preview-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .log-line {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .log-line.info {
+            color: #6b7280;
+        }
+
+        .log-line.warn {
+            color: #d97706;
+        }
+
+        /* Guide Box */
+        .guide-box {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            max-width: 20rem;
+            z-index: 40;
+        }
+
+        .guide-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .guide-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .guide-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .guide-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 9999px;
+            flex-shrink: 0;
+        }
+
+        .guide-dot-blue {
+            background-color: #2563eb;
+        }
+
+        .guide-dot-gray {
+            background-color: #9ca3af;
+        }
+
+        /* Icon Styles */
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .icon-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .icon-lg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .guide-box {
+                display: none;
+            }
+        }
+
+        /* Screen visibility */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Confirmation Modal -->
+        <div id="confirmModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3 id="modalTitle" class="modal-title">Confirm Action</h3>
+                    <p id="modalMessage" class="modal-message">Are you sure you want to proceed?</p>
+                    <div class="modal-actions">
+                        <button id="modalCancel" class="btn btn-secondary">Cancel</button>
+                        <button id="modalConfirm" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="screen active">
+            <div class="header">
+                <div class="header-left">
+                    <svg class="icon-lg" viewBox="0 0 24 24">
+                        <line x1="12" y1="2" x2="12" y2="6"></line>
+                        <line x1="12" y1="18" x2="12" y2="22"></line>
+                        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                        <line x1="2" y1="12" x2="6" y2="12"></line>
+                        <line x1="18" y1="12" x2="22" y2="12"></line>
+                        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                    </svg>
+                    <div class="header-title">
+                        <h1>Bradken SwitchOS</h1>
+                        <p id="headerSubtitle" class="header-subtitle">EX123 at Kansanshi (GV0012)</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn" onclick="navigateToSettings()">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m0-6h6m-6 0H6m15-3.87l-5.2 3M6.2 15.87l5.2-3m0 0l5.2 3M6.2 8.13l5.2 3"></path>
+                            <path d="M19.4 15c.6-1 1-2.1 1-3.3 0-1.2-.4-2.3-1-3.3M4.6 15c-.6-1-1-2.1-1-3.3 0-1.2.4-2.3 1-3.3"></path>
+                        </svg>
+                        <span>Settings</span>
+                    </button>
+                    <button class="header-btn" onclick="navigateToLogs()">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Logs</span>
+                    </button>
+                    <button class="logout-btn" onclick="logout()">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="content-wrapper">
+                    <!-- Event Timeline -->
+                    <div class="card">
+                        <div class="timeline-header">
+                            <div>
+                                <h2 class="card-title">Power Cycle Events</h2>
+                                <p id="eventCount" class="card-subtitle">Showing events in the last 1D</p>
+                            </div>
+                            <div class="timeline-buttons">
+                                <button class="timeline-btn" onclick="setTimeWindow('1H')">1H</button>
+                                <button class="timeline-btn active" onclick="setTimeWindow('1D')">1D</button>
+                                <button class="timeline-btn" onclick="setTimeWindow('1W')">1W</button>
+                                <button class="timeline-btn" onclick="setTimeWindow('1M')">1M</button>
+                            </div>
+                        </div>
+                        <div class="timeline-svg-container">
+                            <svg id="timelineSvg" width="1000" height="200"></svg>
+                        </div>
+                        <div class="timeline-legend">
+                            <div class="legend-item">
+                                <div class="legend-dot legend-dot-auto"></div>
+                                <span>Automatic Power Cycle</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot legend-dot-manual"></div>
+                                <span>Manual Power Cycle</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auto Power Cycle -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Auto Power Cycle</h2>
+                                <p id="autoPowerCycleStatus" class="card-subtitle">Monitoring active - System will automatically power cycle devices when connectivity issues are detected</p>
+                            </div>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="toggle-input" id="autoPowerCycleToggle" checked onchange="toggleAutoPowerCycle(this)">
+                                <div class="toggle-large"></div>
+                            </label>
+                        </div>
+                        <div id="autoPowerCycleAlert" class="alert alert-success">
+                            <svg class="icon alert-success-icon" id="autoPowerCycleAlertIcon" viewBox="0 0 24 24">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <div>
+                                <p class="alert-success-title" id="autoPowerCycleAlertTitle">System Status: Active</p>
+                                <p class="alert-success-text" id="autoPowerCycleAlertText">Monitoring interval: Every 5 minutes | Max retry attempts: 3 | Cooldown period: 15 minutes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Controls -->
+                    <div class="card">
+                        <h2 class="card-title" style="margin-bottom: 1rem;">Manual Controls</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Power</th>
+                                        <th>LED Indicator</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="table-icon-cell">
+                                                <svg class="icon table-icon" viewBox="0 0 24 24">
+                                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                                                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                                                </svg>
+                                                <span class="table-label">Screen</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label class="toggle-container">
+                                                <input type="checkbox" class="toggle-input" id="screenPower" checked onchange="togglePower('screen', 'Screen', this)">
+                                                <div class="toggle-small"></div>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="toggle-container">
+                                                <input type="checkbox" class="toggle-input" id="screenLed" checked onchange="toggleLed('screen', 'Screen', this)">
+                                                <div class="toggle-small"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-icon-cell">
+                                                <svg class="icon table-icon" viewBox="0 0 24 24">
+                                                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                                                    <rect x="9" y="9" width="6" height="6"></rect>
+                                                    <line x1="9" y1="1" x2="9" y2="4"></line>
+                                                    <line x1="15" y1="1" x2="15" y2="4"></line>
+                                                    <line x1="9" y1="20" x2="9" y2="23"></line>
+                                                    <line x1="15" y1="20" x2="15" y2="23"></line>
+                                                    <line x1="20" y1="9" x2="23" y2="9"></line>
+                                                    <line x1="20" y1="14" x2="23" y2="14"></line>
+                                                    <line x1="1" y1="9" x2="4" y2="9"></line>
+                                                    <line x1="1" y1="14" x2="4" y2="14"></line>
+                                                </svg>
+                                                <span class="table-label">Processor</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label class="toggle-container">
+                                                <input type="checkbox" class="toggle-input" id="processorPower" checked onchange="togglePower('processor', 'Processor', this, true)">
+                                                <div class="toggle-small"></div>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="toggle-container">
+                                                <input type="checkbox" class="toggle-input" id="processorLed" checked onchange="toggleLed('processor', 'Processor', this)">
+                                                <div class="toggle-small"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-icon-cell">
+                                                <svg class="icon table-icon" viewBox="0 0 24 24">
+                                                    <path d="M9 18h6"></path>
+                                                    <path d="M10 22h4"></path>
+                                                    <path d="m15 2-4 4-4-4Z"></path>
+                                                    <path d="M12 6v6"></path>
+                                                    <circle cx="12" cy="12" r="5"></circle>
+                                                </svg>
+                                                <span class="table-label">Lights</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label class="toggle-container">
+                                                <input type="checkbox" class="toggle-input" id="lightsPower" onchange="togglePower('lights', 'Lights', this)">
+                                                <div class="toggle-small"></div>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="toggle-container">
+                                                <input type="checkbox" class="toggle-input" id="lightsLed" checked onchange="toggleLed('lights', 'Lights', this)">
+                                                <div class="toggle-small"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="alert alert-info" style="margin-top: 1rem;">
+                            <svg class="icon-sm alert-info-icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            <p class="alert-info-text">LED Indicators are independent of device power state and represent physical status lights on the Smart switchboard</p>
+                        </div>
+                    </div>
+
+                    <!-- Light Schedule -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Light Schedule</h2>
+                                <p id="lightScheduleStatus" class="card-subtitle">Manual control only</p>
+                            </div>
+                            <label class="toggle-container">
+                                <input type="checkbox" class="toggle-input" id="lightScheduleToggle" onchange="toggleLightSchedule(this)">
+                                <div class="toggle-large"></div>
+                            </label>
+                        </div>
+                        <div class="schedule-grid">
+                            <div class="schedule-card">
+                                <div class="schedule-label">
+                                    <svg class="icon-sm" style="color: #6b7280;" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span class="schedule-label-text">ON Time</span>
+                                </div>
+                                <div class="schedule-time">18:00</div>
+                                <div class="schedule-period">6:00 PM</div>
+                            </div>
+                            <div class="schedule-card">
+                                <div class="schedule-label">
+                                    <svg class="icon-sm" style="color: #6b7280;" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span class="schedule-label-text">OFF Time</span>
+                                </div>
+                                <div class="schedule-time">06:00</div>
+                                <div class="schedule-period">6:00 AM</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="navigateToSettings()">
+                            Configure Schedule
+                            <svg class="icon-sm" viewBox="0 0 24 24">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settingsScreen" class="screen">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-btn" onclick="navigateToDashboard()">← Back</button>
+                    <div class="header-title">
+                        <h1>Settings</h1>
+                        <p id="settingsHeaderSubtitle" class="header-subtitle">EX123 at Kansanshi (GV0012)</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="content-wrapper" style="max-width: 64rem;">
+                    <!-- Auto Power Cycle Configuration -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Auto Power Cycle Configuration</h2>
+                                <p class="card-subtitle">Configure automatic power cycling parameters</p>
+                            </div>
+                            <div id="autoPowerCycleEditButtons" class="edit-buttons">
+                                <button class="btn btn-secondary" onclick="toggleEdit('autoPowerCycle', true)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </button>
+                            </div>
+                            <div id="autoPowerCycleSaveButtons" class="edit-buttons" style="display: none;">
+                                <button class="btn btn-secondary" onclick="toggleEdit('autoPowerCycle', false)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    Cancel
+                                </button>
+                                <button class="btn btn-primary" onclick="saveSettings('autoPowerCycle', 'Auto Power Cycle')">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <div class="form-group">
+                                <label class="form-label">Monitoring Interval</label>
+                                <select id="monitoringInterval" class="form-select" disabled>
+                                    <option>5 minutes</option>
+                                    <option>10 minutes</option>
+                                    <option>15 minutes</option>
+                                    <option>30 minutes</option>
+                                </select>
+                                <p class="form-help">How often to check device connectivity</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Failed Attempts Threshold</label>
+                                <input type="number" id="failedThreshold" class="form-input" value="3" disabled>
+                                <p class="form-help">Number of failed ping attempts before power cycling</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Maximum Retry Attempts</label>
+                                <input type="number" id="maxRetries" class="form-input" value="3" disabled>
+                                <p class="form-help">Maximum number of power cycle retries</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cooldown Period</label>
+                                <select id="cooldownPeriod" class="form-select" disabled>
+                                    <option>15 minutes</option>
+                                    <option>30 minutes</option>
+                                    <option>1 hour</option>
+                                    <option>2 hours</option>
+                                </select>
+                                <p class="form-help">Wait time before attempting another power cycle</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Light Schedule Configuration -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Light Schedule Configuration</h2>
+                                <p class="card-subtitle">Configure automatic light on/off times</p>
+                            </div>
+                            <div id="lightScheduleEditButtons" class="edit-buttons">
+                                <button class="btn btn-secondary" onclick="toggleEdit('lightSchedule', true)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </button>
+                            </div>
+                            <div id="lightScheduleSaveButtons" class="edit-buttons" style="display: none;">
+                                <button class="btn btn-secondary" onclick="toggleEdit('lightSchedule', false)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    Cancel
+                                </button>
+                                <button class="btn btn-primary" onclick="saveSettings('lightSchedule', 'Light Schedule')">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <div class="form-group">
+                                <label class="form-label">Lights ON Time</label>
+                                <input type="time" id="lightsOnTime" class="form-input" value="18:00" disabled>
+                                <p class="form-help">Time when lights automatically turn on</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Lights OFF Time</label>
+                                <input type="time" id="lightsOffTime" class="form-input" value="06:00" disabled>
+                                <p class="form-help">Time when lights automatically turn off</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Network Configuration -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Network Configuration</h2>
+                                <p class="card-subtitle">Configure IP addresses for devices</p>
+                            </div>
+                            <div id="networkEditButtons" class="edit-buttons">
+                                <button class="btn btn-secondary" onclick="toggleEdit('network', true)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </button>
+                            </div>
+                            <div id="networkSaveButtons" class="edit-buttons" style="display: none;">
+                                <button class="btn btn-secondary" onclick="toggleEdit('network', false)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    Cancel
+                                </button>
+                                <button class="btn btn-primary" onclick="saveSettings('network', 'Network Configuration')">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <div class="form-group">
+                                <label class="form-label">Screen IP Address</label>
+                                <input type="text" id="screenIp" class="form-input" value="192.168.1.100" disabled>
+                                <p class="form-help">IP address for the display screen</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Processor IP Address</label>
+                                <input type="text" id="processorIp" class="form-input" value="192.168.1.101" disabled>
+                                <p class="form-help">IP address for the processing unit</p>
+                            </div>
+                            <div class="alert alert-info">
+                                <svg class="icon-sm alert-info-icon" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                <p class="alert-info-text">Lights are controlled via power relay and do not require network configuration</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Information -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">System Information</h2>
+                                <p class="card-subtitle">Configure system identification displayed in header</p>
+                            </div>
+                            <div id="systemInfoEditButtons" class="edit-buttons">
+                                <button class="btn btn-secondary" onclick="toggleEdit('systemInfo', true)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </button>
+                            </div>
+                            <div id="systemInfoSaveButtons" class="edit-buttons" style="display: none;">
+                                <button class="btn btn-secondary" onclick="toggleEdit('systemInfo', false)">
+                                    <svg class="icon-sm" viewBox="0 0 24 24">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    Cancel
+                                </button>
+                                <button class="btn btn-primary" onclick="saveSettings('systemInfo', 'System Information')">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <div class="form-group">
+                                <label class="form-label">System Code</label>
+                                <input type="text" id="systemCode" class="form-input" value="EX123" placeholder="e.g., EX123" disabled>
+                                <p class="form-help">Unique identifier for this system (e.g., EX123, CAT001)</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Equipment/Site Name</label>
+                                <input type="text" id="equipmentName" class="form-input" value="Kansanshi" placeholder="e.g., Kansanshi" disabled>
+                                <p class="form-help">Mine site or equipment name where this system is deployed</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Location Code</label>
+                                <input type="text" id="locationCode" class="form-input" value="GV0012" placeholder="e.g., GV0012" disabled>
+                                <p class="form-help">Specific location or unit identifier (e.g., GV0012, Pit-A)</p>
+                            </div>
+                            <div class="alert alert-info">
+                                <svg class="icon-sm alert-info-icon" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                <p id="systemInfoPreview" class="alert-info-text">This information appears in the application header: "EX123 at Kansanshi (GV0012)"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Screen -->
+        <div id="logsScreen" class="screen">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-btn" onclick="navigateToDashboard()">← Back</button>
+                    <div class="header-title">
+                        <h1>System Logs</h1>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="content-wrapper" style="max-width: 64rem;">
+                    <div class="card">
+                        <h2 class="card-title" style="margin-bottom: 1rem;">Download System Logs</h2>
+                        <div class="settings-section">
+                            <div class="form-group">
+                                <label class="form-label">Date Range</label>
+                                <div class="form-grid">
+                                    <div>
+                                        <label class="form-help" style="display: block; margin-bottom: 0.25rem;">From</label>
+                                        <input type="date" class="form-input" id="logsFromDate">
+                                    </div>
+                                    <div>
+                                        <label class="form-help" style="display: block; margin-bottom: 0.25rem;">To</label>
+                                        <input type="date" class="form-input" id="logsToDate">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Log Level</label>
+                                <select class="form-select">
+                                    <option>All Levels</option>
+                                    <option>Error</option>
+                                    <option>Warning</option>
+                                    <option>Info</option>
+                                    <option>Debug</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Component</label>
+                                <select class="form-select">
+                                    <option>All Components</option>
+                                    <option>Screen</option>
+                                    <option>Processor</option>
+                                    <option>Lights</option>
+                                    <option>System</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="padding-top: 1rem;">
+                                <button class="btn btn-primary" style="width: 100%; padding: 0.75rem;" onclick="downloadLogs()">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    Download Logs
+                                </button>
+                            </div>
+                            <div class="logs-preview">
+                                <h3 class="logs-preview-title">Recent Activity</h3>
+                                <div class="log-line info">[2025-10-22 14:32:15] INFO: Screen connectivity check passed</div>
+                                <div class="log-line info">[2025-10-22 14:32:15] INFO: Processor connectivity check passed</div>
+                                <div class="log-line info">[2025-10-22 14:31:45] INFO: Lights powered on (scheduled)</div>
+                                <div class="log-line warn">[2025-10-22 14:30:22] WARN: Screen ping timeout (attempt 1/3)</div>
+                                <div class="log-line info">[2025-10-22 14:30:00] INFO: Auto power cycle monitoring active</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Guide -->
+        <div class="guide-box">
+            <h3 class="guide-title">🎯 Interactive Mockup</h3>
+            <div class="guide-list">
+                <div class="guide-item">
+                    <div class="guide-dot guide-dot-blue"></div>
+                    <span>Try toggling Auto Power Cycle</span>
+                </div>
+                <div class="guide-item">
+                    <div class="guide-dot guide-dot-gray"></div>
+                    <span>Click time window filters (1H/1D/1W/1M)</span>
+                </div>
+                <div class="guide-item">
+                    <div class="guide-dot guide-dot-gray"></div>
+                    <span>Toggle manual controls (confirmation required)</span>
+                </div>
+                <div class="guide-item">
+                    <div class="guide-dot guide-dot-gray"></div>
+                    <span>Settings → Click Edit to modify sections</span>
+                </div>
+                <div class="guide-item">
+                    <div class="guide-dot guide-dot-gray"></div>
+                    <span>All state changes require confirmation ✓</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        const appState = {
+            currentScreen: 'dashboard',
+            autoPowerCycle: true,
+            ledScheduleEnabled: false,
+            timeWindow: '1D',
+            manualControls: {
+                screen: { power: true, ledIndicator: true },
+                processor: { power: true, ledIndicator: true },
+                lights: { power: false, ledIndicator: true }
+            },
+            editMode: {
+                autoPowerCycle: false,
+                lightSchedule: false,
+                network: false,
+                systemInfo: false
+            },
+            systemInfo: {
+                systemCode: 'EX123',
+                equipment: 'Kansanshi',
+                location: 'GV0012'
+            }
+        };
+
+        // Modal Management
+        let modalConfirmCallback = null;
+
+        function showConfirmation(title, message, onConfirm, confirmText = 'Confirm') {
+            const modal = document.getElementById('confirmModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalConfirmBtn = document.getElementById('modalConfirm');
+
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalConfirmBtn.textContent = confirmText;
+            modalConfirmCallback = onConfirm;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            modalConfirmCallback = null;
+        }
+
+        document.getElementById('modalCancel').addEventListener('click', closeModal);
+
+        document.getElementById('modalConfirm').addEventListener('click', () => {
+            if (modalConfirmCallback) {
+                modalConfirmCallback();
+            }
+            closeModal();
+        });
+
+        // Screen Navigation
+        function navigateToScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenName + 'Screen').classList.add('active');
+            appState.currentScreen = screenName;
+        }
+
+        function navigateToDashboard() {
+            navigateToScreen('dashboard');
+        }
+
+        function navigateToSettings() {
+            navigateToScreen('settings');
+        }
+
+        function navigateToLogs() {
+            navigateToScreen('logs');
+        }
+
+        // Logout function
+        function logout() {
+            showConfirmation(
+                'Confirm Logout',
+                'Are you sure you want to log out?',
+                () => {
+                    // Redirect to logout route
+                    window.location.href = '/logout';
+                },
+                'Logout'
+            );
+        }
+
+        // Auto Power Cycle
+        function toggleAutoPowerCycle(checkbox) {
+            const newState = checkbox.checked;
+            const action = newState ? 'start' : 'stop';
+            
+            showConfirmation(
+                newState ? 'Enable Auto Power Cycle' : 'Disable Auto Power Cycle',
+                newState
+                    ? 'The system will automatically power cycle devices when connectivity issues are detected. Continue?'
+                    : 'Automatic power cycling will be disabled. You will need to manually power cycle devices if issues occur. Continue?',
+                () => {
+                    // Disable checkbox during operation
+                    checkbox.disabled = true;
+                    
+                    // Show loading state in status
+                    const status = document.getElementById('autoPowerCycleStatus');
+                    const originalStatusText = status.textContent;
+                    status.textContent = newState ? 'Starting monitoring service...' : 'Stopping monitoring service...';
+                    
+                    fetch('/service-control', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: action,
+                            service_name: 'jebi-switchboard-guard.service'
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            appState.autoPowerCycle = newState;
+                            alert(`Service ${action} successful: ${data.message}`);
+                            // Refresh service status immediately
+                            updateServiceStatus();
+                        } else {
+                            // Revert checkbox on failure
+                            checkbox.checked = !newState;
+                            status.textContent = originalStatusText;
+                            alert(`Service ${action} failed: ${data.error}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error controlling service:', error);
+                        // Revert checkbox on error
+                        checkbox.checked = !newState;
+                        status.textContent = originalStatusText;
+                        alert(`Network error during service ${action}: ${error.message}`);
+                    })
+                    .finally(() => {
+                        // Re-enable checkbox
+                        checkbox.disabled = false;
+                    });
+                },
+                newState ? 'Enable' : 'Disable'
+            );
+            // Revert checkbox state temporarily until confirmed
+            checkbox.checked = !newState;
+        }
+
+        function updateAutoPowerCycleUI() {
+            const checkbox = document.getElementById('autoPowerCycleToggle');
+            const status = document.getElementById('autoPowerCycleStatus');
+            const alert = document.getElementById('autoPowerCycleAlert');
+
+            checkbox.checked = appState.autoPowerCycle;
+
+            if (appState.autoPowerCycle) {
+                status.textContent = 'Monitoring active - System will automatically power cycle devices when connectivity issues are detected';
+                alert.style.display = 'flex';
+            } else {
+                status.textContent = 'Monitoring disabled - Manual intervention required for power cycling';
+                alert.style.display = 'none';
+            }
+        }
+
+        // Manual Controls
+        function togglePower(component, label, checkbox, isCritical = false) {
+            const newState = checkbox.checked;
+            const criticalWarning = isCritical && !newState ? ' This may interrupt critical operations.' : '';
+
+            showConfirmation(
+                newState ? `Turn ON ${label}` : `Turn OFF ${label}`,
+                `This will power ${newState ? 'on' : 'off'} the ${label.toLowerCase()} device.${criticalWarning} Continue?`,
+                () => {
+                    appState.manualControls[component].power = newState;
+                    checkbox.checked = newState;
+                },
+                newState ? 'Turn ON' : 'Turn OFF'
+            );
+            // Revert checkbox state temporarily
+            checkbox.checked = !newState;
+        }
+
+        function toggleLed(component, label, checkbox) {
+            const newState = checkbox.checked;
+
+            showConfirmation(
+                newState ? `Turn ON ${label} LED Indicator` : `Turn OFF ${label} LED Indicator`,
+                `This will turn ${newState ? 'on' : 'off'} the physical LED indicator on the Smart switchboard for the ${label.toLowerCase()}. Continue?`,
+                () => {
+                    appState.manualControls[component].ledIndicator = newState;
+                    checkbox.checked = newState;
+                },
+                newState ? 'Turn ON' : 'Turn OFF'
+            );
+            // Revert checkbox state temporarily
+            checkbox.checked = !newState;
+        }
+
+        // Light Schedule
+        function toggleLightSchedule(checkbox) {
+            const newState = checkbox.checked;
+
+            showConfirmation(
+                newState ? 'Enable Light Schedule' : 'Disable Light Schedule',
+                newState
+                    ? 'This will enable the automatic light schedule. Lights will turn on/off at configured times. Continue?'
+                    : 'This will disable the automatic light schedule. Lights will need to be controlled manually. Continue?',
+                () => {
+                    appState.ledScheduleEnabled = newState;
+                    updateLightScheduleUI();
+                },
+                newState ? 'Enable' : 'Disable'
+            );
+            // Revert checkbox state temporarily
+            checkbox.checked = !newState;
+        }
+
+        function updateLightScheduleUI() {
+            const checkbox = document.getElementById('lightScheduleToggle');
+            const status = document.getElementById('lightScheduleStatus');
+
+            checkbox.checked = appState.ledScheduleEnabled;
+            status.textContent = appState.ledScheduleEnabled ? 'Automatic schedule active' : 'Manual control only';
+        }
+
+        // Timeline
+        function generateEventData() {
+            const now = new Date();
+            const events = [];
+            const hoursAgo = (hours) => new Date(now - hours * 60 * 60 * 1000);
+
+            events.push(
+                { component: 'Processor', timestamp: hoursAgo(2), type: 'auto' },
+                { component: 'Screen', timestamp: hoursAgo(3), type: 'manual' },
+                { component: 'Processor', timestamp: hoursAgo(5), type: 'auto' },
+                { component: 'Lights', timestamp: hoursAgo(6), type: 'manual' },
+                { component: 'Screen', timestamp: hoursAgo(8), type: 'auto' },
+                { component: 'Processor', timestamp: hoursAgo(10), type: 'auto' },
+                { component: 'Lights', timestamp: hoursAgo(12), type: 'auto' },
+                { component: 'Screen', timestamp: hoursAgo(14), type: 'manual' },
+                { component: 'Processor', timestamp: hoursAgo(16), type: 'auto' },
+                { component: 'Lights', timestamp: hoursAgo(18), type: 'manual' },
+                { component: 'Screen', timestamp: hoursAgo(20), type: 'auto' },
+                { component: 'Processor', timestamp: hoursAgo(22), type: 'auto' }
+            );
+
+            return events;
+        }
+
+        function getFilteredEvents() {
+            const now = new Date();
+            let cutoffTime;
+
+            switch(appState.timeWindow) {
+                case '1H':
+                    cutoffTime = new Date(now - 1 * 60 * 60 * 1000);
+                    break;
+                case '1D':
+                    cutoffTime = new Date(now - 24 * 60 * 60 * 1000);
+                    break;
+                case '1W':
+                    cutoffTime = new Date(now - 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case '1M':
+                    cutoffTime = new Date(now - 30 * 24 * 60 * 60 * 1000);
+                    break;
+                default:
+                    cutoffTime = new Date(now - 24 * 60 * 60 * 1000);
+            }
+
+            const allEvents = generateEventData();
+            return allEvents.filter(event => event.timestamp >= cutoffTime);
+        }
+
+        function setTimeWindow(window) {
+            appState.timeWindow = window;
+
+            // Update button states
+            document.querySelectorAll('.timeline-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Redraw timeline
+            drawTimeline();
+        }
+
+        function drawTimeline() {
+            const svg = document.getElementById('timelineSvg');
+            const filteredEvents = getFilteredEvents();
+            const components = ['Processor', 'Screen', 'Lights'];
+
+            const width = 1000;
+            const height = 200;
+            const padding = { top: 20, right: 40, bottom: 40, left: 100 };
+            const plotWidth = width - padding.left - padding.right;
+            const plotHeight = height - padding.top - padding.bottom;
+
+            const now = new Date();
+            let startTime;
+
+            switch(appState.timeWindow) {
+                case '1H':
+                    startTime = new Date(now - 1 * 60 * 60 * 1000);
+                    break;
+                case '1D':
+                    startTime = new Date(now - 24 * 60 * 60 * 1000);
+                    break;
+                case '1W':
+                    startTime = new Date(now - 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case '1M':
+                    startTime = new Date(now - 30 * 24 * 60 * 60 * 1000);
+                    break;
+                default:
+                    startTime = new Date(now - 24 * 60 * 60 * 1000);
+            }
+
+            const xScale = (timestamp) => {
+                const range = now - startTime;
+                const position = timestamp - startTime;
+                return padding.left + (position / range) * plotWidth;
+            };
+
+            const yScale = (component) => {
+                const index = components.indexOf(component);
+                const spacing = plotHeight / (components.length - 1);
+                return padding.top + index * spacing;
+            };
+
+            const formatTimeLabel = (date) => {
+                if (appState.timeWindow === '1H' || appState.timeWindow === '1D') {
+                    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                } else {
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }
+            };
+
+            // Clear SVG
+            svg.innerHTML = '';
+
+            // Background
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', 'white');
+            svg.appendChild(rect);
+
+            // Grid lines for components
+            components.forEach(component => {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', padding.left);
+                line.setAttribute('y1', yScale(component));
+                line.setAttribute('x2', width - padding.right);
+                line.setAttribute('y2', yScale(component));
+                line.setAttribute('stroke', '#e5e7eb');
+                line.setAttribute('stroke-width', '1');
+                svg.appendChild(line);
+            });
+
+            // X-axis labels and grid
+            const labelCount = 6;
+            for (let i = 0; i <= labelCount; i++) {
+                const time = new Date(startTime.getTime() + (now - startTime) * (i / labelCount));
+                const x = padding.left + (plotWidth * i / labelCount);
+
+                // Vertical grid line
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', padding.top);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', height - padding.bottom);
+                line.setAttribute('stroke', '#e5e7eb');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('stroke-dasharray', '2,2');
+                svg.appendChild(line);
+
+                // Label
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x);
+                text.setAttribute('y', height - padding.bottom + 20);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '10');
+                text.setAttribute('fill', '#6b7280');
+                text.textContent = formatTimeLabel(time);
+                svg.appendChild(text);
+            }
+
+            // Y-axis labels
+            components.forEach(component => {
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', padding.left - 10);
+                text.setAttribute('y', yScale(component));
+                text.setAttribute('text-anchor', 'end');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', '#374151');
+                text.setAttribute('font-weight', '500');
+                text.textContent = component;
+                svg.appendChild(text);
+            });
+
+            // Event markers
+            filteredEvents.forEach(event => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', xScale(event.timestamp));
+                circle.setAttribute('cy', yScale(event.component));
+                circle.setAttribute('r', '6');
+
+                if (event.type === 'auto') {
+                    circle.setAttribute('fill', '#2563eb');
+                } else {
+                    circle.setAttribute('fill', 'none');
+                    circle.setAttribute('stroke', '#2563eb');
+                    circle.setAttribute('stroke-width', '2');
+                }
+
+                const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                title.textContent = `${event.component} - ${event.type} - ${event.timestamp.toLocaleString()}`;
+                circle.appendChild(title);
+
+                svg.appendChild(circle);
+            });
+
+            // Update event count
+            const eventCount = document.getElementById('eventCount');
+            eventCount.textContent = `Showing ${filteredEvents.length} event${filteredEvents.length !== 1 ? 's' : ''} in the last ${appState.timeWindow}`;
+        }
+
+        // Settings Edit Mode
+        function toggleEdit(section, enable) {
+            appState.editMode[section] = enable;
+
+            const editButtons = document.getElementById(`${section}EditButtons`);
+            const saveButtons = document.getElementById(`${section}SaveButtons`);
+
+            editButtons.style.display = enable ? 'none' : 'flex';
+            saveButtons.style.display = enable ? 'flex' : 'none';
+
+            // Enable/disable form inputs
+            if (section === 'autoPowerCycle') {
+                document.getElementById('monitoringInterval').disabled = !enable;
+                document.getElementById('failedThreshold').disabled = !enable;
+                document.getElementById('maxRetries').disabled = !enable;
+                document.getElementById('cooldownPeriod').disabled = !enable;
+            } else if (section === 'lightSchedule') {
+                document.getElementById('lightsOnTime').disabled = !enable;
+                document.getElementById('lightsOffTime').disabled = !enable;
+            } else if (section === 'network') {
+                document.getElementById('screenIp').disabled = !enable;
+                document.getElementById('processorIp').disabled = !enable;
+            } else if (section === 'systemInfo') {
+                document.getElementById('systemCode').disabled = !enable;
+                document.getElementById('equipmentName').disabled = !enable;
+                document.getElementById('locationCode').disabled = !enable;
+            }
+        }
+
+        function saveSettings(section, sectionName) {
+            showConfirmation(
+                `Save ${sectionName} Settings`,
+                `This will save the changes to ${sectionName.toLowerCase()}. Changes will take effect immediately. Continue?`,
+                () => {
+                    // Update system info if that's what was edited
+                    if (section === 'systemInfo') {
+                        appState.systemInfo.systemCode = document.getElementById('systemCode').value;
+                        appState.systemInfo.equipment = document.getElementById('equipmentName').value;
+                        appState.systemInfo.location = document.getElementById('locationCode').value;
+                        updateSystemInfoUI();
+                    }
+                    toggleEdit(section, false);
+                },
+                'Save Changes'
+            );
+        }
+
+        function updateSystemInfoUI() {
+            const subtitle = `${appState.systemInfo.systemCode} at ${appState.systemInfo.equipment} (${appState.systemInfo.location})`;
+            document.getElementById('headerSubtitle').textContent = subtitle;
+            document.getElementById('settingsHeaderSubtitle').textContent = subtitle;
+            document.getElementById('systemInfoPreview').textContent = `This information appears in the application header: "${subtitle}"`;
+        }
+
+        // Add event listeners for system info inputs
+        document.getElementById('systemCode').addEventListener('input', function() {
+            if (appState.editMode.systemInfo) {
+                const preview = `${this.value} at ${document.getElementById('equipmentName').value} (${document.getElementById('locationCode').value})`;
+                document.getElementById('systemInfoPreview').textContent = `This information appears in the application header: "${preview}"`;
+            }
+        });
+
+        document.getElementById('equipmentName').addEventListener('input', function() {
+            if (appState.editMode.systemInfo) {
+                const preview = `${document.getElementById('systemCode').value} at ${this.value} (${document.getElementById('locationCode').value})`;
+                document.getElementById('systemInfoPreview').textContent = `This information appears in the application header: "${preview}"`;
+            }
+        });
+
+        document.getElementById('locationCode').addEventListener('input', function() {
+            if (appState.editMode.systemInfo) {
+                const preview = `${document.getElementById('systemCode').value} at ${document.getElementById('equipmentName').value} (${this.value})`;
+                document.getElementById('systemInfoPreview').textContent = `This information appears in the application header: "${preview}"`;
+            }
+        });
+
+        // Logs
+        function downloadLogs() {
+            showConfirmation(
+                'Download System Logs',
+                'This will download the system logs for the selected date range and filters. Continue?',
+                () => {
+                    alert('Logs download started...');
+                },
+                'Download'
+            );
+        }
+
+        // Fetch and update service status
+        function updateServiceStatus() {
+            fetch('/service-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const alertBox = document.getElementById('autoPowerCycleAlert');
+                        const alertIcon = document.getElementById('autoPowerCycleAlertIcon');
+                        const alertTitle = document.getElementById('autoPowerCycleAlertTitle');
+                        const alertText = document.getElementById('autoPowerCycleAlertText');
+                        const checkbox = document.getElementById('autoPowerCycleToggle');
+                        const status = document.getElementById('autoPowerCycleStatus');
+
+                        // Update based on service status
+                        if (data.active && data.status === 'active') {
+                            // Service is active
+                            appState.autoPowerCycle = true;
+                            checkbox.checked = true;
+                            
+                            // Update alert to success style
+                            alertBox.className = 'alert alert-success';
+                            alertIcon.className = 'icon alert-success-icon';
+                            alertIcon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
+                            
+                            alertTitle.className = 'alert-success-title';
+                            alertTitle.textContent = 'System Status: Active';
+                            
+                            alertText.className = 'alert-success-text';
+                            alertText.textContent = `Monitoring interval: Every 5 minutes | Max retry attempts: 3 | Cooldown period: 15 minutes | Uptime: ${data.uptime || 'N/A'}`;
+                            
+                            status.textContent = 'Monitoring active - System will automatically power cycle devices when connectivity issues are detected';
+                            alertBox.style.display = 'flex';
+                        } else if (data.status === 'inactive' || data.status === 'failed') {
+                            // Service is inactive or failed
+                            appState.autoPowerCycle = false;
+                            checkbox.checked = false;
+                            
+                            // Update alert to error style
+                            alertBox.className = 'alert alert-error';
+                            alertIcon.className = 'icon alert-error-icon';
+                            alertIcon.innerHTML = '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>';
+                            
+                            alertTitle.className = 'alert-error-title';
+                            alertTitle.textContent = data.status === 'failed' ? 'System Status: Failed' : 'System Status: Inactive';
+                            
+                            alertText.className = 'alert-error-text';
+                            alertText.textContent = 'Monitoring service is not running. Please start the service to enable automatic power cycling.';
+                            
+                            status.textContent = 'Monitoring disabled - Manual intervention required for power cycling';
+                            alertBox.style.display = 'flex';
+                        } else {
+                            // Unknown status
+                            appState.autoPowerCycle = false;
+                            checkbox.checked = false;
+                            
+                            // Update alert to warning style
+                            alertBox.className = 'alert alert-warning';
+                            alertIcon.className = 'icon alert-warning-icon';
+                            alertIcon.innerHTML = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>';
+                            
+                            alertTitle.className = 'alert-warning-title';
+                            alertTitle.textContent = `System Status: ${data.status || 'Unknown'}`;
+                            
+                            alertText.className = 'alert-warning-text';
+                            alertText.textContent = 'Service status is unknown. Please check the service configuration.';
+                            
+                            status.textContent = 'Monitoring status unknown';
+                            alertBox.style.display = 'flex';
+                        }
+                    } else {
+                        console.error('Error fetching service status:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Network error fetching service status:', error);
+                });
+        }
+
+        // Initialize
+        function init() {
+            // Set default dates for logs
+            const today = new Date();
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+
+            document.getElementById('logsFromDate').valueAsDate = weekAgo;
+            document.getElementById('logsToDate').valueAsDate = today;
+
+            // Draw initial timeline
+            drawTimeline();
+
+            // Update UI
+            updateAutoPowerCycleUI();
+            updateLightScheduleUI();
+            
+            // Fetch service status immediately and every 10 seconds
+            updateServiceStatus();
+            setInterval(updateServiceStatus, 10000);
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>

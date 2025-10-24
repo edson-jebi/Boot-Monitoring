@@ -12,13 +12,19 @@ class MainController(BaseController):
     def _register_routes(self):
         """Register main routes."""
         self.blueprint.add_url_rule('/', 'home', self.home, methods=['GET'])
+        self.blueprint.add_url_rule('/dashboard', 'dashboard', self.dashboard, methods=['GET'])
         self.blueprint.add_url_rule('/execute', 'execute_command', self.execute_command, methods=['GET'])
         self.blueprint.add_url_rule('/api/session-check', 'session_check', self.session_check, methods=['GET'])
     
     @login_required
     def home(self):
-        """Home page route - redirects to service monitor."""
-        return redirect(url_for('main.service_monitor'))
+        """Home page route - redirects to Bradken SwitchOS dashboard."""
+        return redirect(url_for('main.dashboard'))
+    
+    @login_required
+    def dashboard(self):
+        """Dashboard page - shows Bradken SwitchOS interface."""
+        return render_template('bradken-switchos-mockup.html')
     
     @login_required
     def execute_command(self):
