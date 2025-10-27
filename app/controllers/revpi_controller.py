@@ -24,6 +24,13 @@ class RevPiController(BaseController):
         self.blueprint.add_url_rule('/revpi-schedule/enable', 'enable_schedule', self.enable_schedule, methods=['POST'])
         self.blueprint.add_url_rule('/revpi-schedule/delete/<device_id>', 'delete_schedule', self.delete_schedule, methods=['DELETE'])
         self.blueprint.add_url_rule('/revpi-schedule/check', 'check_schedule', self.check_schedule, methods=['POST'])
+        
+        # Log download endpoint
+        self.blueprint.add_url_rule('/download-logs-by-date', 'download_logs_by_date', self.download_logs_by_date, methods=['POST'])
+        
+        # Switchboard configuration endpoints
+        self.blueprint.add_url_rule('/switchboard-config', 'get_switchboard_config', self.get_switchboard_config, methods=['GET'])
+        self.blueprint.add_url_rule('/switchboard-config/update', 'update_switchboard_config', self.update_switchboard_config, methods=['POST'])
     
     @login_required
     def revpi_control(self):
@@ -369,3 +376,284 @@ class RevPiController(BaseController):
         except Exception as e:
             self.logger.error(f"Error checking schedule: {e}", exc_info=True)
             return jsonify({'success': False, 'message': f'Error checking schedule: {str(e)}'}), 500
+    
+    @login_required
+    def download_logs_by_date(self):
+        """Download log files from jebi-switchboard directory filtered by date range"""
+        try:
+            import os
+            import zipfile
+            import io
+            from datetime import datetime
+            from flask import send_file
+            
+            # Get date range from request
+            data = request.get_json()
+            self.logger.info(f"Received download request with data: {data}")
+            
+            from_date_str = data.get('from_date')
+            to_date_str = data.get('to_date')
+            
+            if not from_date_str or not to_date_str:
+                return jsonify({
+                    'success': False,
+                    'message': 'Both from_date and to_date are required'
+                }), 400
+            
+            # Parse dates
+            try:
+                from_date = datetime.strptime(from_date_str, '%Y-%m-%d')
+                to_date = datetime.strptime(to_date_str, '%Y-%m-%d')
+                # Set to_date to end of day
+                to_date = to_date.replace(hour=23, minute=59, second=59)
+            except ValueError as e:
+                return jsonify({
+                    'success': False,
+                    'message': f'Invalid date format. Use YYYY-MM-DD: {str(e)}'
+                }), 400
+            
+            log_directory = '/var/log/jebi-switchboard'
+            
+            # Check if directory exists
+            if not os.path.exists(log_directory):
+                return jsonify({
+                    'success': False,
+                    'message': f'Log directory not found: {log_directory}'
+                }), 404
+            
+            # Find log files within date range
+            matching_files = []
+            try:
+                for filename in os.listdir(log_directory):
+                    filepath = os.path.join(log_directory, filename)
+                    
+                    # Only process files (not directories)
+                    if not os.path.isfile(filepath):
+                        continue
+                    
+                    # Get file modification time
+                    file_mtime = datetime.fromtimestamp(os.path.getmtime(filepath))
+                    
+                    # Check if file was modified within date range
+                    if from_date <= file_mtime <= to_date:
+                        matching_files.append({
+                            'name': filename,
+                            'path': filepath,
+                            'modified': file_mtime
+                        })
+                
+            except PermissionError:
+                return jsonify({
+                    'success': False,
+                    'message': 'Permission denied accessing log directory'
+                }), 403
+            
+            if not matching_files:
+                return jsonify({
+                    'success': False,
+                    'message': f'No log files found between {from_date_str} and {to_date_str}'
+                }), 404
+            
+            # Create zip file in memory
+            memory_file = io.BytesIO()
+            with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+                for file_info in matching_files:
+                    try:
+                        # Add file to zip with just the filename (not full path)
+                        zf.write(file_info['path'], file_info['name'])
+                    except Exception as e:
+                        self.logger.warning(f"Could not add {file_info['name']} to zip: {e}")
+            
+            # Prepare the file for download
+            memory_file.seek(0)
+            
+            # Generate filename with date range
+            zip_filename = f"jebi-switchboard-logs_{from_date_str}_to_{to_date_str}.zip"
+            
+            self.log_user_action("downloaded logs", f"date range: {from_date_str} to {to_date_str}, files: {len(matching_files)}")
+            
+            return send_file(
+                memory_file,
+                mimetype='application/zip',
+                as_attachment=True,
+                download_name=zip_filename
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Error downloading logs by date: {e}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'message': f'Error downloading logs: {str(e)}'
+            }), 500
+    
+    @login_required
+    def get_switchboard_config(self):
+        """Get switchboard configuration from JSON file"""
+        try:
+            import json
+            
+            config_path = '/home/pi/jebi-switchboard/config/strict_log_config.json'
+            
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+            
+            self.log_user_action("retrieved switchboard configuration")
+            
+            return jsonify({
+                'success': True,
+                'config': {
+                    'CHECK_INTERVAL_SEC': config.get('CHECK_INTERVAL_SEC', 10),
+                    'FAIL_WINDOW': config.get('FAIL_WINDOW', 2),
+                    'MAX_POWER_CYCLES': config.get('MAX_POWER_CYCLES', 4),
+                    'REBOOT_WAIT_SEC': config.get('REBOOT_WAIT_SEC', 9),
+                    'OFF_SECONDS': config.get('OFF_SECONDS', 10),
+                    'STARTUP_DELAY_SEC': config.get('STARTUP_DELAY_SEC', 20),
+                    'RelayScreen': {
+                        'ip': config.get('RelayScreen', {}).get('ip', '192.168.1.143')
+                    },
+                    'RelayProcessor': {
+                        'ip': config.get('RelayProcessor', {}).get('ip', '192.168.1.142')
+                    }
+                }
+            })
+            
+        except FileNotFoundError:
+            self.logger.error(f"Config file not found: {config_path}")
+            return jsonify({
+                'success': False,
+                'message': 'Configuration file not found'
+            }), 404
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Invalid JSON in config file: {e}")
+            return jsonify({
+                'success': False,
+                'message': 'Invalid configuration file format'
+            }), 500
+        except Exception as e:
+            self.logger.error(f"Error reading switchboard config: {e}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'message': f'Error reading configuration: {str(e)}'
+            }), 500
+    
+    @login_required
+    def update_switchboard_config(self):
+        """Update switchboard configuration and restart service"""
+        try:
+            import json
+            import subprocess
+            
+            config_path = '/home/pi/jebi-switchboard/config/strict_log_config.json'
+            
+            # Get updated values from request
+            data = request.get_json()
+            
+            # Read current config
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+            
+            # Track what was updated for logging
+            updates = []
+            
+            # Update only the monitoring parameters
+            if 'CHECK_INTERVAL_SEC' in data:
+                config['CHECK_INTERVAL_SEC'] = int(data['CHECK_INTERVAL_SEC'])
+                updates.append(f"CHECK_INTERVAL_SEC={config['CHECK_INTERVAL_SEC']}")
+            if 'FAIL_WINDOW' in data:
+                config['FAIL_WINDOW'] = int(data['FAIL_WINDOW'])
+                updates.append(f"FAIL_WINDOW={config['FAIL_WINDOW']}")
+            if 'MAX_POWER_CYCLES' in data:
+                config['MAX_POWER_CYCLES'] = int(data['MAX_POWER_CYCLES'])
+                updates.append(f"MAX_POWER_CYCLES={config['MAX_POWER_CYCLES']}")
+            if 'REBOOT_WAIT_SEC' in data:
+                config['REBOOT_WAIT_SEC'] = int(data['REBOOT_WAIT_SEC'])
+                updates.append(f"REBOOT_WAIT_SEC={config['REBOOT_WAIT_SEC']}")
+            
+            # Update IP addresses for RelayScreen and RelayProcessor
+            if 'RelayScreen_ip' in data:
+                if 'RelayScreen' not in config:
+                    config['RelayScreen'] = {}
+                config['RelayScreen']['ip'] = str(data['RelayScreen_ip'])
+                updates.append(f"RelayScreen.ip={config['RelayScreen']['ip']}")
+            
+            if 'RelayProcessor_ip' in data:
+                if 'RelayProcessor' not in config:
+                    config['RelayProcessor'] = {}
+                config['RelayProcessor']['ip'] = str(data['RelayProcessor_ip'])
+                updates.append(f"RelayProcessor.ip={config['RelayProcessor']['ip']}")
+            
+            # Write updated config back to file
+            with open(config_path, 'w') as f:
+                json.dump(config, f, indent=4)
+            
+            self.log_user_action("updated switchboard configuration", ", ".join(updates))
+            
+            # Only restart service if monitoring parameters were changed
+            should_restart_service = any(key in data for key in ['CHECK_INTERVAL_SEC', 'FAIL_WINDOW', 'MAX_POWER_CYCLES', 'REBOOT_WAIT_SEC'])
+            
+            if should_restart_service:
+                # Restart the jebi-switchboard-guard service
+                try:
+                    result = subprocess.run(
+                        ['sudo', 'systemctl', 'restart', 'jebi-switchboard-guard.service'],
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                    
+                    if result.returncode == 0:
+                        self.logger.info("jebi-switchboard-guard.service restarted successfully")
+                        return jsonify({
+                            'success': True,
+                            'message': 'Configuration updated and service restarted successfully'
+                        })
+                    else:
+                        self.logger.error(f"Failed to restart service: {result.stderr}")
+                        return jsonify({
+                            'success': False,
+                            'message': f'Configuration saved but service restart failed: {result.stderr}'
+                        }), 500
+                        
+                except subprocess.TimeoutExpired:
+                    self.logger.error("Service restart timed out")
+                    return jsonify({
+                        'success': False,
+                        'message': 'Configuration saved but service restart timed out'
+                    }), 500
+                except Exception as e:
+                    self.logger.error(f"Error restarting service: {e}")
+                    return jsonify({
+                        'success': False,
+                        'message': f'Configuration saved but service restart failed: {str(e)}'
+                    }), 500
+            else:
+                # IP addresses updated, no service restart needed
+                return jsonify({
+                    'success': True,
+                    'message': 'Configuration updated successfully'
+                })
+            
+        except FileNotFoundError:
+            self.logger.error(f"Config file not found: {config_path}")
+            return jsonify({
+                'success': False,
+                'message': 'Configuration file not found'
+            }), 404
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Invalid JSON in config file: {e}")
+            return jsonify({
+                'success': False,
+                'message': 'Invalid configuration file format'
+            }), 500
+        except ValueError as e:
+            self.logger.error(f"Invalid parameter value: {e}")
+            return jsonify({
+                'success': False,
+                'message': f'Invalid parameter value: {str(e)}'
+            }), 400
+        except Exception as e:
+            self.logger.error(f"Error updating switchboard config: {e}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'message': f'Error updating configuration: {str(e)}'
+            }), 500

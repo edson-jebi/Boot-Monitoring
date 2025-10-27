@@ -1243,7 +1243,7 @@
             <div class="content-area">
                 <div class="content-wrapper" style="max-width: 64rem;">
                     <!-- Auto Power Cycle Configuration -->
-                    <div class="card">
+                    <div id="autoPowerCycleCard" class="card">
                         <div class="card-header">
                             <div>
                                 <h2 class="card-title">Auto Power Cycle Configuration</h2>
@@ -1273,34 +1273,24 @@
                         </div>
                         <div class="settings-section">
                             <div class="form-group">
-                                <label class="form-label">Monitoring Interval</label>
-                                <select id="monitoringInterval" class="form-select" disabled>
-                                    <option>5 minutes</option>
-                                    <option>10 minutes</option>
-                                    <option>15 minutes</option>
-                                    <option>30 minutes</option>
-                                </select>
-                                <p class="form-help">How often to check device connectivity</p>
+                                <label class="form-label">Monitoring Interval (seconds)</label>
+                                <input type="number" id="monitoringInterval" class="form-input" value="10" min="1" disabled>
+                                <p class="form-help">How often to check device connectivity (CHECK_INTERVAL_SEC)</p>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Failed Attempts Threshold</label>
-                                <input type="number" id="failedThreshold" class="form-input" value="3" disabled>
-                                <p class="form-help">Number of failed ping attempts before power cycling</p>
+                                <input type="number" id="failedThreshold" class="form-input" value="2" min="1" disabled>
+                                <p class="form-help">Number of failed ping attempts before power cycling (FAIL_WINDOW)</p>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Maximum Retry Attempts</label>
-                                <input type="number" id="maxRetries" class="form-input" value="3" disabled>
-                                <p class="form-help">Maximum number of power cycle retries</p>
+                                <input type="number" id="maxRetries" class="form-input" value="4" min="1" disabled>
+                                <p class="form-help">Maximum number of power cycle retries (MAX_POWER_CYCLES)</p>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Cooldown Period</label>
-                                <select id="cooldownPeriod" class="form-select" disabled>
-                                    <option>15 minutes</option>
-                                    <option>30 minutes</option>
-                                    <option>1 hour</option>
-                                    <option>2 hours</option>
-                                </select>
-                                <p class="form-help">Wait time before attempting another power cycle</p>
+                                <label class="form-label">Cooldown Period (seconds)</label>
+                                <input type="number" id="cooldownPeriod" class="form-input" value="9" min="1" disabled>
+                                <p class="form-help">Wait time before attempting another power cycle (REBOOT_WAIT_SEC)</p>
                             </div>
                         </div>
                     </div>
@@ -1419,7 +1409,7 @@
                     </div>
 
                     <!-- Network Configuration -->
-                    <div class="card">
+                    <div id="networkCard" class="card">
                         <div class="card-header">
                             <div>
                                 <h2 class="card-title">Network Configuration</h2>
@@ -1567,7 +1557,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display: none;">
                                 <label class="form-label">Log Level</label>
                                 <select class="form-select">
                                     <option>All Levels</option>
@@ -1577,7 +1567,7 @@
                                     <option>Debug</option>
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display: none;">
                                 <label class="form-label">Component</label>
                                 <select class="form-select">
                                     <option>All Components</option>
@@ -1588,7 +1578,7 @@
                                 </select>
                             </div>
                             <div class="form-group" style="padding-top: 1rem;">
-                                <button class="btn btn-primary" style="width: 100%; padding: 0.75rem;" onclick="downloadLogs()">
+                                <button id="downloadLogsBtn" class="btn btn-primary download-logs-btn" style="width: 100%; padding: 0.75rem;" onclick="downloadLogs()">
                                     <svg class="icon" viewBox="0 0 24 24">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -1598,12 +1588,13 @@
                                 </button>
                             </div>
                             <div class="logs-preview">
-                                <h3 class="logs-preview-title">Recent Activity</h3>
-                                <div class="log-line info">[2025-10-22 14:32:15] INFO: Screen connectivity check passed</div>
-                                <div class="log-line info">[2025-10-22 14:32:15] INFO: Processor connectivity check passed</div>
-                                <div class="log-line info">[2025-10-22 14:31:45] INFO: Lights powered on (scheduled)</div>
-                                <div class="log-line warn">[2025-10-22 14:30:22] WARN: Screen ping timeout (attempt 1/3)</div>
-                                <div class="log-line info">[2025-10-22 14:30:00] INFO: Auto power cycle monitoring active</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h3 class="logs-preview-title">Recent Activity (Switchboard Guard)</h3>
+                                    <span id="logsLastUpdate" style="font-size: 0.875rem; color: #6b7280;">Loading...</span>
+                                </div>
+                                <div id="switchboardLogsContainer">
+                                    <div class="log-line info" style="text-align: center; color: #6b7280;">Loading logs...</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1702,6 +1693,11 @@
             });
             document.getElementById(screenName + 'Screen').classList.add('active');
             appState.currentScreen = screenName;
+            
+            // Stop auto-refresh when leaving logs screen
+            if (screenName !== 'logs') {
+                stopLogsAutoRefresh();
+            }
         }
 
         function navigateToDashboard() {
@@ -1710,6 +1706,19 @@
 
         function navigateToSettings() {
             navigateToScreen('settings');
+            // Wait for screen transition, then scroll to and highlight the Auto Power Cycle Configuration section
+            setTimeout(() => {
+                const autoPowerCycleCard = document.getElementById('autoPowerCycleCard');
+                if (autoPowerCycleCard) {
+                    autoPowerCycleCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Add a highlight effect
+                    autoPowerCycleCard.style.transition = 'box-shadow 0.3s ease';
+                    autoPowerCycleCard.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.5)';
+                    setTimeout(() => {
+                        autoPowerCycleCard.style.boxShadow = '';
+                    }, 2000);
+                }
+            }, 100);
         }
 
         function navigateToLightScheduleSettings() {
@@ -1729,8 +1738,29 @@
             }, 100);
         }
 
+        function navigateToNetworkSettings() {
+            navigateToScreen('settings');
+            // Wait for screen transition, then scroll to and highlight the Network Configuration section
+            setTimeout(() => {
+                const networkCard = document.getElementById('networkCard');
+                if (networkCard) {
+                    networkCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Add a highlight effect
+                    networkCard.style.transition = 'box-shadow 0.3s ease';
+                    networkCard.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.5)';
+                    setTimeout(() => {
+                        networkCard.style.boxShadow = '';
+                    }, 2000);
+                }
+            }, 100);
+        }
+
         function navigateToLogs() {
             navigateToScreen('logs');
+            // Load switchboard logs when navigating to logs screen
+            loadSwitchboardLogs();
+            // Start auto-refresh
+            startLogsAutoRefresh();
         }
 
         // Logout function
@@ -2366,11 +2396,43 @@
             // Disable toggle if no schedule is configured
             if (!hasSchedule) {
                 checkbox.disabled = true;
-                status.textContent = 'No schedule configured - Please configure times in Settings';
+                status.textContent = 'No schedule configured - Please configure times in Configure Schedule or Settings';
             } else {
                 checkbox.disabled = false;
                 status.textContent = appState.ledScheduleEnabled ? 'Automatic schedule active' : 'Manual control only';
             }
+        }
+
+        function loadSwitchboardConfig() {
+            // Load switchboard configuration from JSON file
+            fetch('/switchboard-config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.config) {
+                    const config = data.config;
+                    
+                    // Update Auto Power Cycle form fields with loaded values
+                    document.getElementById('monitoringInterval').value = config.CHECK_INTERVAL_SEC || 10;
+                    document.getElementById('failedThreshold').value = config.FAIL_WINDOW || 2;
+                    document.getElementById('maxRetries').value = config.MAX_POWER_CYCLES || 4;
+                    document.getElementById('cooldownPeriod').value = config.REBOOT_WAIT_SEC || 9;
+                    
+                    // Update Network Configuration form fields with loaded IP addresses
+                    if (config.RelayScreen && config.RelayScreen.ip) {
+                        document.getElementById('screenIp').value = config.RelayScreen.ip;
+                    }
+                    if (config.RelayProcessor && config.RelayProcessor.ip) {
+                        document.getElementById('processorIp').value = config.RelayProcessor.ip;
+                    }
+                    
+                    console.log('Switchboard configuration loaded:', config);
+                } else {
+                    console.error('Failed to load switchboard config:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading switchboard config:', error);
+            });
         }
 
         function loadLightSchedule() {
@@ -2751,6 +2813,159 @@
                 `Save ${sectionName} Settings`,
                 `This will save the changes to ${sectionName.toLowerCase()}. Changes will take effect immediately. Continue?`,
                 () => {
+                    // Update Auto Power Cycle configuration
+                    if (section === 'autoPowerCycle') {
+                        const monitoringInterval = parseInt(document.getElementById('monitoringInterval').value);
+                        const failedThreshold = parseInt(document.getElementById('failedThreshold').value);
+                        const maxRetries = parseInt(document.getElementById('maxRetries').value);
+                        const cooldownPeriod = parseInt(document.getElementById('cooldownPeriod').value);
+                        
+                        // Validate values
+                        if (isNaN(monitoringInterval) || monitoringInterval < 1) {
+                            alert('Monitoring Interval must be at least 1 second');
+                            return;
+                        }
+                        if (isNaN(failedThreshold) || failedThreshold < 1) {
+                            alert('Failed Attempts Threshold must be at least 1');
+                            return;
+                        }
+                        if (isNaN(maxRetries) || maxRetries < 1) {
+                            alert('Maximum Retry Attempts must be at least 1');
+                            return;
+                        }
+                        if (isNaN(cooldownPeriod) || cooldownPeriod < 1) {
+                            alert('Cooldown Period must be at least 1 second');
+                            return;
+                        }
+                        
+                        // Prepare config data
+                        const configData = {
+                            CHECK_INTERVAL_SEC: monitoringInterval,
+                            FAIL_WINDOW: failedThreshold,
+                            MAX_POWER_CYCLES: maxRetries,
+                            REBOOT_WAIT_SEC: cooldownPeriod
+                        };
+                        
+                        // Disable save button during operation
+                        const saveBtn = document.querySelector('#autoPowerCycleSaveButtons .btn-primary');
+                        if (saveBtn) {
+                            saveBtn.disabled = true;
+                            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                        }
+                        
+                        // Save to backend
+                        fetch('/switchboard-config/update', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(configData)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showConfirmation(
+                                    'Configuration Saved',
+                                    'Auto Power Cycle configuration updated successfully. Service has been restarted with new parameters.',
+                                    () => {},
+                                    'OK'
+                                );
+                                toggleEdit(section, false);
+                            } else {
+                                throw new Error(data.message || 'Failed to save configuration');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error saving auto power cycle config:', error);
+                            showConfirmation(
+                                'Save Failed',
+                                `Failed to save configuration: ${error.message}`,
+                                () => {},
+                                'OK'
+                            );
+                        })
+                        .finally(() => {
+                            // Re-enable save button
+                            if (saveBtn) {
+                                saveBtn.disabled = false;
+                                saveBtn.innerHTML = 'Save Changes';
+                            }
+                        });
+                        
+                        return; // Don't call toggleEdit yet, wait for async operation
+                    }
+                    
+                    // Update Network Configuration
+                    if (section === 'network') {
+                        const screenIp = document.getElementById('screenIp').value;
+                        const processorIp = document.getElementById('processorIp').value;
+                        
+                        // Validate IP address format (simple validation)
+                        const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+                        if (!ipPattern.test(screenIp)) {
+                            alert('Invalid Screen IP address format. Please use format: xxx.xxx.xxx.xxx');
+                            return;
+                        }
+                        if (!ipPattern.test(processorIp)) {
+                            alert('Invalid Processor IP address format. Please use format: xxx.xxx.xxx.xxx');
+                            return;
+                        }
+                        
+                        // Prepare config data
+                        const configData = {
+                            RelayScreen_ip: screenIp,
+                            RelayProcessor_ip: processorIp
+                        };
+                        
+                        // Disable save button during operation
+                        const saveBtn = document.querySelector('#networkSaveButtons .btn-primary');
+                        if (saveBtn) {
+                            saveBtn.disabled = true;
+                            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                        }
+                        
+                        // Save to backend
+                        fetch('/switchboard-config/update', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(configData)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showConfirmation(
+                                    'Configuration Saved',
+                                    'Network configuration updated successfully. Changes will take effect on next device power cycle.',
+                                    () => {},
+                                    'OK'
+                                );
+                                toggleEdit(section, false);
+                            } else {
+                                throw new Error(data.message || 'Failed to save configuration');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error saving network config:', error);
+                            showConfirmation(
+                                'Save Failed',
+                                `Failed to save network configuration: ${error.message}`,
+                                () => {},
+                                'OK'
+                            );
+                        })
+                        .finally(() => {
+                            // Re-enable save button
+                            if (saveBtn) {
+                                saveBtn.disabled = false;
+                                saveBtn.innerHTML = 'Save Changes';
+                            }
+                        });
+                        
+                        return; // Don't call toggleEdit yet, wait for async operation
+                    }
+                    
                     // Update system info if that's what was edited
                     if (section === 'systemInfo') {
                         appState.systemInfo.systemCode = document.getElementById('systemCode').value;
@@ -2861,14 +3076,204 @@
 
         // Logs
         function downloadLogs() {
+            const fromDate = document.getElementById('logsFromDate').value;
+            const toDate = document.getElementById('logsToDate').value;
+            
+            if (!fromDate || !toDate) {
+                alert('Please select both from and to dates');
+                return;
+            }
+            
+            // Validate date range
+            if (new Date(fromDate) > new Date(toDate)) {
+                alert('From date must be before or equal to To date');
+                return;
+            }
+            
             showConfirmation(
                 'Download System Logs',
-                'This will download the system logs for the selected date range and filters. Continue?',
+                'This will download logs from ' + fromDate + ' to ' + toDate + '. Continue?',
                 () => {
-                    alert('Logs download started...');
+                    // Show loading indication
+                    const downloadBtn = document.getElementById('downloadLogsBtn');
+                    if (!downloadBtn) {
+                        alert('Error: Download button not found');
+                        return;
+                    }
+                    
+                    const originalText = downloadBtn.innerHTML;
+                    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
+                    downloadBtn.disabled = true;
+                    
+                    // Make POST request to download endpoint
+                    fetch('/download-logs-by-date', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            from_date: fromDate,
+                            to_date: toDate
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.error || 'Failed to download logs');
+                            });
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // Create download link
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `jebi-switchboard-logs_${fromDate}_to_${toDate}.zip`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        
+                        // Reset button
+                        downloadBtn.innerHTML = originalText;
+                        downloadBtn.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Download error:', error);
+                        alert('Error downloading logs: ' + error.message);
+                        
+                        // Reset button
+                        downloadBtn.innerHTML = originalText;
+                        downloadBtn.disabled = false;
+                    });
                 },
                 'Download'
             );
+        }
+
+        // Load switchboard logs from backend using log-directory endpoint
+        function loadSwitchboardLogs() {
+            const container = document.getElementById('switchboardLogsContainer');
+            if (!container) return;
+            
+            container.innerHTML = '<div class="log-line info" style="text-align: center; color: #6b7280;">Loading logs...</div>';
+            
+            // Use the existing log-directory endpoint from config_editor
+            fetch('/log-directory')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.files && data.files.length > 0) {
+                        // Find the check_alive_strict.log file
+                        const logFile = data.files.find(f => f.name === 'check_alive_strict.log');
+                        if (logFile && logFile.readable) {
+                            // Download and parse the log file
+                            fetch(`/download-log-file/${encodeURIComponent(logFile.name)}`)
+                                .then(response => response.text())
+                                .then(logContent => {
+                                    displaySwitchboardLogs(logContent);
+                                    updateLastRefreshTime();
+                                })
+                                .catch(error => {
+                                    console.error('Error downloading log file:', error);
+                                    container.innerHTML = '<div class="log-line error" style="text-align: center; color: #ef4444;">Error downloading log file: ' + error.message + '</div>';
+                                    updateLastRefreshTime('Error');
+                                });
+                        } else {
+                            container.innerHTML = '<div class="log-line info" style="text-align: center; color: #6b7280;">Log file not found or not readable</div>';
+                            updateLastRefreshTime();
+                        }
+                    } else {
+                        container.innerHTML = '<div class="log-line info" style="text-align: center; color: #6b7280;">No log files available</div>';
+                        updateLastRefreshTime();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading log directory:', error);
+                    container.innerHTML = '<div class="log-line error" style="text-align: center; color: #ef4444;">Error loading logs: ' + error.message + '</div>';
+                    updateLastRefreshTime('Error');
+                });
+        }
+
+        // Update the last refresh time display
+        function updateLastRefreshTime(status = 'Updated') {
+            const lastUpdateElement = document.getElementById('logsLastUpdate');
+            if (lastUpdateElement) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                lastUpdateElement.textContent = `${status} at ${timeString}`;
+                
+                // Add a subtle flash animation
+                lastUpdateElement.style.color = '#3b82f6';
+                setTimeout(() => {
+                    lastUpdateElement.style.color = '#6b7280';
+                }, 500);
+            }
+        }
+
+        // Display switchboard logs in the UI
+        function displaySwitchboardLogs(logContent) {
+            const container = document.getElementById('switchboardLogsContainer');
+            if (!container) return;
+            
+            // Clear container
+            container.innerHTML = '';
+            
+            // Split log content into lines
+            const lines = logContent.split('\n').filter(line => line.trim() !== '');
+            
+            // Take the last 50 lines and reverse to show most recent first
+            const recentLines = lines.slice(-10).reverse();
+            
+            if (recentLines.length === 0) {
+                container.innerHTML = '<div class="log-line info" style="text-align: center; color: #6b7280;">No log entries found</div>';
+                return;
+            }
+            
+            // Display each log entry
+            recentLines.forEach(line => {
+                const logDiv = document.createElement('div');
+                
+                // Parse log line: "2025-10-27 21:30:16 INFO check-guard - Message"
+                const logMatch = line.match(/^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+(\w+)\s+(.+)$/);
+                
+                let levelClass = 'info';
+                if (logMatch && logMatch[2]) {
+                    const level = logMatch[2].toUpperCase();
+                    if (level === 'ERROR' || level === 'CRITICAL') {
+                        levelClass = 'error';
+                    } else if (level === 'WARNING' || level === 'WARN') {
+                        levelClass = 'warn';
+                    }
+                }
+                
+                logDiv.className = `log-line ${levelClass}`;
+                logDiv.textContent = line;
+                container.appendChild(logDiv);
+            });
+        }
+
+        // Auto-refresh logs every 10 seconds when on logs screen for real-time updates
+        let logsRefreshInterval = null;
+        
+        function startLogsAutoRefresh() {
+            // Clear any existing interval
+            if (logsRefreshInterval) {
+                clearInterval(logsRefreshInterval);
+            }
+            // Refresh every 10 seconds for real-time feel
+            logsRefreshInterval = setInterval(() => {
+                if (appState.currentScreen === 'logs') {
+                    loadSwitchboardLogs();
+                }
+            }, 10000); // 10 seconds for real-time updates
+        }
+        
+        function stopLogsAutoRefresh() {
+            if (logsRefreshInterval) {
+                clearInterval(logsRefreshInterval);
+                logsRefreshInterval = null;
+            }
         }
 
         // Fetch and update service status
@@ -3089,6 +3494,8 @@
             lightsOnTimePicker = new TimePicker('lightsOnTime', 'lightsOnTimeDropdown');
             lightsOffTimePicker = new TimePicker('lightsOffTime', 'lightsOffTimeDropdown');
             
+            // Load switchboard configuration from JSON file
+            loadSwitchboardConfig();
             
             // Load saved light schedule from database
             loadLightSchedule();

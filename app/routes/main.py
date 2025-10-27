@@ -46,6 +46,13 @@ main_bp.add_url_rule('/revpi-schedule/enable', 'enable_schedule', revpi_controll
 main_bp.add_url_rule('/revpi-schedule/delete/<device_id>', 'delete_schedule', revpi_controller.delete_schedule, methods=['DELETE'])
 main_bp.add_url_rule('/revpi-schedule/check', 'check_schedule', revpi_controller.check_schedule, methods=['POST'])
 
+# Register log download route
+main_bp.add_url_rule('/download-logs-by-date', 'download_logs_by_date', revpi_controller.download_logs_by_date, methods=['POST'])
+
+# Register switchboard configuration routes
+main_bp.add_url_rule('/switchboard-config', 'get_switchboard_config', revpi_controller.get_switchboard_config, methods=['GET'])
+main_bp.add_url_rule('/switchboard-config/update', 'update_switchboard_config', revpi_controller.update_switchboard_config, methods=['POST'])
+
 # Register Service Monitor routes under main blueprint
 main_bp.add_url_rule('/service-monitor', 'service_monitor', service_monitor_controller.service_monitor, methods=['GET'])
 main_bp.add_url_rule('/service-status', 'service_status', service_monitor_controller.service_status, methods=['GET'])

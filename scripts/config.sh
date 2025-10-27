@@ -8,7 +8,7 @@
 # Set this to match your web.py configuration:
 # - Development: typically 5010 (with debug=True)
 # - Production: typically 5000 (with gunicorn)
-FLASK_PORT=5010
+FLASK_PORT=5000
 
 # API endpoint
 API_URL="http://localhost:${FLASK_PORT}/revpi-schedule/check"
