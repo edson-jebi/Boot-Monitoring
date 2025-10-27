@@ -514,6 +514,212 @@
             gap: 1rem;
         }
 
+        /* Day Checkbox Styles */
+        .day-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            background-color: #ffffff;
+        }
+
+        .day-checkbox:hover:not(:has(input:disabled)) {
+            border-color: #f97316;
+            background-color: #fff7ed;
+        }
+
+        .day-checkbox input[type="checkbox"] {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .day-checkbox input[type="checkbox"]:checked + span {
+            font-weight: 600;
+            color: #f97316;
+        }
+
+        .day-checkbox:has(input:checked) {
+            border-color: #f97316;
+            background-color: #fff7ed;
+        }
+
+        .day-checkbox:has(input:disabled) {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .day-checkbox span {
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        /* Custom 24-Hour Time Picker */
+        .time-picker-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .time-picker-input {
+            width: 100%;
+            padding: 0.5rem 2.5rem 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            background-color: #ffffff;
+        }
+
+        .time-picker-input:disabled {
+            background-color: #f9fafb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .time-picker-input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        .time-picker-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #6b7280;
+            pointer-events: none;
+        }
+
+        .time-picker-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 0.25rem;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .time-picker-dropdown.active {
+            display: block;
+        }
+
+        .time-picker-header {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        .time-picker-display {
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: #f97316;
+            letter-spacing: 0.1em;
+        }
+
+        .time-picker-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            padding: 0.75rem;
+        }
+
+        .time-picker-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-picker-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .time-picker-scroll {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            background-color: #ffffff;
+        }
+
+        .time-picker-option {
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+
+        .time-picker-option:hover {
+            background-color: #fff7ed;
+        }
+
+        .time-picker-option.selected {
+            background-color: #f97316;
+            color: white;
+            font-weight: 600;
+        }
+
+        .time-picker-footer {
+            padding: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-picker-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-picker-btn.cancel {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .time-picker-btn.cancel:hover {
+            background-color: #e5e7eb;
+        }
+
+        .time-picker-btn.confirm {
+            background-color: #f97316;
+            color: white;
+        }
+
+        .time-picker-btn.confirm:hover {
+            background-color: #ea580c;
+        }
+
         /* Modal Styles */
         .modal-overlay {
             position: fixed;
@@ -853,7 +1059,7 @@
                             </svg>
                             <div>
                                 <p class="alert-success-title" id="autoPowerCycleAlertTitle">System Status: Active</p>
-                                <p class="alert-success-text" id="autoPowerCycleAlertText">Monitoring interval: Every 5 minutes | Max retry attempts: 3 | Cooldown period: 15 minutes</p>
+                                <p class="alert-success-text" id="autoPowerCycleAlertText">Loading configuration...</p>
                             </div>
                         </div>
                     </div>
@@ -884,7 +1090,7 @@
                                         </td>
                                         <td>
                                             <label class="toggle-container">
-                                                <input type="checkbox" class="toggle-input" id="screenPower" checked onchange="togglePower('screen', 'Screen', this)">
+                                                <input type="checkbox" class="toggle-input" id="screenPower" checked onchange="handleToggleSwitch('RelayScreen', this.checked)">
                                                 <div class="toggle-small"></div>
                                             </label>
                                         </td>
@@ -915,7 +1121,7 @@
                                         </td>
                                         <td>
                                             <label class="toggle-container">
-                                                <input type="checkbox" class="toggle-input" id="processorPower" checked onchange="togglePower('processor', 'Processor', this, true)">
+                                                <input type="checkbox" class="toggle-input" id="processorPower" checked onchange="handleToggleSwitch('RelayProcessor', this.checked)">
                                                 <div class="toggle-small"></div>
                                             </label>
                                         </td>
@@ -941,7 +1147,7 @@
                                         </td>
                                         <td>
                                             <label class="toggle-container">
-                                                <input type="checkbox" class="toggle-input" id="lightsPower" onchange="togglePower('lights', 'Lights', this)">
+                                                <input type="checkbox" class="toggle-input" id="lightsPower" onchange="handleToggleSwitch('RelayLight', this.checked)">
                                                 <div class="toggle-small"></div>
                                             </label>
                                         </td>
@@ -1001,7 +1207,7 @@
                                 <div class="schedule-period">6:00 AM</div>
                             </div>
                         </div>
-                        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="navigateToSettings()">
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="navigateToLightScheduleSettings()">
                             Configure Schedule
                             <svg class="icon-sm" viewBox="0 0 24 24">
                                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -1100,7 +1306,7 @@
                     </div>
 
                     <!-- Light Schedule Configuration -->
-                    <div class="card">
+                    <div id="lightScheduleCard" class="card">
                         <div class="card-header">
                             <div>
                                 <h2 class="card-title">Light Schedule Configuration</h2>
@@ -1130,14 +1336,84 @@
                         </div>
                         <div class="settings-section">
                             <div class="form-group">
-                                <label class="form-label">Lights ON Time</label>
-                                <input type="time" id="lightsOnTime" class="form-input" value="18:00" disabled>
-                                <p class="form-help">Time when lights automatically turn on</p>
+                                <label class="form-label">Lights ON Time (24-hour format)</label>
+                                <div class="time-picker-container">
+                                    <input type="text" 
+                                           id="lightsOnTime" 
+                                           class="time-picker-input" 
+                                           value="" 
+                                           readonly 
+                                           disabled
+                                           placeholder="HH:MM">
+                                    <svg class="time-picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <div id="lightsOnTimeDropdown" class="time-picker-dropdown"></div>
+                                </div>
+                                <p class="form-help">Time when lights automatically turn on (HH:MM format)</p>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Lights OFF Time</label>
-                                <input type="time" id="lightsOffTime" class="form-input" value="06:00" disabled>
-                                <p class="form-help">Time when lights automatically turn off</p>
+                                <label class="form-label">Lights OFF Time (24-hour format)</label>
+                                <div class="time-picker-container">
+                                    <input type="text" 
+                                           id="lightsOffTime" 
+                                           class="time-picker-input" 
+                                           value="06:00" 
+                                           readonly 
+                                           disabled
+                                           placeholder="HH:MM">
+                                    <svg class="time-picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <div id="lightsOffTimeDropdown" class="time-picker-dropdown"></div>
+                                </div>
+                                <p class="form-help">Time when lights automatically turn off (HH:MM format)</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Active Days</label>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" id="dayMon" value="mon" checked disabled>
+                                        <span>Mon</span>
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" id="dayTue" value="tue" checked disabled>
+                                        <span>Tue</span>
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" id="dayWed" value="wed" checked disabled>
+                                        <span>Wed</span>
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" id="dayThu" value="thu" checked disabled>
+                                        <span>Thu</span>
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" id="dayFri" value="fri" checked disabled>
+                                        <span>Fri</span>
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" id="daySat" value="sat" checked disabled>
+                                        <span>Sat</span>
+                                    </label>
+                                    <label class="day-checkbox">
+                                        <input type="checkbox" id="daySun" value="sun" checked disabled>
+                                        <span>Sun</span>
+                                    </label>
+                                </div>
+                                <p class="form-help">Select days when the light schedule should be active</p>
+                            </div>
+                            <div class="alert alert-info">
+                                <svg class="icon-sm alert-info-icon" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <div>
+                                    <p class="alert-info-text" style="margin-bottom: 0.25rem;"><strong>RevPi System Time:</strong> <span id="revpiSystemTime">Loading...</span></p>
+                                    <p class="alert-info-text" style="font-size: 0.75rem; color: #6b7280;">Schedule times are based on the RevPi system clock. Ensure time synchronization is configured correctly.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1436,6 +1712,23 @@
             navigateToScreen('settings');
         }
 
+        function navigateToLightScheduleSettings() {
+            navigateToScreen('settings');
+            // Wait for screen transition, then scroll to and highlight the Light Schedule section
+            setTimeout(() => {
+                const lightScheduleCard = document.getElementById('lightScheduleCard');
+                if (lightScheduleCard) {
+                    lightScheduleCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Add a highlight effect
+                    lightScheduleCard.style.transition = 'box-shadow 0.3s ease';
+                    lightScheduleCard.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.5)';
+                    setTimeout(() => {
+                        lightScheduleCard.style.boxShadow = '';
+                    }, 2000);
+                }
+            }, 100);
+        }
+
         function navigateToLogs() {
             navigateToScreen('logs');
         }
@@ -1535,43 +1828,201 @@
             }
         }
 
-        // Manual Controls
-        function togglePower(component, label, checkbox, isCritical = false) {
-            const newState = checkbox.checked;
-            const criticalWarning = isCritical && !newState ? ' This may interrupt critical operations.' : '';
-
+        // Manual Controls - Device Toggle with Real API Calls
+        function handleToggleSwitch(device, isChecked) {
+            const action = isChecked ? 'on' : 'off';
+            const toggleSwitch = document.getElementById(device === 'RelayScreen' ? 'screenPower' : 
+                                                         device === 'RelayProcessor' ? 'processorPower' : 'lightsPower');
+            
+            // Get friendly device name
+            const deviceNames = {
+                'RelayScreen': 'Screen',
+                'RelayProcessor': 'Processor',
+                'RelayLight': 'Lights'
+            };
+            const friendlyName = deviceNames[device] || device;
+            
+            // Show confirmation modal before executing
             showConfirmation(
-                newState ? `Turn ON ${label}` : `Turn OFF ${label}`,
-                `This will power ${newState ? 'on' : 'off'} the ${label.toLowerCase()} device.${criticalWarning} Continue?`,
+                `${action === 'on' ? 'Turn On' : 'Turn Off'} ${friendlyName}`,
+                `Are you sure you want to turn ${action} the ${friendlyName}?`,
                 () => {
-                    appState.manualControls[component].power = newState;
-                    checkbox.checked = newState;
+                    // User confirmed - proceed with toggle
+                    if (toggleSwitch) toggleSwitch.disabled = true;
+
+                    fetch('/revpi-toggle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            device: device,
+                            action: action
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Add brief visual feedback delay for manual user actions (200ms)
+                            setTimeout(() => {
+                                if (toggleSwitch) toggleSwitch.disabled = false;
+                                
+                                // Update app state
+                                const component = device === 'RelayScreen' ? 'screen' : 
+                                                 device === 'RelayProcessor' ? 'processor' : 'lights';
+                                if (appState.manualControls[component]) {
+                                    appState.manualControls[component].power = isChecked;
+                                }
+                            }, 10); // Brief 200ms delay for visual feedback on manual changes
+                        } else {
+                            // Re-enable toggle immediately on error
+                            if (toggleSwitch) toggleSwitch.disabled = false;
+                            
+                            // Show error and revert toggle switch
+                            const errorMsg = (data.message || 'Operation failed').replace(/^ip host say:\s*/i, '');
+                            showConfirmation(
+                                'Operation Failed',
+                                `Failed to switch ${friendlyName}: ${errorMsg}`,
+                                () => {},
+                                'OK'
+                            );
+                            if (toggleSwitch) toggleSwitch.checked = !isChecked;
+                        }
+                    })
+                    .catch(error => {
+                        // Re-enable toggle and revert state
+                        if (toggleSwitch) {
+                            toggleSwitch.disabled = false;
+                            toggleSwitch.checked = !isChecked;
+                        }
+
+                        console.error('Error:', error);
+                        const errorMsg = error.message.replace(/^ip host say:\s*/i, '');
+                        showConfirmation(
+                            'Connection Error',
+                            `Connection failed: ${errorMsg}`,
+                            () => {},
+                            'OK'
+                        );
+                    });
                 },
-                newState ? 'Turn ON' : 'Turn OFF'
+                `Turn ${action === 'on' ? 'On' : 'Off'}`
             );
-            // Revert checkbox state temporarily
-            checkbox.checked = !newState;
+            
+            // Revert checkbox state temporarily until confirmed
+            if (toggleSwitch) toggleSwitch.checked = !isChecked;
         }
 
         function toggleLed(component, label, checkbox) {
-            const newState = checkbox.checked;
-
+            const isChecked = checkbox.checked;
+            const action = isChecked ? 'on' : 'off';
+            
+            // Map component names to LED device names
+            const ledDeviceMap = {
+                'screen': 'LedScreen',
+                'processor': 'LedProcessor',
+                'lights': 'LedLight'
+            };
+            
+            const ledDevice = ledDeviceMap[component];
+            if (!ledDevice) {
+                console.error('Unknown LED component:', component);
+                checkbox.checked = !isChecked;
+                return;
+            }
+            
+            // Show confirmation modal before executing
             showConfirmation(
-                newState ? `Turn ON ${label} LED Indicator` : `Turn OFF ${label} LED Indicator`,
-                `This will turn ${newState ? 'on' : 'off'} the physical LED indicator on the Smart switchboard for the ${label.toLowerCase()}. Continue?`,
+                `${action === 'on' ? 'Turn On' : 'Turn Off'} ${label} LED`,
+                `Are you sure you want to turn ${action} the LED indicator for ${label}?`,
                 () => {
-                    appState.manualControls[component].ledIndicator = newState;
-                    checkbox.checked = newState;
+                    // User confirmed - proceed with toggle
+                    checkbox.disabled = true;
+
+                    fetch('/revpi-toggle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            device: ledDevice,
+                            action: action
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Add brief visual feedback delay for manual user actions (200ms)
+                            setTimeout(() => {
+                                checkbox.disabled = false;
+                                
+                                // Update app state
+                                if (appState.manualControls[component]) {
+                                    appState.manualControls[component].ledIndicator = isChecked;
+                                }
+                            }, 10); // Brief 200ms delay for visual feedback on manual changes
+                        } else {
+                            // Re-enable checkbox immediately on error
+                            checkbox.disabled = false;
+                            
+                            // Show error and revert checkbox
+                            const errorMsg = (data.message || 'Operation failed').replace(/^ip host say:\s*/i, '');
+                            showConfirmation(
+                                'Operation Failed',
+                                `Failed to switch LED for ${label}: ${errorMsg}`,
+                                () => {},
+                                'OK'
+                            );
+                            checkbox.checked = !isChecked;
+                        }
+                    })
+                    .catch(error => {
+                        // Re-enable checkbox and revert state
+                        checkbox.disabled = false;
+                        checkbox.checked = !isChecked;
+
+                        console.error('Error:', error);
+                        const errorMsg = error.message.replace(/^ip host say:\s*/i, '');
+                        showConfirmation(
+                            'Connection Error',
+                            `Connection failed: ${errorMsg}`,
+                            () => {},
+                            'OK'
+                        );
+                    });
                 },
-                newState ? 'Turn ON' : 'Turn OFF'
+                `Turn ${action === 'on' ? 'On' : 'Off'}`
             );
-            // Revert checkbox state temporarily
-            checkbox.checked = !newState;
+            
+            // Revert checkbox state temporarily until confirmed
+            checkbox.checked = !isChecked;
         }
 
         // Light Schedule
         function toggleLightSchedule(checkbox) {
             const newState = checkbox.checked;
+            
+            // Get schedule times from Settings page inputs
+            const lightsOnTime = document.getElementById('lightsOnTime').value;
+            const lightsOffTime = document.getElementById('lightsOffTime').value;
+            
+            // Check if a schedule is configured
+            if (!lightsOnTime || !lightsOffTime) {
+                // No schedule configured - prevent toggle and show message
+                checkbox.checked = !newState;
+                showConfirmation(
+                    'No Schedule Configured',
+                    'Please configure light schedule times in Settings before enabling the schedule.',
+                    () => {
+                        navigateToSettings();
+                    },
+                    'Go to Settings'
+                );
+                return;
+            }
+
+            // Revert checkbox state temporarily until user confirms
+            checkbox.checked = !newState;
 
             showConfirmation(
                 newState ? 'Enable Light Schedule' : 'Disable Light Schedule',
@@ -1579,21 +2030,480 @@
                     ? 'This will enable the automatic light schedule. Lights will turn on/off at configured times. Continue?'
                     : 'This will disable the automatic light schedule. Lights will need to be controlled manually. Continue?',
                 () => {
-                    appState.ledScheduleEnabled = newState;
-                    updateLightScheduleUI();
+                    // User confirmed - set checkbox to desired state
+                    checkbox.checked = newState;
+                    
+                    // Disable checkbox during operation
+                    checkbox.disabled = true;
+                    
+                    // Get selected days
+                    const selectedDays = getSelectedDays();
+                    
+                    // Save the schedule configuration (only saves enabled/disabled state)
+                    saveScheduleConfiguration(newState, lightsOnTime, lightsOffTime, selectedDays, checkbox);
                 },
                 newState ? 'Enable' : 'Disable'
             );
-            // Revert checkbox state temporarily
-            checkbox.checked = !newState;
+        }
+
+        // Custom 24-Hour Time Picker
+        class TimePicker {
+            constructor(inputId, dropdownId) {
+                this.input = document.getElementById(inputId);
+                this.dropdown = document.getElementById(dropdownId);
+                this.selectedHour = 18;
+                this.selectedMinute = 0;
+                
+                if (this.input && this.dropdown) {
+                    this.init();
+                }
+            }
+            
+            init() {
+                // Parse initial value
+                const initialValue = this.input.value || '18:00';
+                const [hour, minute] = initialValue.split(':').map(Number);
+                this.selectedHour = hour;
+                this.selectedMinute = minute;
+                
+                // Click event to open picker
+                this.input.addEventListener('click', () => {
+                    if (!this.input.disabled) {
+                        this.open();
+                    }
+                });
+                
+                // Close on outside click
+                document.addEventListener('click', (e) => {
+                    if (!this.input.contains(e.target) && !this.dropdown.contains(e.target)) {
+                        this.close();
+                    }
+                });
+            }
+            
+            open() {
+                this.render();
+                this.dropdown.classList.add('active');
+            }
+            
+            close() {
+                this.dropdown.classList.remove('active');
+            }
+            
+            render() {
+                const hoursOptions = Array.from({ length: 24 }, (_, i) => {
+                    const hour = i.toString().padStart(2, '0');
+                    const selected = i === this.selectedHour ? 'selected' : '';
+                    return `<div class="time-picker-option ${selected}" data-hour="${i}">${hour}</div>`;
+                }).join('');
+                
+                const minutesOptions = Array.from({ length: 60 }, (_, i) => {
+                    const minute = i.toString().padStart(2, '0');
+                    const selected = i === this.selectedMinute ? 'selected' : '';
+                    return `<div class="time-picker-option ${selected}" data-minute="${i}">${minute}</div>`;
+                }).join('');
+                
+                this.dropdown.innerHTML = `
+                    <div class="time-picker-header">
+                        <div class="time-picker-display">${this.formatTime()}</div>
+                    </div>
+                    <div class="time-picker-body">
+                        <div class="time-picker-column">
+                            <div class="time-picker-label">Hour</div>
+                            <div class="time-picker-scroll" id="${this.input.id}_hours">
+                                ${hoursOptions}
+                            </div>
+                        </div>
+                        <div class="time-picker-column">
+                            <div class="time-picker-label">Minute</div>
+                            <div class="time-picker-scroll" id="${this.input.id}_minutes">
+                                ${minutesOptions}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="time-picker-footer">
+                        <button class="time-picker-btn cancel">Cancel</button>
+                        <button class="time-picker-btn confirm">OK</button>
+                    </div>
+                `;
+                
+                // Attach event listeners
+                this.attachEvents();
+                
+                // Scroll to selected items
+                this.scrollToSelected();
+            }
+            
+            attachEvents() {
+                // Hour selection
+                const hourOptions = this.dropdown.querySelectorAll('[data-hour]');
+                hourOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        this.selectedHour = parseInt(e.target.dataset.hour);
+                        this.updateDisplay();
+                        this.updateSelection();
+                    });
+                });
+                
+                // Minute selection
+                const minuteOptions = this.dropdown.querySelectorAll('[data-minute]');
+                minuteOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        this.selectedMinute = parseInt(e.target.dataset.minute);
+                        this.updateDisplay();
+                        this.updateSelection();
+                    });
+                });
+                
+                // Cancel button
+                this.dropdown.querySelector('.cancel').addEventListener('click', () => {
+                    this.close();
+                });
+                
+                // Confirm button
+                this.dropdown.querySelector('.confirm').addEventListener('click', () => {
+                    this.input.value = this.formatTime();
+                    this.close();
+                });
+            }
+            
+            updateDisplay() {
+                const display = this.dropdown.querySelector('.time-picker-display');
+                if (display) {
+                    display.textContent = this.formatTime();
+                }
+            }
+            
+            updateSelection() {
+                // Update hour selection
+                this.dropdown.querySelectorAll('[data-hour]').forEach(option => {
+                    option.classList.toggle('selected', parseInt(option.dataset.hour) === this.selectedHour);
+                });
+                
+                // Update minute selection
+                this.dropdown.querySelectorAll('[data-minute]').forEach(option => {
+                    option.classList.toggle('selected', parseInt(option.dataset.minute) === this.selectedMinute);
+                });
+            }
+            
+            scrollToSelected() {
+                const hourScroll = document.getElementById(`${this.input.id}_hours`);
+                const minuteScroll = document.getElementById(`${this.input.id}_minutes`);
+                
+                if (hourScroll) {
+                    const selectedHour = hourScroll.querySelector('.selected');
+                    if (selectedHour) {
+                        selectedHour.scrollIntoView({ block: 'center' });
+                    }
+                }
+                
+                if (minuteScroll) {
+                    const selectedMinute = minuteScroll.querySelector('.selected');
+                    if (selectedMinute) {
+                        selectedMinute.scrollIntoView({ block: 'center' });
+                    }
+                }
+            }
+            
+            formatTime() {
+                return `${this.selectedHour.toString().padStart(2, '0')}:${this.selectedMinute.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Initialize time pickers (will be called after DOM loads)
+        let lightsOnTimePicker, lightsOffTimePicker;
+
+        function getSelectedDays() {
+            const days = [];
+            const dayMap = {
+                'dayMon': 'mon',
+                'dayTue': 'tue',
+                'dayWed': 'wed',
+                'dayThu': 'thu',
+                'dayFri': 'fri',
+                'daySat': 'sat',
+                'daySun': 'sun'
+            };
+            
+            for (const [id, value] of Object.entries(dayMap)) {
+                const checkbox = document.getElementById(id);
+                if (checkbox && checkbox.checked) {
+                    days.push(value);
+                }
+            }
+            
+            return days.length > 0 ? days : ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        }
+
+        function saveScheduleConfiguration(enabled, onTime, offTime, days, checkbox) {
+            // Store the actual ON and OFF times - backend will handle the logic
+            // start_time = when lights turn ON
+            // end_time = when lights turn OFF
+            
+            // Prepare schedule data for RelayLight device
+            const scheduleData = {
+                device_id: 'RelayLight',
+                start_time: onTime,     // Lights ON time
+                end_time: offTime,      // Lights OFF time
+                days: days,             // Selected days from checkboxes
+                enabled: enabled
+            };
+
+            // First, save the schedule configuration to database
+            fetch('/revpi-schedule/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(scheduleData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    appState.ledScheduleEnabled = enabled;
+                    updateLightScheduleUI();
+                    
+                    // Determine the appropriate relay action based on schedule state and current time
+                    let lightAction;
+                    
+                    if (!enabled) {
+                        // If schedule is disabled, turn lights OFF
+                        lightAction = 'off';
+                    } else {
+                        // If schedule is enabled, check if current time is within scheduled ON time
+                        lightAction = isWithinScheduleTime(onTime, offTime) ? 'on' : 'off';
+                    }
+                    
+                    return fetch('/revpi-toggle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            device: 'RelayLight',
+                            action: lightAction
+                        })
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to save schedule');
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Format days for display
+                    const dayNames = {
+                        'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday',
+                        'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'
+                    };
+                    const daysList = days.map(d => dayNames[d] || d).join(', ');
+                    
+                    // Determine current state message
+                    let statusMessage;
+                    if (!enabled) {
+                        statusMessage = 'Light schedule disabled successfully. Lights are now OFF. Manual control only.';
+                    } else {
+                        const isWithinSchedule = isWithinScheduleTime(onTime, offTime);
+                        const currentStatus = isWithinSchedule ? 'ON (within scheduled time)' : 'OFF (outside scheduled time)';
+                        statusMessage = `Light schedule enabled successfully. Lights are currently ${currentStatus}. Schedule: ON at ${onTime}, OFF at ${offTime} on ${daysList}.`;
+                    }
+                    
+                    showConfirmation(
+                        'Schedule Saved',
+                        statusMessage,
+                        () => {},
+                        'OK'
+                    );
+                } else {
+                    throw new Error(data.message || 'Failed to toggle light relay');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving schedule or toggling lights:', error);
+                showConfirmation(
+                    'Operation Failed',
+                    `Failed to complete operation: ${error.message}`,
+                    () => {},
+                    'OK'
+                );
+            })
+            .finally(() => {
+                // Re-enable checkbox
+                checkbox.disabled = false;
+            });
+        }
+        
+        // Helper function to check if current time is within schedule time
+        function isWithinScheduleTime(onTime, offTime) {
+            const now = new Date();
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            // Handle overnight schedule (e.g., ON at 18:00, OFF at 06:00)
+            if (onTime > offTime) {
+                // Current time is within schedule if:
+                // - time >= onTime (after 18:00) OR
+                // - time < offTime (before 06:00)
+                return currentTime >= onTime || currentTime < offTime;
+            } else {
+                // Normal daytime schedule (e.g., ON at 08:00, OFF at 17:00)
+                // Current time is within schedule if:
+                // - time >= onTime AND time < offTime
+                return currentTime >= onTime && currentTime < offTime;
+            }
         }
 
         function updateLightScheduleUI() {
             const checkbox = document.getElementById('lightScheduleToggle');
             const status = document.getElementById('lightScheduleStatus');
+            
+            // Check if schedule times are configured
+            const lightsOnTime = document.getElementById('lightsOnTime').value;
+            const lightsOffTime = document.getElementById('lightsOffTime').value;
+            const hasSchedule = lightsOnTime && lightsOffTime;
 
             checkbox.checked = appState.ledScheduleEnabled;
-            status.textContent = appState.ledScheduleEnabled ? 'Automatic schedule active' : 'Manual control only';
+            
+            // Disable toggle if no schedule is configured
+            if (!hasSchedule) {
+                checkbox.disabled = true;
+                status.textContent = 'No schedule configured - Please configure times in Settings';
+            } else {
+                checkbox.disabled = false;
+                status.textContent = appState.ledScheduleEnabled ? 'Automatic schedule active' : 'Manual control only';
+            }
+        }
+
+        function loadLightSchedule() {
+            // Load saved light schedule from backend database
+            fetch('/revpi-schedule/get/RelayLight')
+            .then(response => response.json())
+            .then(data => {
+                // Backend returns data in 'data.data' for success responses
+                if (data.success && data.data) {
+                    const schedule = data.data;
+                    
+                    // Update appState
+                    appState.ledScheduleEnabled = schedule.enabled;
+                    
+                    // Update checkbox state
+                    const checkbox = document.getElementById('lightScheduleToggle');
+                    if (checkbox) {
+                        checkbox.checked = schedule.enabled;
+                    }
+                    
+                    // Update time inputs in Settings page - use saved values or leave empty
+                    const lightsOnTime = document.getElementById('lightsOnTime');
+                    const lightsOffTime = document.getElementById('lightsOffTime');
+                    
+                    if (lightsOnTime) {
+                        lightsOnTime.value = schedule.start_time || '';
+                        // Update time picker internal state if value exists
+                        if (schedule.start_time && lightsOnTimePicker) {
+                            const [hour, minute] = schedule.start_time.split(':').map(Number);
+                            lightsOnTimePicker.selectedHour = hour;
+                            lightsOnTimePicker.selectedMinute = minute;
+                        }
+                    }
+                    if (lightsOffTime) {
+                        lightsOffTime.value = schedule.end_time || '';
+                        // Update time picker internal state if value exists
+                        if (schedule.end_time && lightsOffTimePicker) {
+                            const [hour, minute] = schedule.end_time.split(':').map(Number);
+                            lightsOffTimePicker.selectedHour = hour;
+                            lightsOffTimePicker.selectedMinute = minute;
+                        }
+                    }
+                    
+                    // Update day checkboxes
+                    if (schedule.days && Array.isArray(schedule.days)) {
+                        // First, uncheck all days
+                        ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(day => {
+                            const dayCheckbox = document.getElementById('day' + day.charAt(0).toUpperCase() + day.slice(1));
+                            if (dayCheckbox) {
+                                dayCheckbox.checked = false;
+                            }
+                        });
+                        
+                        // Then, check only the saved days
+                        schedule.days.forEach(day => {
+                            const dayCheckbox = document.getElementById('day' + day.charAt(0).toUpperCase() + day.slice(1));
+                            if (dayCheckbox) {
+                                dayCheckbox.checked = true;
+                            }
+                        });
+                    }
+                    
+                    // Update UI text
+                    updateLightScheduleUI();
+                    
+                    // Update dashboard schedule display
+                    updateDashboardScheduleDisplay(schedule.start_time, schedule.end_time);
+                    
+                    console.log('Light schedule loaded from database:', schedule);
+                } else {
+                    console.log('No saved light schedule found in database (or success=false):', data.message || 'No data');
+                    // Don't clear if there are existing values in the form
+                    // This allows manually entered values to persist even when DB has no schedule
+                    const lightsOnTime = document.getElementById('lightsOnTime');
+                    const lightsOffTime = document.getElementById('lightsOffTime');
+                    
+                    // Only clear if fields are truly empty (not just DB empty)
+                    if (!lightsOnTime.value && !lightsOffTime.value) {
+                        // Clear dashboard display only if no values exist
+                        updateDashboardScheduleDisplay('', '');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading light schedule from database:', error);
+                // On network/fetch error, don't clear existing values
+                // This allows the UI to maintain state during network issues
+                console.log('Keeping existing form values due to fetch error');
+            });
+        }
+        
+        // Helper function to update dashboard schedule display
+        function updateDashboardScheduleDisplay(onTime, offTime) {
+            // Update the dashboard Light Schedule card to show actual saved times
+            const scheduleTimeElements = document.querySelectorAll('.schedule-time');
+            const schedulePeriodElements = document.querySelectorAll('.schedule-period');
+            
+            if (scheduleTimeElements.length >= 2) {
+                if (onTime) {
+                    scheduleTimeElements[0].textContent = onTime;
+                    // Update period (AM/PM) display
+                    if (schedulePeriodElements.length >= 1) {
+                        schedulePeriodElements[0].textContent = formatTimePeriod(onTime);
+                    }
+                } else {
+                    scheduleTimeElements[0].textContent = '--:--';
+                    if (schedulePeriodElements.length >= 1) {
+                        schedulePeriodElements[0].textContent = '--';
+                    }
+                }
+                
+                if (offTime) {
+                    scheduleTimeElements[1].textContent = offTime;
+                    // Update period (AM/PM) display
+                    if (schedulePeriodElements.length >= 2) {
+                        schedulePeriodElements[1].textContent = formatTimePeriod(offTime);
+                    }
+                } else {
+                    scheduleTimeElements[1].textContent = '--:--';
+                    if (schedulePeriodElements.length >= 2) {
+                        schedulePeriodElements[1].textContent = '--';
+                    }
+                }
+            }
+        }
+        
+        // Helper function to format time to 12-hour format with AM/PM
+        function formatTimePeriod(time24) {
+            if (!time24) return '--';
+            const [hour, minute] = time24.split(':').map(Number);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour === 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+            return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
         }
 
         // Timeline
@@ -1819,6 +2729,13 @@
             } else if (section === 'lightSchedule') {
                 document.getElementById('lightsOnTime').disabled = !enable;
                 document.getElementById('lightsOffTime').disabled = !enable;
+                // Enable/disable day checkboxes
+                ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
+                    const checkbox = document.getElementById('day' + day);
+                    if (checkbox) {
+                        checkbox.disabled = !enable;
+                    }
+                });
             } else if (section === 'network') {
                 document.getElementById('screenIp').disabled = !enable;
                 document.getElementById('processorIp').disabled = !enable;
@@ -1841,6 +2758,72 @@
                         appState.systemInfo.location = document.getElementById('locationCode').value;
                         updateSystemInfoUI();
                     }
+                    
+                    // Update light schedule if that's what was edited
+                    if (section === 'lightSchedule') {
+                        const lightsOnTime = document.getElementById('lightsOnTime').value;
+                        const lightsOffTime = document.getElementById('lightsOffTime').value;
+                        const selectedDays = getSelectedDays();
+                        
+                        // Validate that times are configured
+                        if (!lightsOnTime || !lightsOffTime) {
+                            showConfirmation(
+                                'Missing Time Configuration',
+                                'Please set both ON and OFF times before saving the schedule.',
+                                () => {},
+                                'OK'
+                            );
+                            return;
+                        }
+                        
+                        // Prepare schedule data - store actual ON and OFF times
+                        // Backend will handle the logic
+                        const scheduleData = {
+                            device_id: 'RelayLight',
+                            start_time: lightsOnTime,  // Lights ON time
+                            end_time: lightsOffTime,   // Lights OFF time
+                            days: selectedDays,
+                            enabled: appState.ledScheduleEnabled // Keep current enabled state
+                        };
+                        
+                        // Save to database
+                        fetch('/revpi-schedule/save', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(scheduleData)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update dashboard display with new times
+                                updateDashboardScheduleDisplay(lightsOnTime, lightsOffTime);
+                                
+                                // Update UI to reflect changes
+                                updateLightScheduleUI();
+                                
+                                showConfirmation(
+                                    'Schedule Saved',
+                                    `Light schedule times updated successfully. ON: ${lightsOnTime}, OFF: ${lightsOffTime}`,
+                                    () => {},
+                                    'OK'
+                                );
+                            } else {
+                                throw new Error(data.message || 'Failed to save schedule');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error saving light schedule:', error);
+                            showConfirmation(
+                                'Save Failed',
+                                `Failed to save light schedule: ${error.message}`,
+                                () => {},
+                                'OK'
+                            );
+                        });
+                    }
+                    
                     toggleEdit(section, false);
                 },
                 'Save Changes'
@@ -1890,10 +2873,13 @@
 
         // Fetch and update service status
         function updateServiceStatus() {
-            fetch('/service-status')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+            // First, fetch the configuration to get the check interval
+            Promise.all([
+                fetch('/service-status').then(r => r.json()),
+                fetch('/config-data').then(r => r.json())
+            ])
+                .then(([serviceData, configData]) => {
+                    if (serviceData.success) {
                         const alertBox = document.getElementById('autoPowerCycleAlert');
                         const alertIcon = document.getElementById('autoPowerCycleAlertIcon');
                         const alertTitle = document.getElementById('autoPowerCycleAlertTitle');
@@ -1901,8 +2887,30 @@
                         const checkbox = document.getElementById('autoPowerCycleToggle');
                         const status = document.getElementById('autoPowerCycleStatus');
 
+                        // Get configuration values
+                        let checkIntervalSec = 300; // Default 5 minutes
+                        let maxPowerCycles = 3;
+                        let rebootWaitSec = 900; // Default 15 minutes
+                        
+                        if (configData.success && configData.data) {
+                            checkIntervalSec = configData.data.CHECK_INTERVAL_SEC || 300;
+                            maxPowerCycles = configData.data.MAX_POWER_CYCLES || 3;
+                            rebootWaitSec = configData.data.REBOOT_WAIT_SEC || 900;
+                        }
+                        
+                        // Convert seconds to human-readable format
+                        const intervalMinutes = Math.round(checkIntervalSec / 60);
+                        const intervalText = intervalMinutes >= 1 
+                            ? `Every ${intervalMinutes} minute${intervalMinutes !== 1 ? 's' : ''}`
+                            : `Every ${checkIntervalSec} second${checkIntervalSec !== 1 ? 's' : ''}`;
+                        
+                        const cooldownMinutes = Math.round(rebootWaitSec / 60);
+                        const cooldownText = cooldownMinutes >= 1
+                            ? `${cooldownMinutes} minute${cooldownMinutes !== 1 ? 's' : ''}`
+                            : `${rebootWaitSec} second${rebootWaitSec !== 1 ? 's' : ''}`;
+
                         // Update based on service status
-                        if (data.active && data.status === 'active') {
+                        if (serviceData.active && serviceData.status === 'active') {
                             // Service is active
                             appState.autoPowerCycle = true;
                             checkbox.checked = true;
@@ -1916,11 +2924,11 @@
                             alertTitle.textContent = 'System Status: Active';
                             
                             alertText.className = 'alert-success-text';
-                            alertText.textContent = `Monitoring interval: Every 5 minutes | Max retry attempts: 3 | Cooldown period: 15 minutes | Uptime: ${data.uptime || 'N/A'}`;
+                            alertText.textContent = `Monitoring interval: ${intervalText} | Max retry attempts: ${maxPowerCycles} | Cooldown period: ${cooldownText} | Uptime: ${serviceData.uptime || 'N/A'}`;
                             
                             status.textContent = 'Monitoring active - System will automatically power cycle devices when connectivity issues are detected';
                             alertBox.style.display = 'flex';
-                        } else if (data.status === 'inactive' || data.status === 'failed') {
+                        } else if (serviceData.status === 'inactive' || serviceData.status === 'failed') {
                             // Service is inactive or failed
                             appState.autoPowerCycle = false;
                             checkbox.checked = false;
@@ -1931,7 +2939,7 @@
                             alertIcon.innerHTML = '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>';
                             
                             alertTitle.className = 'alert-error-title';
-                            alertTitle.textContent = data.status === 'failed' ? 'System Status: Failed' : 'System Status: Inactive';
+                            alertTitle.textContent = serviceData.status === 'failed' ? 'System Status: Failed' : 'System Status: Inactive';
                             
                             alertText.className = 'alert-error-text';
                             alertText.textContent = 'Monitoring service is not running. Please start the service to enable automatic power cycling.';
@@ -1949,7 +2957,7 @@
                             alertIcon.innerHTML = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>';
                             
                             alertTitle.className = 'alert-warning-title';
-                            alertTitle.textContent = `System Status: ${data.status || 'Unknown'}`;
+                            alertTitle.textContent = `System Status: ${serviceData.status || 'Unknown'}`;
                             
                             alertText.className = 'alert-warning-text';
                             alertText.textContent = 'Service status is unknown. Please check the service configuration.';
@@ -1958,11 +2966,105 @@
                             alertBox.style.display = 'flex';
                         }
                     } else {
-                        console.error('Error fetching service status:', data.error);
+                        console.error('Error fetching service status:', serviceData.error);
                     }
                 })
                 .catch(error => {
                     console.error('Network error fetching service status:', error);
+                });
+        }
+
+        // Update device status for manual controls
+        function updateDeviceStatus() {
+            fetch('/revpi-status')
+            .then(response => response.json())
+            .then(data => {
+                // Update Screen power status
+                if (data.RelayScreen) {
+                    const screenToggle = document.getElementById('screenPower');
+                    if (screenToggle && data.RelayScreen.status === 'ON') {
+                        screenToggle.checked = true;
+                    } else if (screenToggle) {
+                        screenToggle.checked = false;
+                    }
+                }
+
+                // Update Processor power status
+                if (data.RelayProcessor) {
+                    const processorToggle = document.getElementById('processorPower');
+                    if (processorToggle && data.RelayProcessor.status === 'ON') {
+                        processorToggle.checked = true;
+                    } else if (processorToggle) {
+                        processorToggle.checked = false;
+                    }
+                }
+
+                // Update Lights power status
+                if (data.RelayLight) {
+                    const lightsToggle = document.getElementById('lightsPower');
+                    if (lightsToggle && data.RelayLight.status === 'ON') {
+                        lightsToggle.checked = true;
+                    } else if (lightsToggle) {
+                        lightsToggle.checked = false;
+                    }
+                }
+
+                // Update Screen LED status
+                if (data.LedScreen) {
+                    const screenLedToggle = document.getElementById('screenLed');
+                    if (screenLedToggle && data.LedScreen.status === 'ON') {
+                        screenLedToggle.checked = true;
+                    } else if (screenLedToggle) {
+                        screenLedToggle.checked = false;
+                    }
+                }
+
+                // Update Processor LED status
+                if (data.LedProcessor) {
+                    const processorLedToggle = document.getElementById('processorLed');
+                    if (processorLedToggle && data.LedProcessor.status === 'ON') {
+                        processorLedToggle.checked = true;
+                    } else if (processorLedToggle) {
+                        processorLedToggle.checked = false;
+                    }
+                }
+
+                // Update Lights LED status
+                if (data.LedLight) {
+                    const lightsLedToggle = document.getElementById('lightsLed');
+                    if (lightsLedToggle && data.LedLight.status === 'ON') {
+                        lightsLedToggle.checked = true;
+                    } else if (lightsLedToggle) {
+                        lightsLedToggle.checked = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching device status:', error);
+            });
+        }
+
+        // Update RevPi system time display
+        function updateSystemTime() {
+            fetch('/system-time')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.time) {
+                        const timeElement = document.getElementById('revpiSystemTime');
+                        if (timeElement) {
+                            // Format: "Thu, Oct 24 2025, 20:15:30"
+                            timeElement.textContent = data.time;
+                        }
+                    } else {
+                        console.error('Error fetching system time:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Network error fetching system time:', error);
+                    const timeElement = document.getElementById('revpiSystemTime');
+                    if (timeElement) {
+                        timeElement.textContent = 'Unable to fetch time';
+                    }
                 });
         }
 
@@ -1983,9 +3085,55 @@
             updateAutoPowerCycleUI();
             updateLightScheduleUI();
             
+            // Initialize custom time pickers
+            lightsOnTimePicker = new TimePicker('lightsOnTime', 'lightsOnTimeDropdown');
+            lightsOffTimePicker = new TimePicker('lightsOffTime', 'lightsOffTimeDropdown');
+            
+            
+            // Load saved light schedule from database
+            loadLightSchedule();
+            
             // Fetch service status immediately and every 10 seconds
             updateServiceStatus();
-            setInterval(updateServiceStatus, 10000);
+            setInterval(updateServiceStatus, 5000);
+            
+            // Fetch device status for manual controls immediately and every 15 seconds
+            updateDeviceStatus();
+            setInterval(updateDeviceStatus, 5000);
+            
+            // Update RevPi system time immediately and every 5 seconds
+            updateSystemTime();
+            setInterval(updateSystemTime, 5000);
+            
+            // Check and enforce light schedule immediately and every 60 seconds
+            checkLightSchedule();
+            setInterval(checkLightSchedule, 60000);
+        }
+
+        // Function to check and enforce light schedule
+        function checkLightSchedule() {
+            // Only check if we're not on the page or if schedule is enabled
+            if (!appState.ledScheduleEnabled) {
+                return;
+            }
+            
+            fetch('/revpi-schedule/check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.action !== 'none') {
+                    console.log('Schedule check:', data.message);
+                    // Refresh device status to show updated relay state
+                    updateDeviceStatus();
+                }
+            })
+            .catch(error => {
+                console.error('Error checking light schedule:', error);
+            });
         }
 
         // Start the application
@@ -1993,3 +3141,4 @@
     </script>
 </body>
 </html>
+

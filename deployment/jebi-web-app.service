@@ -1,0 +1,21 @@
+[Unit]
+Description=JEBI Web Application (Flask)
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/Boot-Monitoring_Mockup/Boot-Monitoring
+Environment="PATH=/home/pi/Boot-Monitoring_Mockup/Boot-Monitoring/venv/bin"
+ExecStart=/home/pi/Boot-Monitoring_Mockup/Boot-Monitoring/venv/bin/python3 web.py
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jebi-web-app
+
+[Install]
+WantedBy=multi-user.target

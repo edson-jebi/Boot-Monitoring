@@ -1,0 +1,155 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    BOOT-MONITORING INSTALLATION                                ║
+║                         Quick Reference Card                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ INSTALLATION                                                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  sudo /home/pi/Boot-Monitoring/deployment/simple_install.sh
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ WHAT GETS INSTALLED                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  ✓ Flask Web Application (Gunicorn + 2 workers)
+  ✓ Virtual Environment with all dependencies
+  ✓ Systemd service: boot-monitoring.service
+  ✓ Light Schedule Checker: light-schedule-check.timer
+  ✓ Firewall configuration (port 5000)
+  ✓ Auto-start on boot for all services
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ACCESS APPLICATION                                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Local:   http://localhost:5000
+  Network: http://[PI_IP]:5000
+
+  Find IP: hostname -I
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ MAIN SERVICE COMMANDS                                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Status:  sudo systemctl status boot-monitoring
+  Logs:    sudo journalctl -fu boot-monitoring
+  Start:   sudo systemctl start boot-monitoring
+  Stop:    sudo systemctl stop boot-monitoring
+  Restart: sudo systemctl restart boot-monitoring
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ LIGHT SCHEDULE COMMANDS                                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Timer:   sudo systemctl status light-schedule-check.timer
+  Logs:    tail -f /var/log/light-schedule-check.log
+  List:    sudo systemctl list-timers light-schedule-check.timer
+  Start:   sudo systemctl start light-schedule-check.timer
+  Stop:    sudo systemctl stop light-schedule-check.timer
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Check Services:
+    systemctl list-units | grep -E "(boot-monitoring|light-schedule)"
+
+  Test Main App:
+    curl http://localhost:5000
+
+  Test Schedule API:
+    curl -X POST http://localhost:5000/revpi-schedule/check
+
+  Check Port:
+    sudo netstat -tlnp | grep 5000
+
+  View All Logs:
+    sudo journalctl -u boot-monitoring -u light-schedule-check.service -f
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ FILE LOCATIONS                                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  App Directory:     /home/pi/Boot-Monitoring
+  Virtual Env:       /home/pi/Boot-Monitoring/venv
+  Config:            /home/pi/Boot-Monitoring/.env
+  
+  Main Service:      /etc/systemd/system/boot-monitoring.service
+  Schedule Service:  /etc/systemd/system/light-schedule-check.service
+  Schedule Timer:    /etc/systemd/system/light-schedule-check.timer
+  
+  Schedule Logs:     /var/log/light-schedule-check.log
+  Schedule Script:   /home/pi/Boot-Monitoring/scripts/check_light_schedule.sh
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ CONFIGURE LIGHT SCHEDULE                                                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1. Open web interface: http://[PI_IP]:5000
+  2. Navigate to: Settings → Light Schedule Configuration
+  3. Click: Edit
+  4. Set ON Time (24h format): e.g., 18:00
+  5. Set OFF Time (24h format): e.g., 06:00
+  6. Select active days
+  7. Click: Save Changes
+  8. Go to Dashboard → Enable "Light Schedule" toggle
+  9. Monitor: tail -f /var/log/light-schedule-check.log
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ VERIFY INSTALLATION                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1. Check main service:
+     systemctl is-active boot-monitoring
+     Expected: active
+
+  2. Check timer:
+     systemctl is-active light-schedule-check.timer
+     Expected: active
+
+  3. Access web:
+     curl http://localhost:5000
+     Expected: HTML response
+
+  4. Test after reboot:
+     sudo reboot
+     # Wait for boot, then:
+     systemctl status boot-monitoring
+     systemctl status light-schedule-check.timer
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ UNINSTALL                                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  sudo /home/pi/Boot-Monitoring/deployment/uninstall_autostart.sh
+
+  Or manually:
+    sudo systemctl stop boot-monitoring light-schedule-check.timer
+    sudo systemctl disable boot-monitoring light-schedule-check.timer
+    sudo rm /etc/systemd/system/boot-monitoring.service
+    sudo rm /etc/systemd/system/light-schedule-check.*
+    sudo systemctl daemon-reload
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ SCHEDULE FREQUENCY                                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  The light schedule is checked every 1 minute automatically.
+  No browser or terminal session required.
+  Runs independently in the background.
+  Survives system reboots.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ SUPPORT & DOCUMENTATION                                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Full Guide:        /home/pi/Boot-Monitoring/SIMPLE_INSTALL_GUIDE.md
+  Update Summary:    /home/pi/Boot-Monitoring/SIMPLE_INSTALL_UPDATE_SUMMARY.md
+  Auto-start Guide:  /home/pi/Boot-Monitoring/AUTOSTART_ON_BOOT.md
+  Port Config:       /home/pi/Boot-Monitoring/scripts/PORT_CONFIGURATION.md
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  Version: 2.0  │  Updated: October 27, 2025  │  Boot-Monitoring Team        ║
+╚══════════════════════════════════════════════════════════════════════════════╝

@@ -150,6 +150,79 @@ else
     exit 1
 fi
 
+# Install Light Schedule Checker (systemd timer)
+print_info "Installing Light Schedule Checker..."
+SCRIPTS_DIR="$APP_DIR/scripts"
+CHECK_SCRIPT="$SCRIPTS_DIR/check_light_schedule.sh"
+
+# Check if check script exists
+if [ -f "$CHECK_SCRIPT" ]; then
+    # Make the check script executable
+    print_info "Making check_light_schedule.sh executable..."
+    chmod +x "$CHECK_SCRIPT"
+    
+    # Create log directory and file
+    print_info "Creating log directory..."
+    mkdir -p /var/log
+    touch /var/log/light-schedule-check.log
+    chown $APP_USER:$APP_USER /var/log/light-schedule-check.log 2>/dev/null || true
+    
+    # Create systemd service file for schedule check
+    print_info "Creating light-schedule-check.service..."
+    cat > /etc/systemd/system/light-schedule-check.service << EOF
+[Unit]
+Description=Light Schedule Check
+After=network.target $SERVICE_NAME.service
+
+[Service]
+Type=oneshot
+User=$APP_USER
+WorkingDirectory=$APP_DIR
+ExecStart=$CHECK_SCRIPT
+StandardOutput=append:/var/log/light-schedule-check.log
+StandardError=append:/var/log/light-schedule-check.log
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # Create systemd timer file for schedule check
+    print_info "Creating light-schedule-check.timer..."
+    cat > /etc/systemd/system/light-schedule-check.timer << EOF
+[Unit]
+Description=Light Schedule Check Timer
+Requires=light-schedule-check.service
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+EOF
+
+    # Reload systemd
+    print_info "Reloading systemd daemon..."
+    systemctl daemon-reload
+    
+    # Enable and start the timer
+    print_info "Enabling and starting light-schedule-check.timer..."
+    systemctl enable light-schedule-check.timer
+    systemctl start light-schedule-check.timer
+    
+    # Check if timer started successfully
+    sleep 1
+    if systemctl is-active --quiet light-schedule-check.timer; then
+        print_success "Light Schedule Checker installed and started!"
+    else
+        print_error "Light Schedule Timer failed to start"
+        systemctl status light-schedule-check.timer
+    fi
+else
+    print_info "Light schedule check script not found at $CHECK_SCRIPT, skipping..."
+fi
+
 # Configure firewall to allow port 5000
 print_info "Configuring firewall to allow port 5000..."
 if command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active --quiet firewalld; then
@@ -177,26 +250,37 @@ echo "   • Virtual environment: $VENV_DIR"
 echo "   • Gunicorn WSGI server (2 workers)"
 echo "   • Secure environment configuration"
 echo "   • Systemd service management"
+echo "   • Light Schedule Automation (systemd timer)"
 echo "   • Firewall configured for port 5000"
 echo
 echo "🔧 Service Management:"
-echo "   Status:  systemctl status $SERVICE_NAME"
-echo "   Logs:    journalctl -fu $SERVICE_NAME"
-echo "   Stop:    systemctl stop $SERVICE_NAME"
-echo "   Start:   systemctl start $SERVICE_NAME"
-echo "   Restart: systemctl restart $SERVICE_NAME"
+echo "   Main App Status:  systemctl status $SERVICE_NAME"
+echo "   Main App Logs:    journalctl -fu $SERVICE_NAME"
+echo "   Stop:             systemctl stop $SERVICE_NAME"
+echo "   Start:            systemctl start $SERVICE_NAME"
+echo "   Restart:          systemctl restart $SERVICE_NAME"
+echo
+echo "⏰ Light Schedule Management:"
+echo "   Timer Status:     systemctl status light-schedule-check.timer"
+echo "   Schedule Logs:    tail -f /var/log/light-schedule-check.log"
+echo "   Timer List:       systemctl list-timers light-schedule-check.timer"
+echo "   Stop Timer:       systemctl stop light-schedule-check.timer"
+echo "   Start Timer:      systemctl start light-schedule-check.timer"
 echo
 echo "🔥 Firewall Management:"
-echo "   List rules: firewall-cmd --list-all"
-echo "   Remove port: firewall-cmd --remove-port=5000/tcp --permanent && firewall-cmd --reload"
-echo "   Add port: firewall-cmd --add-port=5000/tcp --permanent && firewall-cmd --reload"
+echo "   List rules:       firewall-cmd --list-all"
+echo "   Remove port:      firewall-cmd --remove-port=5000/tcp --permanent && firewall-cmd --reload"
+echo "   Add port:         firewall-cmd --add-port=5000/tcp --permanent && firewall-cmd --reload"
 echo
 echo " Application Access:"
 echo "   URL: http://$(hostname -I | awk '{print $1}'):5000"
 echo "   Local: http://localhost:5000"
 echo
 echo " Important Files:"
-echo "   Environment: $APP_DIR/.env"
-echo "   WSGI Entry: $APP_DIR/wsgi.py"
-echo "   Service: /etc/systemd/system/$SERVICE_NAME.service"
+echo "   Environment:      $APP_DIR/.env"
+echo "   WSGI Entry:       $APP_DIR/wsgi.py"
+echo "   Main Service:     /etc/systemd/system/$SERVICE_NAME.service"
+echo "   Schedule Service: /etc/systemd/system/light-schedule-check.service"
+echo "   Schedule Timer:   /etc/systemd/system/light-schedule-check.timer"
+echo "   Schedule Logs:    /var/log/light-schedule-check.log"
 echo

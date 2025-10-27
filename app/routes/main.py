@@ -35,6 +35,7 @@ main_bp.add_url_rule('/revpi-control', 'revpi_control', revpi_controller.revpi_c
 main_bp.add_url_rule('/revpi-status', 'revpi_status', revpi_controller.revpi_status, methods=['GET'])
 main_bp.add_url_rule('/revpi-toggle', 'revpi_toggle', revpi_controller.revpi_toggle, methods=['POST'])
 main_bp.add_url_rule('/revpi-time', 'revpi_time', revpi_controller.revpi_time, methods=['GET'])
+main_bp.add_url_rule('/system-time', 'system_time', revpi_controller.system_time, methods=['GET'])
 main_bp.add_url_rule('/log-service-activation', 'log_service_activation', revpi_controller.log_service_activation, methods=['POST'])
 
 # Register schedule routes
@@ -43,6 +44,7 @@ main_bp.add_url_rule('/revpi-schedule/get/<device_id>', 'get_schedule', revpi_co
 main_bp.add_url_rule('/revpi-schedule/all', 'get_all_schedules', revpi_controller.get_all_schedules, methods=['GET'])
 main_bp.add_url_rule('/revpi-schedule/enable', 'enable_schedule', revpi_controller.enable_schedule, methods=['POST'])
 main_bp.add_url_rule('/revpi-schedule/delete/<device_id>', 'delete_schedule', revpi_controller.delete_schedule, methods=['DELETE'])
+main_bp.add_url_rule('/revpi-schedule/check', 'check_schedule', revpi_controller.check_schedule, methods=['POST'])
 
 # Register Service Monitor routes under main blueprint
 main_bp.add_url_rule('/service-monitor', 'service_monitor', service_monitor_controller.service_monitor, methods=['GET'])

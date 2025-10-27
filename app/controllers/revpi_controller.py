@@ -23,6 +23,7 @@ class RevPiController(BaseController):
         self.blueprint.add_url_rule('/revpi-schedule/all', 'get_all_schedules', self.get_all_schedules, methods=['GET'])
         self.blueprint.add_url_rule('/revpi-schedule/enable', 'enable_schedule', self.enable_schedule, methods=['POST'])
         self.blueprint.add_url_rule('/revpi-schedule/delete/<device_id>', 'delete_schedule', self.delete_schedule, methods=['DELETE'])
+        self.blueprint.add_url_rule('/revpi-schedule/check', 'check_schedule', self.check_schedule, methods=['POST'])
     
     @login_required
     def revpi_control(self):
@@ -156,6 +157,22 @@ class RevPiController(BaseController):
             self.logger.error(f"RevPi time error: {e}")
             return jsonify({'success': False, 'error': str(e)}), 500
     
+    def system_time(self):
+        """Get current system time formatted for display in UI."""
+        try:
+            import datetime
+            now = datetime.datetime.now()
+            # Format: "Thu, Oct 24 2025, 20:15:30"
+            formatted_time = now.strftime('%a, %b %d %Y, %H:%M:%S')
+            return jsonify({
+                'success': True,
+                'time': formatted_time,
+                'timestamp': now.isoformat()
+            })
+        except Exception as e:
+            self.logger.error(f"System time error: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
     @login_required
     def save_schedule(self):
         """Save a device schedule."""
@@ -256,3 +273,99 @@ class RevPiController(BaseController):
         except Exception as e:
             self.logger.error(f"Error deleting schedule for {device_id}: {e}")
             return jsonify({'success': False, 'message': 'Internal server error'}), 500
+    
+    def check_schedule(self):
+        """
+        Check schedule and enforce relay state for RelayLight.
+        This endpoint is called periodically by the frontend to maintain schedule.
+        No login required as it's called automatically by the app.
+        """
+        try:
+            from datetime import datetime, time as dt_time
+            
+            schedule_service = self.service_factory.get_schedule_service()
+            result = schedule_service.get_schedule('RelayLight')
+            
+            if not result.get('success') or not result.get('data'):
+                return jsonify({'success': True, 'action': 'none', 'message': 'No schedule configured'})
+            
+            schedule = result['data']
+            
+            # Check if schedule is enabled
+            if not schedule.get('enabled'):
+                return jsonify({'success': True, 'action': 'none', 'message': 'Schedule disabled'})
+            
+            # Check if today is a scheduled day
+            day_map = {0: 'mon', 1: 'tue', 2: 'wed', 3: 'thu', 4: 'fri', 5: 'sat', 6: 'sun'}
+            today = datetime.now().weekday()
+            today_abbr = day_map.get(today, '')
+            
+            scheduled_days = schedule.get('days', [])
+            if scheduled_days and today_abbr not in scheduled_days:
+                return jsonify({'success': True, 'action': 'none', 'message': f'Not scheduled for {today_abbr}'})
+            
+            # Get current time and schedule times
+            start_time_str = schedule.get('start_time')
+            end_time_str = schedule.get('end_time')
+            
+            if not start_time_str or not end_time_str:
+                return jsonify({'success': False, 'message': 'Invalid schedule times'})
+            
+            # Parse times
+            # start_time = lights ON time
+            # end_time = lights OFF time
+            start_hour, start_min = map(int, start_time_str.split(':'))
+            end_hour, end_min = map(int, end_time_str.split(':'))
+            
+            on_time = dt_time(start_hour, start_min)
+            off_time = dt_time(end_hour, end_min)
+            current_time = datetime.now().time()
+            
+            # Determine if light should be on
+            # Handle both daytime and overnight schedules
+            if on_time < off_time:
+                # Normal daytime schedule (e.g., ON at 08:00, OFF at 17:00)
+                should_be_on = on_time <= current_time < off_time
+            else:
+                # Overnight schedule (e.g., ON at 18:00, OFF at 06:00)
+                # Light should be ON if current time >= on_time OR current time < off_time
+                should_be_on = current_time >= on_time or current_time < off_time
+            
+            # Get current relay status
+            revpi_service = self.service_factory.get_revpi_service()
+            status_data = revpi_service.get_all_devices_status()
+            
+            relay_light = status_data.get('RelayLight', {})
+            current_status = relay_light.get('status', 'UNKNOWN')
+            is_currently_on = current_status == 'ON'
+            
+            # Determine if we need to toggle
+            if should_be_on and not is_currently_on:
+                # Light should be ON but it's OFF - turn it ON
+                toggle_result = revpi_service.toggle_device('RelayLight', DeviceAction.ON)
+                if toggle_result.get('success'):
+                    self.logger.info("Schedule check: Turned RelayLight ON")
+                    return jsonify({'success': True, 'action': 'turned_on', 'message': 'Light turned ON per schedule'})
+                else:
+                    return jsonify({'success': False, 'action': 'failed', 'message': 'Failed to turn light ON'})
+            
+            elif not should_be_on and is_currently_on:
+                # Light should be OFF but it's ON - turn it OFF
+                toggle_result = revpi_service.toggle_device('RelayLight', DeviceAction.OFF)
+                if toggle_result.get('success'):
+                    self.logger.info("Schedule check: Turned RelayLight OFF")
+                    return jsonify({'success': True, 'action': 'turned_off', 'message': 'Light turned OFF per schedule'})
+                else:
+                    return jsonify({'success': False, 'action': 'failed', 'message': 'Failed to turn light OFF'})
+            
+            else:
+                # Light is in correct state
+                return jsonify({
+                    'success': True, 
+                    'action': 'none', 
+                    'message': f'Light already {"ON" if is_currently_on else "OFF"} (correct state)'
+                })
+        
+        except Exception as e:
+            self.logger.error(f"Error checking schedule: {e}", exc_info=True)
+            return jsonify({'success': False, 'message': f'Error checking schedule: {str(e)}'}), 500
