@@ -46,12 +46,25 @@ main_bp.add_url_rule('/revpi-schedule/enable', 'enable_schedule', revpi_controll
 main_bp.add_url_rule('/revpi-schedule/delete/<device_id>', 'delete_schedule', revpi_controller.delete_schedule, methods=['DELETE'])
 main_bp.add_url_rule('/revpi-schedule/check', 'check_schedule', revpi_controller.check_schedule, methods=['POST'])
 
+# Register timezone and internet check routes
+main_bp.add_url_rule('/api/check-internet', 'check_internet', revpi_controller.check_internet, methods=['GET'])
+main_bp.add_url_rule('/api/timezone/current', 'get_current_timezone', revpi_controller.get_current_timezone, methods=['GET'])
+main_bp.add_url_rule('/api/timezone/list', 'list_timezones', revpi_controller.list_timezones, methods=['GET'])
+main_bp.add_url_rule('/api/timezone/set', 'set_timezone', revpi_controller.set_timezone, methods=['POST'])
+
 # Register log download route
 main_bp.add_url_rule('/download-logs-by-date', 'download_logs_by_date', revpi_controller.download_logs_by_date, methods=['POST'])
 
 # Register switchboard configuration routes
 main_bp.add_url_rule('/switchboard-config', 'get_switchboard_config', revpi_controller.get_switchboard_config, methods=['GET'])
 main_bp.add_url_rule('/switchboard-config/update', 'update_switchboard_config', revpi_controller.update_switchboard_config, methods=['POST'])
+
+# Register relay activations route
+main_bp.add_url_rule('/api/relay-activations', 'get_relay_activations', revpi_controller.get_relay_activations, methods=['GET'])
+
+# Register system information routes
+main_bp.add_url_rule('/api/system-info', 'get_system_info', revpi_controller.get_system_info, methods=['GET'])
+main_bp.add_url_rule('/api/system-info/save', 'save_system_info', revpi_controller.save_system_info, methods=['POST'])
 
 # Register Service Monitor routes under main blueprint
 main_bp.add_url_rule('/service-monitor', 'service_monitor', service_monitor_controller.service_monitor, methods=['GET'])

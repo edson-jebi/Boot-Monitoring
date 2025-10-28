@@ -81,8 +81,8 @@ class Database:
                         start_time TEXT NOT NULL,
                         end_time TEXT NOT NULL,
                         enabled BOOLEAN DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        created_at TIMESTAMP DEFAULT (datetime('now', 'localtime')),
+                        updated_at TIMESTAMP DEFAULT (datetime('now', 'localtime')),
                         user_id INTEGER,
                         FOREIGN KEY (user_id) REFERENCES users (id)
                     )
@@ -123,7 +123,7 @@ class Database:
                         username TEXT,
                         is_automatic BOOLEAN DEFAULT 0,
                         success BOOLEAN DEFAULT 1,
-                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        timestamp TIMESTAMP DEFAULT (datetime('now', 'localtime')),
                         FOREIGN KEY (user_id) REFERENCES users (id)
                     )
                 ''')
@@ -274,9 +274,9 @@ class Schedule:
                     # Update existing schedule
                     schedule_id = existing['id']
                     cursor.execute('''
-                        UPDATE device_schedules 
-                        SET start_time = ?, end_time = ?, enabled = ?, 
-                            updated_at = CURRENT_TIMESTAMP, user_id = ?
+                        UPDATE device_schedules
+                        SET start_time = ?, end_time = ?, enabled = ?,
+                            updated_at = datetime('now', 'localtime'), user_id = ?
                         WHERE id = ?
                     ''', (start_time, end_time, enabled, user_id, schedule_id))
                     
@@ -382,8 +382,8 @@ class Schedule:
             with self.db.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
-                    UPDATE device_schedules 
-                    SET enabled = ?, updated_at = CURRENT_TIMESTAMP
+                    UPDATE device_schedules
+                    SET enabled = ?, updated_at = datetime('now', 'localtime')
                     WHERE device_id = ?
                 ''', (enabled, device_id))
                 
@@ -467,7 +467,7 @@ class RelayActivation:
                 cursor.execute('''
                     INSERT INTO relay_activations
                     (device_id, action, user_id, username, is_automatic, success, timestamp)
-                    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                    VALUES (?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
                 ''', (device_id, action, user_id, username, is_automatic, success))
 
                 conn.commit()

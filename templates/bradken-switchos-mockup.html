@@ -28,7 +28,7 @@
 
         /* Header Styles */
         .header {
-            background-color: #1f2937;
+            background-color: #233f7b;
             color: white;
             padding: 1rem;
             display: flex;
@@ -914,6 +914,16 @@
             height: 1.5rem;
         }
 
+        /* Animations */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
             .form-grid {
@@ -966,28 +976,20 @@
         <div id="dashboardScreen" class="screen active">
             <div class="header">
                 <div class="header-left">
-                    <svg class="icon-lg" viewBox="0 0 24 24">
-                        <line x1="12" y1="2" x2="12" y2="6"></line>
-                        <line x1="12" y1="18" x2="12" y2="22"></line>
-                        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                        <line x1="2" y1="12" x2="6" y2="12"></line>
-                        <line x1="18" y1="12" x2="22" y2="12"></line>
-                        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-                    </svg>
+                    <img src="{{ url_for('static', filename='logos.png') }}" alt="Bradken Logo" style="height: 48px; width: auto; margin-right: 1rem;">
                     <div class="header-title">
                         <h1>Bradken SwitchOS</h1>
-                        <p id="headerSubtitle" class="header-subtitle">EX123 at Kansanshi (GV0012)</p>
+                        <p id="headerSubtitle" class="header-subtitle">System Information Not Set</p>
                     </div>
                 </div>
                 <div class="header-right">
                     <button class="header-btn" onclick="navigateToSettings()">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M12 1v6m0 6v6m0-6h6m-6 0H6m15-3.87l-5.2 3M6.2 15.87l5.2-3m0 0l5.2 3M6.2 8.13l5.2 3"></path>
-                            <path d="M19.4 15c.6-1 1-2.1 1-3.3 0-1.2-.4-2.3-1-3.3M4.6 15c-.6-1-1-2.1-1-3.3 0-1.2.4-2.3 1-3.3"></path>
-                        </svg>
+                        <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: rotate 4s linear infinite; cursor: pointer;">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v10"></path>
+                                <path d="M17 12h5M2 12h5"></path>
+                                <path d="m4.93 4.93 4.24 4.24m5.66 0 4.24-4.24M4.93 19.07l4.24-4.24m5.66 0 4.24 4.24"></path>
+                            </svg>
                         <span>Settings</span>
                     </button>
                     <button class="header-btn" onclick="navigateToLogs()">
@@ -1223,9 +1225,10 @@
             <div class="header">
                 <div class="header-left">
                     <button class="back-btn" onclick="navigateToDashboard()">← Back</button>
+                    <img src="{{ url_for('static', filename='logos.png') }}" alt="Bradken Logo" style="height: 48px; width: auto; margin-right: 1rem;">
                     <div class="header-title">
                         <h1>Settings</h1>
-                        <p id="settingsHeaderSubtitle" class="header-subtitle">EX123 at Kansanshi (GV0012)</p>
+                        <p id="settingsHeaderSubtitle" class="header-subtitle">System Information Not Set</p>
                     </div>
                 </div>
                 <div class="header-right">
@@ -1405,6 +1408,26 @@
                                     <p class="alert-info-text" style="font-size: 0.75rem; color: #6b7280;">Schedule times are based on the RevPi system clock. Ensure time synchronization is configured correctly.</p>
                                 </div>
                             </div>
+
+                            <!-- Timezone Configuration (Only visible when internet is available) -->
+                            <div id="timezoneSection" style="display: none; margin-top: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">System Timezone</label>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <select id="timezoneSelect" class="form-input" style="flex: 1;" disabled>
+                                            <option value="">Loading timezones...</option>
+                                        </select>
+                                        <button class="btn btn-primary" id="setTimezoneBtn" onclick="setTimezone()" disabled>
+                                            Set Timezone
+                                        </button>
+                                    </div>
+                                    <p class="form-help">
+                                        <span id="currentTimezoneText">Current: <strong id="currentTimezone">Loading...</strong></span>
+                                        <br>
+                                        <span style="color: #10b981;">✓ Internet connection detected - timezone configuration available</span>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1491,17 +1514,17 @@
                         <div class="settings-section">
                             <div class="form-group">
                                 <label class="form-label">System Code</label>
-                                <input type="text" id="systemCode" class="form-input" value="EX123" placeholder="e.g., EX123" disabled>
+                                <input type="text" id="systemCode" class="form-input" value="" placeholder="e.g., EX123" disabled>
                                 <p class="form-help">Unique identifier for this system (e.g., EX123, CAT001)</p>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Equipment/Site Name</label>
-                                <input type="text" id="equipmentName" class="form-input" value="Kansanshi" placeholder="e.g., Kansanshi" disabled>
+                                <input type="text" id="equipmentName" class="form-input" value="" placeholder="e.g., Kansanshi" disabled>
                                 <p class="form-help">Mine site or equipment name where this system is deployed</p>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Location Code</label>
-                                <input type="text" id="locationCode" class="form-input" value="GV0012" placeholder="e.g., GV0012" disabled>
+                                <input type="text" id="locationCode" class="form-input" value="" placeholder="e.g., GV0012" disabled>
                                 <p class="form-help">Specific location or unit identifier (e.g., GV0012, Pit-A)</p>
                             </div>
                             <div class="alert alert-info">
@@ -1510,7 +1533,7 @@
                                     <line x1="12" y1="16" x2="12" y2="12"></line>
                                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                 </svg>
-                                <p id="systemInfoPreview" class="alert-info-text">This information appears in the application header: "EX123 at Kansanshi (GV0012)"</p>
+                                <p id="systemInfoPreview" class="alert-info-text">This information appears in the application header: "System Information Not Set"</p>
                             </div>
                         </div>
                     </div>
@@ -1523,9 +1546,12 @@
             <div class="header">
                 <div class="header-left">
                     <button class="back-btn" onclick="navigateToDashboard()">← Back</button>
+                    <img src="{{ url_for('static', filename='logos.png') }}" alt="Bradken Logo" style="height: 48px; width: auto; margin-right: 1rem;">
                     <div class="header-title">
                         <h1>System Logs</h1>
+                        <p id="logsHeaderSubtitle" class="header-subtitle">System Information Not Set</p>
                     </div>
+                    
                 </div>
                 <div class="header-right">
                     <button class="logout-btn" onclick="logout()">
@@ -1603,31 +1629,7 @@
         </div>
 
         <!-- Interactive Guide -->
-        <div class="guide-box">
-            <h3 class="guide-title">🎯 Interactive Mockup</h3>
-            <div class="guide-list">
-                <div class="guide-item">
-                    <div class="guide-dot guide-dot-blue"></div>
-                    <span>Try toggling Auto Power Cycle</span>
-                </div>
-                <div class="guide-item">
-                    <div class="guide-dot guide-dot-gray"></div>
-                    <span>Click time window filters (1H/1D/1W/1M)</span>
-                </div>
-                <div class="guide-item">
-                    <div class="guide-dot guide-dot-gray"></div>
-                    <span>Toggle manual controls (confirmation required)</span>
-                </div>
-                <div class="guide-item">
-                    <div class="guide-dot guide-dot-gray"></div>
-                    <span>Settings → Click Edit to modify sections</span>
-                </div>
-                <div class="guide-item">
-                    <div class="guide-dot guide-dot-gray"></div>
-                    <span>All state changes require confirmation ✓</span>
-                </div>
-            </div>
-        </div>
+        
     </div>
 
     <script>
@@ -1649,9 +1651,9 @@
                 systemInfo: false
             },
             systemInfo: {
-                systemCode: 'EX123',
-                equipment: 'Kansanshi',
-                location: 'GV0012'
+                systemCode: '',
+                equipment: '',
+                location: ''
             }
         };
 
@@ -2569,30 +2571,96 @@
         }
 
         // Timeline
-        function generateEventData() {
+        // Store fetched events globally
+        let allRelayEvents = [];
+
+        // Fetch real relay activation events from database
+        function fetchRelayActivations() {
             const now = new Date();
-            const events = [];
-            const hoursAgo = (hours) => new Date(now - hours * 60 * 60 * 1000);
+            let startTime;
 
-            events.push(
-                { component: 'Processor', timestamp: hoursAgo(2), type: 'auto' },
-                { component: 'Screen', timestamp: hoursAgo(3), type: 'manual' },
-                { component: 'Processor', timestamp: hoursAgo(5), type: 'auto' },
-                { component: 'Lights', timestamp: hoursAgo(6), type: 'manual' },
-                { component: 'Screen', timestamp: hoursAgo(8), type: 'auto' },
-                { component: 'Processor', timestamp: hoursAgo(10), type: 'auto' },
-                { component: 'Lights', timestamp: hoursAgo(12), type: 'auto' },
-                { component: 'Screen', timestamp: hoursAgo(14), type: 'manual' },
-                { component: 'Processor', timestamp: hoursAgo(16), type: 'auto' },
-                { component: 'Lights', timestamp: hoursAgo(18), type: 'manual' },
-                { component: 'Screen', timestamp: hoursAgo(20), type: 'auto' },
-                { component: 'Processor', timestamp: hoursAgo(22), type: 'auto' }
-            );
+            // Calculate start time based on time window
+            switch(appState.timeWindow) {
+                case '1H':
+                    startTime = new Date(now - 1 * 60 * 60 * 1000);
+                    break;
+                case '1D':
+                    startTime = new Date(now - 24 * 60 * 60 * 1000);
+                    break;
+                case '1W':
+                    startTime = new Date(now - 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case '1M':
+                    startTime = new Date(now - 30 * 24 * 60 * 60 * 1000);
+                    break;
+                default:
+                    startTime = new Date(now - 24 * 60 * 60 * 1000);
+            }
 
-            return events;
+            // Fetch all recent events (last 30 days) and filter on frontend
+            // This handles timezone mismatches in old database records
+            const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+            const year = thirtyDaysAgo.getFullYear();
+            const month = String(thirtyDaysAgo.getMonth() + 1).padStart(2, '0');
+            const day = String(thirtyDaysAgo.getDate()).padStart(2, '0');
+            const hours = String(thirtyDaysAgo.getHours()).padStart(2, '0');
+            const minutes = String(thirtyDaysAgo.getMinutes()).padStart(2, '0');
+            const seconds = String(thirtyDaysAgo.getSeconds()).padStart(2, '0');
+            const fetchStartTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+            // Fetch from API
+            fetch(`/api/relay-activations?start_time=${encodeURIComponent(fetchStartTime)}&limit=2000`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.events) {
+                        // Transform database events to timeline format
+                        allRelayEvents = data.events.map(event => {
+                            // Map device_id to component name
+                            let component = 'Unknown';
+                            if (event.device_id === 'RelayProcessor') component = 'Processor';
+                            else if (event.device_id === 'RelayScreen') component = 'Screen';
+                            else if (event.device_id === 'RelayLight') component = 'Lights';
+
+                            // Determine type based on is_automatic flag
+                            const type = event.is_automatic ? 'auto' : 'manual';
+
+                            // Parse timestamp - database stores in format "YYYY-MM-DD HH:MM:SS"
+                            // Replace space with T to make it ISO-compatible
+                            const timestamp = new Date(event.timestamp.replace(' ', 'T'));
+
+                            return {
+                                component: component,
+                                timestamp: timestamp,
+                                type: type,
+                                action: event.action,
+                                username: event.username,
+                                success: event.success
+                            };
+                        });
+
+                        // Update event count display
+                        const eventCount = document.getElementById('eventCount');
+                        if (eventCount) {
+                            eventCount.textContent = `Showing ${allRelayEvents.length} events in the last ${appState.timeWindow}`;
+                        }
+
+                        // Redraw timeline with new data
+                        drawTimeline();
+                    } else {
+                        console.error('Failed to fetch relay activations:', data.error);
+                        allRelayEvents = [];
+                        drawTimeline();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching relay activations:', error);
+                    allRelayEvents = [];
+                    drawTimeline();
+                });
         }
 
         function getFilteredEvents() {
+            // Filter events based on selected time window
             const now = new Date();
             let cutoffTime;
 
@@ -2613,8 +2681,8 @@
                     cutoffTime = new Date(now - 24 * 60 * 60 * 1000);
             }
 
-            const allEvents = generateEventData();
-            return allEvents.filter(event => event.timestamp >= cutoffTime);
+            // Filter events by comparing actual timestamp objects
+            return allRelayEvents.filter(event => event.timestamp >= cutoffTime);
         }
 
         function setTimeWindow(window) {
@@ -2626,7 +2694,7 @@
             });
             event.target.classList.add('active');
 
-            // Redraw timeline
+            // Redraw timeline with filtered events (no need to refetch)
             drawTimeline();
         }
 
@@ -2761,7 +2829,11 @@
                 }
 
                 const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-                title.textContent = `${event.component} - ${event.type} - ${event.timestamp.toLocaleString()}`;
+                const eventType = event.type === 'auto' ? 'Automatic' : 'Manual';
+                const action = event.action ? event.action.toUpperCase() : 'N/A';
+                const user = event.username || 'System';
+                const time = event.timestamp.toLocaleString();
+                title.textContent = `${event.component} - ${eventType}\nAction: ${action}\nUser: ${user}\nTime: ${time}`;
                 circle.appendChild(title);
 
                 svg.appendChild(circle);
@@ -2968,10 +3040,40 @@
                     
                     // Update system info if that's what was edited
                     if (section === 'systemInfo') {
-                        appState.systemInfo.systemCode = document.getElementById('systemCode').value;
-                        appState.systemInfo.equipment = document.getElementById('equipmentName').value;
-                        appState.systemInfo.location = document.getElementById('locationCode').value;
-                        updateSystemInfoUI();
+                        const systemCode = document.getElementById('systemCode').value;
+                        const equipment = document.getElementById('equipmentName').value;
+                        const location = document.getElementById('locationCode').value;
+
+                        // Save to backend permanently
+                        fetch('/api/system-info/save', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                system_code: systemCode,
+                                equipment: equipment,
+                                location: location
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update appState with saved values
+                                appState.systemInfo.systemCode = systemCode;
+                                appState.systemInfo.equipment = equipment;
+                                appState.systemInfo.location = location;
+                                updateSystemInfoUI();
+
+                                alert('System information saved successfully!');
+                            } else {
+                                alert('Failed to save system information: ' + (data.error || 'Unknown error'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error saving system info:', error);
+                            alert('Error saving system information: ' + error.message);
+                        });
                     }
                     
                     // Update light schedule if that's what was edited
@@ -3046,9 +3148,17 @@
         }
 
         function updateSystemInfoUI() {
-            const subtitle = `${appState.systemInfo.systemCode} at ${appState.systemInfo.equipment} (${appState.systemInfo.location})`;
+            // Build subtitle, handling empty values
+            const parts = [];
+            if (appState.systemInfo.systemCode) parts.push(appState.systemInfo.systemCode);
+            if (appState.systemInfo.equipment) parts.push(`at ${appState.systemInfo.equipment}`);
+            if (appState.systemInfo.location) parts.push(`(${appState.systemInfo.location})`);
+
+            const subtitle = parts.length > 0 ? parts.join(' ') : 'System Information Not Set';
+
             document.getElementById('headerSubtitle').textContent = subtitle;
             document.getElementById('settingsHeaderSubtitle').textContent = subtitle;
+            document.getElementById('logsHeaderSubtitle').textContent = subtitle;
             document.getElementById('systemInfoPreview').textContent = `This information appears in the application header: "${subtitle}"`;
         }
 
@@ -3457,7 +3567,9 @@
                     if (data.success && data.time) {
                         const timeElement = document.getElementById('revpiSystemTime');
                         if (timeElement) {
-                            // Format: "Thu, Oct 24 2025, 20:15:30"
+                            // Clear any existing content first to prevent accumulation
+                            timeElement.innerHTML = '';
+                            // Set the new time text
                             timeElement.textContent = data.time;
                         }
                     } else {
@@ -3468,8 +3580,38 @@
                     console.error('Network error fetching system time:', error);
                     const timeElement = document.getElementById('revpiSystemTime');
                     if (timeElement) {
+                        timeElement.innerHTML = '';
                         timeElement.textContent = 'Unable to fetch time';
                     }
+                });
+        }
+
+        // Load system information from backend
+        function loadSystemInfo() {
+            fetch('/api/system-info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update appState
+                        appState.systemInfo.systemCode = data.system_code || '';
+                        appState.systemInfo.equipment = data.equipment || '';
+                        appState.systemInfo.location = data.location || '';
+
+                        // Update form inputs
+                        document.getElementById('systemCode').value = data.system_code || '';
+                        document.getElementById('equipmentName').value = data.equipment || '';
+                        document.getElementById('locationCode').value = data.location || '';
+
+                        // Update UI display
+                        updateSystemInfoUI();
+
+                        console.log('System information loaded successfully');
+                    } else {
+                        console.error('Failed to load system info:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading system info:', error);
                 });
         }
 
@@ -3483,23 +3625,29 @@
             document.getElementById('logsFromDate').valueAsDate = weekAgo;
             document.getElementById('logsToDate').valueAsDate = today;
 
-            // Draw initial timeline
-            drawTimeline();
+            // Fetch and draw initial timeline with real data
+            fetchRelayActivations();
 
             // Update UI
             updateAutoPowerCycleUI();
             updateLightScheduleUI();
-            
+
             // Initialize custom time pickers
             lightsOnTimePicker = new TimePicker('lightsOnTime', 'lightsOnTimeDropdown');
             lightsOffTimePicker = new TimePicker('lightsOffTime', 'lightsOffTimeDropdown');
-            
+
             // Load switchboard configuration from JSON file
             loadSwitchboardConfig();
-            
+
             // Load saved light schedule from database
             loadLightSchedule();
-            
+
+            // Load saved system information
+            loadSystemInfo();
+
+            // Check internet and load timezone if available
+            checkInternetAndLoadTimezone();
+
             // Fetch service status immediately and every 10 seconds
             updateServiceStatus();
             setInterval(updateServiceStatus, 5000);
@@ -3511,7 +3659,7 @@
             // Update RevPi system time immediately and every 5 seconds
             updateSystemTime();
             setInterval(updateSystemTime, 5000);
-            
+
             // Check and enforce light schedule immediately and every 60 seconds
             checkLightSchedule();
             setInterval(checkLightSchedule, 60000);
@@ -3540,6 +3688,164 @@
             })
             .catch(error => {
                 console.error('Error checking light schedule:', error);
+            });
+        }
+
+        // Timezone Configuration Functions
+        function checkInternetAndLoadTimezone() {
+            fetch('/api/check-internet')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.connected) {
+                        console.log('Internet connected - loading timezone options');
+                        document.getElementById('timezoneSection').style.display = 'block';
+                        loadCurrentTimezone();
+                        loadTimezoneList();
+                    } else {
+                        console.log('No internet - timezone configuration hidden');
+                        document.getElementById('timezoneSection').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking internet:', error);
+                    document.getElementById('timezoneSection').style.display = 'none';
+                });
+        }
+
+        function loadCurrentTimezone() {
+            fetch('/api/timezone/current')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        document.getElementById('currentTimezone').textContent = result.timezone;
+                    } else {
+                        document.getElementById('currentTimezone').textContent = 'Unknown';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading current timezone:', error);
+                    document.getElementById('currentTimezone').textContent = 'Error';
+                });
+        }
+
+        function loadTimezoneList() {
+            const select = document.getElementById('timezoneSelect');
+            const btn = document.getElementById('setTimezoneBtn');
+
+            fetch('/api/timezone/list')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        select.innerHTML = '<option value="">-- Select Timezone --</option>';
+
+                        // Group by region
+                        const regions = {};
+                        result.timezones.forEach(tz => {
+                            const region = tz.split('/')[0];
+                            if (!regions[region]) {
+                                regions[region] = [];
+                            }
+                            regions[region].push(tz);
+                        });
+
+                        // Add common timezones first
+                        const commonGroup = document.createElement('optgroup');
+                        commonGroup.label = 'Common Timezones';
+                        [
+                            'UTC',
+                            'Africa/Lusaka',
+                            'Africa/Johannesburg',
+                            'America/New_York',
+                            'America/Chicago',
+                            'Europe/London',
+                            'Asia/Shanghai',
+                            'Australia/Sydney'
+                        ].forEach(tz => {
+                            if (result.timezones.includes(tz)) {
+                                const option = document.createElement('option');
+                                option.value = tz;
+                                option.textContent = tz;
+                                commonGroup.appendChild(option);
+                            }
+                        });
+                        select.appendChild(commonGroup);
+
+                        // Add all timezones by region
+                        Object.keys(regions).sort().forEach(region => {
+                            const group = document.createElement('optgroup');
+                            group.label = region;
+                            regions[region].forEach(tz => {
+                                const option = document.createElement('option');
+                                option.value = tz;
+                                option.textContent = tz;
+                                group.appendChild(option);
+                            });
+                            select.appendChild(group);
+                        });
+
+                        select.disabled = false;
+                        btn.disabled = false;
+                    } else {
+                        select.innerHTML = '<option value="">Error loading timezones</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading timezone list:', error);
+                    select.innerHTML = '<option value="">Error loading timezones</option>';
+                });
+        }
+
+        function setTimezone() {
+            const select = document.getElementById('timezoneSelect');
+            const btn = document.getElementById('setTimezoneBtn');
+            const timezone = select.value;
+
+            if (!timezone) {
+                alert('Please select a timezone');
+                return;
+            }
+
+            // Confirm
+            if (!confirm(`Set system timezone to ${timezone}?\n\nThis will update the system time and hardware clock (RTC).`)) {
+                return;
+            }
+
+            // Disable controls
+            select.disabled = true;
+            btn.disabled = true;
+            btn.textContent = 'Setting...';
+
+            fetch('/api/timezone/set', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ timezone: timezone })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    const ntpStatus = result.ntp_synced ? '✓ Time synced from internet' : '⚠ Time sync may be pending';
+                    const rtcStatus = result.rtc_updated ? '✓ RTC updated' : '⚠ RTC update failed';
+                    alert(`Timezone set to ${result.timezone}\n\n${ntpStatus}\n${rtcStatus}`);
+                    loadCurrentTimezone();
+                    // Update time display immediately and continue refreshing
+                    updateSystemTime();
+                    // Refresh time display at 1s and 2s to catch the updated time quickly
+                    setTimeout(() => updateSystemTime(), 1000);
+                    setTimeout(() => updateSystemTime(), 2000);
+                } else {
+                    alert('Failed to set timezone: ' + (result.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error setting timezone:', error);
+                alert('Error setting timezone: ' + error.message);
+            })
+            .finally(() => {
+                select.disabled = false;
+                btn.disabled = false;
+                btn.textContent = 'Set Timezone';
             });
         }
 

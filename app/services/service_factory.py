@@ -40,7 +40,7 @@ class ServiceFactory:
         if 'schedule' not in self._services:
             self._services['schedule'] = ScheduleService(self.config)
         return self._services['schedule']
-    
+
     def register_device_service(self, name: str, service: DeviceServiceInterface):
         """Register a new device service for future expansion."""
         self._services[name] = service

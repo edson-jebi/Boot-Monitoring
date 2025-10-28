@@ -31,6 +31,9 @@ class RevPiController(BaseController):
         # Switchboard configuration endpoints
         self.blueprint.add_url_rule('/switchboard-config', 'get_switchboard_config', self.get_switchboard_config, methods=['GET'])
         self.blueprint.add_url_rule('/switchboard-config/update', 'update_switchboard_config', self.update_switchboard_config, methods=['POST'])
+
+        # Relay activation events endpoint
+        self.blueprint.add_url_rule('/api/relay-activations', 'get_relay_activations', self.get_relay_activations, methods=['GET'])
     
     @login_required
     def revpi_control(self):
@@ -168,13 +171,33 @@ class RevPiController(BaseController):
         """Get current system time formatted for display in UI."""
         try:
             import datetime
+            import subprocess
+
+            # Get current time
             now = datetime.datetime.now()
-            # Format: "Thu, Oct 24 2025, 20:15:30"
+
+            # Get timezone name
+            try:
+                tz_result = subprocess.run(
+                    ['timedatectl', 'show', '-p', 'Timezone', '--value'],
+                    capture_output=True,
+                    text=True,
+                    timeout=2
+                )
+                timezone = tz_result.stdout.strip() if tz_result.returncode == 0 else ''
+            except:
+                timezone = ''
+
+            # Format: "Thu, Oct 24 2025, 20:15:30 (America/Vancouver)"
             formatted_time = now.strftime('%a, %b %d %Y, %H:%M:%S')
+            if timezone:
+                formatted_time += f' ({timezone})'
+
             return jsonify({
                 'success': True,
                 'time': formatted_time,
-                'timestamp': now.isoformat()
+                'timestamp': now.isoformat(),
+                'timezone': timezone
             })
         except Exception as e:
             self.logger.error(f"System time error: {e}")
@@ -657,3 +680,166 @@ class RevPiController(BaseController):
                 'success': False,
                 'message': f'Error updating configuration: {str(e)}'
             }), 500
+
+    @login_required
+    def check_internet(self):
+        """Check internet connectivity."""
+        try:
+            command_service = self.service_factory.get_command_service()
+            result = command_service.check_internet_connectivity()
+            return jsonify(result)
+        except Exception as e:
+            self.logger.error(f"Error checking internet: {e}")
+            return jsonify({'success': False, 'connected': False, 'error': str(e)})
+
+    @login_required
+    def get_current_timezone(self):
+        """Get current system timezone."""
+        try:
+            command_service = self.service_factory.get_command_service()
+            result = command_service.get_current_timezone()
+            return jsonify(result)
+        except Exception as e:
+            self.logger.error(f"Error getting timezone: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @login_required
+    def list_timezones(self):
+        """List available timezones, optionally filtered by region."""
+        try:
+            region = request.args.get('region', None)
+            command_service = self.service_factory.get_command_service()
+            result = command_service.list_timezones(region)
+            return jsonify(result)
+        except Exception as e:
+            self.logger.error(f"Error listing timezones: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @login_required
+    def set_timezone(self):
+        """Set system timezone and update RTC."""
+        try:
+            data = request.get_json()
+            timezone = data.get('timezone')
+
+            if not timezone:
+                return jsonify({'success': False, 'error': 'Timezone is required'}), 400
+
+            username = self.get_current_user()
+            command_service = self.service_factory.get_command_service()
+            result = command_service.set_timezone(timezone, username)
+
+            if result.get('success'):
+                return jsonify(result)
+            else:
+                return jsonify(result), 500
+
+        except Exception as e:
+            self.logger.error(f"Error setting timezone: {e}", exc_info=True)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @login_required
+    def get_relay_activations(self):
+        """Get relay activation events from database with optional time filtering."""
+        try:
+            from app.models import RelayActivation
+
+            # Get query parameters
+            start_time = request.args.get('start_time')  # ISO format or SQLite datetime
+            end_time = request.args.get('end_time')
+            device_id = request.args.get('device_id')
+            limit = request.args.get('limit', 2000, type=int)
+
+            # Get activations from database
+            relay_activation = RelayActivation()
+            activations = relay_activation.get_activations(
+                start_time=start_time,
+                end_time=end_time,
+                device_id=device_id,
+                limit=limit
+            )
+
+            self.logger.info(f"Retrieved {len(activations)} relay activation events")
+
+            return jsonify({
+                'success': True,
+                'events': activations,
+                'count': len(activations)
+            })
+
+        except Exception as e:
+            self.logger.error(f"Error getting relay activations: {e}", exc_info=True)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @login_required
+    def get_system_info(self):
+        """Get system information (system code, equipment, location)."""
+        try:
+            import json
+            import os
+
+            system_info_file = '/home/pi/Boot-Monitoring/system_info.json'
+
+            # Return empty if file doesn't exist
+            if not os.path.exists(system_info_file):
+                return jsonify({
+                    'success': True,
+                    'system_code': '',
+                    'equipment': '',
+                    'location': ''
+                })
+
+            # Read from file
+            with open(system_info_file, 'r') as f:
+                data = json.load(f)
+
+            self.logger.info("System information retrieved")
+            return jsonify({
+                'success': True,
+                'system_code': data.get('system_code', ''),
+                'equipment': data.get('equipment', ''),
+                'location': data.get('location', '')
+            })
+
+        except Exception as e:
+            self.logger.error(f"Error getting system info: {e}", exc_info=True)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @login_required
+    def save_system_info(self):
+        """Save system information permanently."""
+        try:
+            import json
+            import os
+
+            data = request.get_json()
+            system_code = data.get('system_code', '')
+            equipment = data.get('equipment', '')
+            location = data.get('location', '')
+
+            system_info_file = '/home/pi/Boot-Monitoring/system_info.json'
+
+            # Save to file
+            system_info = {
+                'system_code': system_code,
+                'equipment': equipment,
+                'location': location
+            }
+
+            with open(system_info_file, 'w') as f:
+                json.dump(system_info, f, indent=2)
+
+            username = self.get_current_user()
+            self.logger.info(f"System information saved by user {username}: {system_info}")
+
+            return jsonify({
+                'success': True,
+                'message': 'System information saved successfully',
+                'system_code': system_code,
+                'equipment': equipment,
+                'location': location
+            })
+
+        except Exception as e:
+            self.logger.error(f"Error saving system info: {e}", exc_info=True)
+            return jsonify({'success': False, 'error': str(e)}), 500

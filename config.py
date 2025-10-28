@@ -29,7 +29,7 @@ class Config:
     # Command settings
     COMMAND_TIMEOUT: int = int(os.environ.get('COMMAND_TIMEOUT') or 10)
     DEFAULT_COMMAND: list = ['piTest', '-w', 'LedProcessor,1']
-    
+
     # Default user credentials
     DEFAULT_USERNAME: str = os.environ.get('DEFAULT_USERNAME') or 'bradken'
     DEFAULT_PASSWORD: str = os.environ.get('DEFAULT_PASSWORD') or 'adminBradken25'
