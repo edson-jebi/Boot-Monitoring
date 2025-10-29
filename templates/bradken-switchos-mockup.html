@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bradken SwitchOS - Interactive Mockup</title>
+    <title>{{ config.APP_NAME }} SwitchOS - Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -1012,9 +1012,9 @@
         <div id="dashboardScreen" class="screen active">
             <div class="header">
                 <div class="header-left">
-                    <img src="{{ url_for('static', filename='logos.png') }}" alt="Bradken Logo" style="height: 48px; width: auto; margin-right: 1rem;">
+                    <img src="{{ url_for('static', filename='logo_jebi.png' if config.APP_BRAND == 'JEBI' else 'logos.png') }}" alt="{{ config.APP_NAME }} Logo" style="height: 48px; width: auto; margin-right: 1rem;">
                     <div class="header-title">
-                        <h1>Bradken SwitchOS</h1>
+                        <h1>{{ config.APP_NAME }} SwitchOS</h1>
                         <p id="headerSubtitle" class="header-subtitle">System Information Not Set</p>
                     </div>
                 </div>
@@ -1280,7 +1280,7 @@
             <div class="header">
                 <div class="header-left">
                     <button class="back-btn" onclick="navigateToDashboard()">← Back</button>
-                    <img src="{{ url_for('static', filename='logos.png') }}" alt="Bradken Logo" style="height: 48px; width: auto; margin-right: 1rem;">
+                    <img src="{{ url_for('static', filename='logo_jebi.png' if config.APP_BRAND == 'JEBI' else 'logos.png') }}" alt="{{ config.APP_NAME }} Logo" style="height: 48px; width: auto; margin-right: 1rem;">
                     <div class="header-title">
                         <h1>Settings</h1>
                         <p id="settingsHeaderSubtitle" class="header-subtitle">System Information Not Set</p>
@@ -1601,12 +1601,12 @@
             <div class="header">
                 <div class="header-left">
                     <button class="back-btn" onclick="navigateToDashboard()">← Back</button>
-                    <img src="{{ url_for('static', filename='logos.png') }}" alt="Bradken Logo" style="height: 48px; width: auto; margin-right: 1rem;">
+                    <img src="{{ url_for('static', filename='logo_jebi.png' if config.APP_BRAND == 'JEBI' else 'logos.png') }}" alt="{{ config.APP_NAME }} Logo" style="height: 48px; width: auto; margin-right: 1rem;">
                     <div class="header-title">
                         <h1>System Logs</h1>
                         <p id="logsHeaderSubtitle" class="header-subtitle">System Information Not Set</p>
                     </div>
-                    
+
                 </div>
                 <div class="header-right">
                     <button class="logout-btn" onclick="logout()">
@@ -1806,7 +1806,7 @@
             // Add to browser history if requested (prevent back button from logging out)
             if (addToHistory) {
                 const state = { screen: screenName };
-                const title = `${screenName.charAt(0).toUpperCase() + screenName.slice(1)} - Bradken SwitchOS`;
+                const title = `${screenName.charAt(0).toUpperCase() + screenName.slice(1)} - {{ config.APP_NAME }} SwitchOS`;
                 const url = `#${screenName}`;
                 window.history.pushState(state, title, url);
             }
@@ -3904,7 +3904,7 @@
         function init() {
             // Set initial history state to prevent back button from going to login
             if (!window.history.state) {
-                window.history.replaceState({ screen: 'dashboard' }, 'Dashboard - Bradken SwitchOS', '#dashboard');
+                window.history.replaceState({ screen: 'dashboard' }, 'Dashboard - {{ config.APP_NAME }} SwitchOS', '#dashboard');
             }
 
             // Set default dates for logs

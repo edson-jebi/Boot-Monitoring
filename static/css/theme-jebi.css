@@ -804,7 +804,7 @@ main,
 /* Professional ocean-inspired palette for login experience */
 [data-brand="JEBI"] body.login-page {
     /* Solid Marine Blue - Deep Ocean */
-    background: #1a5490;        /* Solid Rich Marine Blue */
+    background: #0B2533;        /* Solid Rich Marine Blue */
     background-attachment: fixed;
 }
 
@@ -837,8 +837,7 @@ main,
 
 /* Login Title - Marine Blue Accent */
 [data-brand="JEBI"] body.login-page .login-title {
-    color: #0d3b66;
-    font-family: var(--font-heading);
+    color: #F53A1E;
     font-size: 32px;
     font-weight: 700;
     margin-bottom: 32px;

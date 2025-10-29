@@ -10,9 +10,8 @@
     });
 </script>
 <style>
-    /* Default login page styles for non-JEBI brands */
-    body:not([data-brand="JEBI"]) {
-        background-color: #005596;
+    /* Base login page styles */
+    body {
         font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         margin: 0;
         padding: 0;
@@ -22,17 +21,11 @@
         justify-content: center;
     }
 
-    /* JEBI brand uses theme-jebi.css marine blue styling */
-    body[data-brand="JEBI"] {
-        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Bradken brand (default) - Corporate Blue */
+    body:not([data-brand="JEBI"]) {
+        background: linear-gradient(135deg, #005596 0%, #003d6b 100%);
     }
-    /* Default login container for non-JEBI brands */
+
     body:not([data-brand="JEBI"]) .login-container {
         background-color: white;
         padding: 40px;
@@ -43,27 +36,12 @@
         text-align: center;
     }
 
-    /* Common login container styles */
-    .login-container {
-        max-width: 400px;
-        width: 100%;
-        text-align: center;
-    }
-    /* Default logo styling for non-JEBI brands */
     body:not([data-brand="JEBI"]) .logo {
         max-width: 200px;
         height: auto;
         margin-bottom: 30px;
     }
 
-    /* Common logo styling */
-    .logo {
-        max-width: 200px;
-        height: auto;
-        margin-bottom: 30px;
-    }
-
-    /* Default login title for non-JEBI brands */
     body:not([data-brand="JEBI"]) .login-title {
         color: #005596;
         font-size: 28px;
@@ -71,13 +49,6 @@
         margin-bottom: 30px;
     }
 
-    /* Common form group styles */
-    .form-group {
-        margin-bottom: 20px;
-        text-align: left;
-    }
-
-    /* Default form label for non-JEBI brands */
     body:not([data-brand="JEBI"]) .form-label {
         display: block;
         color: #005596;
@@ -85,7 +56,6 @@
         margin-bottom: 5px;
     }
 
-    /* Default form input for non-JEBI brands */
     body:not([data-brand="JEBI"]) .form-input {
         width: 100%;
         padding: 12px;
@@ -101,13 +71,6 @@
         box-shadow: 0 0 5px rgba(243, 203, 60, 0.5);
     }
 
-    /* Common form input styles */
-    .form-input {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    /* Default login button for non-JEBI brands */
     body:not([data-brand="JEBI"]) .login-button {
         width: 100%;
         padding: 15px;
@@ -125,13 +88,6 @@
         background-color: #004080;
     }
 
-    /* Common button styles */
-    .login-button {
-        width: 100%;
-        cursor: pointer;
-    }
-
-    /* Default error message for non-JEBI brands */
     body:not([data-brand="JEBI"]) .error-message {
         color: #e74a3b;
         margin-top: 15px;
@@ -141,18 +97,48 @@
         border-left: 4px solid #e74a3b;
     }
 
-    /* Default footer text for non-JEBI brands */
     body:not([data-brand="JEBI"]) .footer-text {
         margin-top: 30px;
         color: #939598;
         font-size: 14px;
     }
+
+    /* Common structural styles */
+    .login-container {
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .logo {
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .form-input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .login-button {
+        width: 100%;
+        cursor: pointer;
+    }
+
+    /* JEBI brand styling is defined in theme-jebi.css */
+    /* Allows theme-jebi.css to fully control JEBI login appearance */
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="login-container">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    <img src="{{ url_for('static', filename='logo_jebi.png' if config.APP_BRAND == 'JEBI' else 'logo.png') }}" alt="{{ config.APP_NAME }} Logo" class="logo">
     <h1 class="login-title">{{ config.APP_NAME }}</h1>
     
     <form method="POST" action="{{ url_for('auth.login') }}">
