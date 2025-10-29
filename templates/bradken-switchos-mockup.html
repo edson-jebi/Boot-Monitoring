@@ -34,6 +34,10 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header-left {
@@ -924,6 +928,28 @@
             }
         }
 
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
             .form-grid {
@@ -972,6 +998,16 @@
             </div>
         </div>
 
+        <!-- Toast Notification Container -->
+        <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; max-width: 400px;"></div>
+
+        <!-- Floating Back to Top Button (Mobile) -->
+        <button id="backToTopBtn" onclick="scrollToTop()" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: none; width: 56px; height: 56px; border-radius: 50%; background: #2563eb; color: white; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); cursor: pointer; transition: all 0.3s ease; transform: scale(1);">
+            <svg style="width: 24px; height: 24px; margin: auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+        </button>
+
         <!-- Dashboard Screen -->
         <div id="dashboardScreen" class="screen active">
             <div class="header">
@@ -1018,13 +1054,32 @@
                         <div class="timeline-header">
                             <div>
                                 <h2 class="card-title">Power Cycle Events</h2>
-                                <p id="eventCount" class="card-subtitle">Showing events in the last 1D</p>
+                                <p id="eventCount" class="card-subtitle">Showing events in the last 1H</p>
+                                <p id="lastUpdateTime" class="card-subtitle" style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Last updated: Never</p>
                             </div>
-                            <div class="timeline-buttons">
-                                <button class="timeline-btn" onclick="setTimeWindow('1H')">1H</button>
-                                <button class="timeline-btn active" onclick="setTimeWindow('1D')">1D</button>
-                                <button class="timeline-btn" onclick="setTimeWindow('1W')">1W</button>
-                                <button class="timeline-btn" onclick="setTimeWindow('1M')">1M</button>
+                            <div style="display: flex; gap: 1rem; align-items: center;">
+                                <div class="timeline-buttons">
+                                    <button class="timeline-btn active" onclick="setTimeWindow('1H')">1H</button>
+                                    <button class="timeline-btn" onclick="setTimeWindow('1D')">1D</button>
+                                    <button class="timeline-btn" onclick="setTimeWindow('1W')">1W</button>
+                                    <button class="timeline-btn" onclick="setTimeWindow('1M')">1M</button>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; border-left: 1px solid #e5e7eb; padding-left: 1rem;">
+                                    <label style="font-size: 0.875rem; color: #6b7280; white-space: nowrap;">Auto-refresh:</label>
+                                    <select id="refreshInterval" onchange="setRefreshInterval(this.value)" style="padding: 0.25rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+                                        <option value="0">Manual</option>
+                                        <option value="5000">5s</option>
+                                        <option value="10000" selected>10s</option>
+                                        <option value="30000">30s</option>
+                                        <option value="60000">1min</option>
+                                    </select>
+                                    <button class="timeline-btn" onclick="refreshTimelineNow()" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                        <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="23 4 23 10 17 10"></polyline>
+                                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="timeline-svg-container">
@@ -1638,7 +1693,7 @@
             currentScreen: 'dashboard',
             autoPowerCycle: true,
             ledScheduleEnabled: false,
-            timeWindow: '1D',
+            timeWindow: '1H',
             manualControls: {
                 screen: { power: true, ledIndicator: true },
                 processor: { power: true, ledIndicator: true },
@@ -1688,19 +1743,90 @@
             closeModal();
         });
 
-        // Screen Navigation
-        function navigateToScreen(screenName) {
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            // Set styles based on type
+            const styles = {
+                success: { bg: '#10b981', icon: '✓' },
+                error: { bg: '#ef4444', icon: '✕' },
+                warning: { bg: '#f59e0b', icon: '⚠' },
+                info: { bg: '#3b82f6', icon: 'ℹ' }
+            };
+
+            const style = styles[type] || styles.info;
+
+            toast.style.cssText = `
+                background: ${style.bg};
+                color: white;
+                padding: 1rem 1.25rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-size: 0.875rem;
+                animation: slideIn 0.3s ease-out;
+                cursor: pointer;
+            `;
+
+            toast.innerHTML = `
+                <span style="font-size: 1.25rem; font-weight: bold;">${style.icon}</span>
+                <span style="flex: 1;">${message}</span>
+            `;
+
+            // Add click to dismiss
+            toast.onclick = () => dismissToast(toast);
+
+            container.appendChild(toast);
+
+            // Auto-dismiss after duration
+            setTimeout(() => dismissToast(toast), duration);
+        }
+
+        function dismissToast(toast) {
+            toast.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }
+
+        // Screen Navigation with History Management
+        function navigateToScreen(screenName, addToHistory = true) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
             document.getElementById(screenName + 'Screen').classList.add('active');
             appState.currentScreen = screenName;
-            
+
+            // Add to browser history if requested (prevent back button from logging out)
+            if (addToHistory) {
+                const state = { screen: screenName };
+                const title = `${screenName.charAt(0).toUpperCase() + screenName.slice(1)} - Bradken SwitchOS`;
+                const url = `#${screenName}`;
+                window.history.pushState(state, title, url);
+            }
+
             // Stop auto-refresh when leaving logs screen
             if (screenName !== 'logs') {
                 stopLogsAutoRefresh();
             }
         }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.screen) {
+                // Navigate to the screen from history state without adding to history again
+                navigateToScreen(event.state.screen, false);
+            } else {
+                // If no state (initial page load or manual hash), stay on dashboard
+                navigateToScreen('dashboard', false);
+            }
+        });
 
         function navigateToDashboard() {
             navigateToScreen('dashboard');
@@ -1816,14 +1942,22 @@
                     .then(data => {
                         if (data.success) {
                             appState.autoPowerCycle = newState;
-                            alert(`Service ${action} successful: ${data.message}`);
+                            showToast(
+                                `Auto Power Cycle ${newState ? 'enabled' : 'disabled'} successfully`,
+                                'success',
+                                4000
+                            );
                             // Refresh service status immediately
                             updateServiceStatus();
                         } else {
                             // Revert checkbox on failure
                             checkbox.checked = !newState;
                             status.textContent = originalStatusText;
-                            alert(`Service ${action} failed: ${data.error}`);
+                            showToast(
+                                `Failed to ${action} service: ${data.error}`,
+                                'error',
+                                6000
+                            );
                         }
                     })
                     .catch(error => {
@@ -1831,7 +1965,11 @@
                         // Revert checkbox on error
                         checkbox.checked = !newState;
                         status.textContent = originalStatusText;
-                        alert(`Network error during service ${action}: ${error.message}`);
+                        showToast(
+                            `Network error: Unable to ${action} service`,
+                            'error',
+                            6000
+                        );
                     })
                     .finally(() => {
                         // Re-enable checkbox
@@ -2573,10 +2711,37 @@
         // Timeline
         // Store fetched events globally
         let allRelayEvents = [];
+        let serverTimeOffset = 0; // Offset between server and browser time in milliseconds
+        let refreshTimer = null; // Timer for auto-refresh
+        let currentRefreshInterval = 10000; // Default 10 seconds
 
         // Fetch real relay activation events from database
         function fetchRelayActivations() {
-            const now = new Date();
+            // First, get server's current time to calculate offset
+            fetch('/system-time')
+                .then(response => response.json())
+                .then(timeData => {
+                    if (timeData.success && timeData.timestamp) {
+                        const serverTime = new Date(timeData.timestamp);
+                        const browserTime = new Date();
+                        serverTimeOffset = serverTime - browserTime;
+                        console.log(`Server time offset: ${serverTimeOffset}ms (${serverTimeOffset/1000/60} minutes)`);
+
+                        // Now fetch events with correct time reference
+                        fetchEventsWithServerTime();
+                    } else {
+                        console.error('Failed to get server time, using browser time');
+                        fetchEventsWithServerTime();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error getting server time:', error);
+                    fetchEventsWithServerTime();
+                });
+        }
+
+        function fetchEventsWithServerTime() {
+            const now = new Date(Date.now() + serverTimeOffset); // Server's "now"
             let startTime;
 
             // Calculate start time based on time window
@@ -2624,13 +2789,22 @@
                             // Determine type based on is_automatic flag
                             const type = event.is_automatic ? 'auto' : 'manual';
 
-                            // Parse timestamp - database stores in format "YYYY-MM-DD HH:MM:SS"
-                            // Replace space with T to make it ISO-compatible
-                            const timestamp = new Date(event.timestamp.replace(' ', 'T'));
+                            // Parse timestamp - database stores in format "YYYY-MM-DD HH:MM:SS" in server's local time
+                            // Store both the raw string and a Date object for filtering
+                            const parts = event.timestamp.split(/[- :]/);
+                            const timestamp = new Date(
+                                parseInt(parts[0]), // year
+                                parseInt(parts[1]) - 1, // month (0-indexed)
+                                parseInt(parts[2]), // day
+                                parseInt(parts[3]), // hour
+                                parseInt(parts[4]), // minute
+                                parseInt(parts[5])  // second
+                            );
 
                             return {
                                 component: component,
                                 timestamp: timestamp,
+                                timestampString: event.timestamp, // Keep original for display
                                 type: type,
                                 action: event.action,
                                 username: event.username,
@@ -2638,11 +2812,31 @@
                             };
                         });
 
-                        // Update event count display
+                        console.log(`Fetched ${allRelayEvents.length} total events from database`);
+                        console.log('Sample timestamps:', allRelayEvents.slice(0, 3).map(e => ({
+                            original: data.events[allRelayEvents.indexOf(e)]?.timestamp,
+                            parsed: e.timestamp,
+                            iso: e.timestamp.toISOString()
+                        })));
+
+                        // Get filtered events for current time window
+                        const filteredEvents = getFilteredEvents();
+                        console.log(`Filtered to ${filteredEvents.length} events for ${appState.timeWindow} window`);
+                        console.log('Current time:', new Date());
+                        console.log('Cutoff time for 1H:', new Date(Date.now() - 60 * 60 * 1000));
+
+                        // Update event count display with breakdown
                         const eventCount = document.getElementById('eventCount');
                         if (eventCount) {
-                            eventCount.textContent = `Showing ${allRelayEvents.length} events in the last ${appState.timeWindow}`;
+                            // Count manual vs automatic events
+                            const manualCount = filteredEvents.filter(e => e.type === 'manual').length;
+                            const autoCount = filteredEvents.filter(e => e.type === 'auto').length;
+
+                            eventCount.textContent = `Showing ${filteredEvents.length} events in the last ${appState.timeWindow}, ${manualCount} manual and ${autoCount} jebi-switchboard`;
                         }
+
+                        // Update last update time
+                        updateLastUpdateTime();
 
                         // Redraw timeline with new data
                         drawTimeline();
@@ -2660,8 +2854,8 @@
         }
 
         function getFilteredEvents() {
-            // Filter events based on selected time window
-            const now = new Date();
+            // Filter events based on selected time window using server time
+            const now = new Date(Date.now() + serverTimeOffset);
             let cutoffTime;
 
             switch(appState.timeWindow) {
@@ -2681,8 +2875,28 @@
                     cutoffTime = new Date(now - 24 * 60 * 60 * 1000);
             }
 
+            console.log(`getFilteredEvents: Filtering ${allRelayEvents.length} events`);
+            console.log(`Server current time: ${now.toLocaleString()}`);
+            console.log(`Cutoff time for ${appState.timeWindow}: ${cutoffTime.toLocaleString()}`);
+
             // Filter events by comparing actual timestamp objects
-            return allRelayEvents.filter(event => event.timestamp >= cutoffTime);
+            const filtered = allRelayEvents.filter(event => {
+                const isInRange = event.timestamp >= cutoffTime;
+                return isInRange;
+            });
+
+            console.log(`Filtered result: ${filtered.length} events`);
+
+            // Debug: show first few events that passed/failed filter
+            if (allRelayEvents.length > 0) {
+                console.log('First 3 events filter check:');
+                allRelayEvents.slice(0, 3).forEach((event, i) => {
+                    const passed = event.timestamp >= cutoffTime;
+                    console.log(`  Event ${i}: ${event.timestamp.toLocaleString()} >= ${cutoffTime.toLocaleString()} ? ${passed}`);
+                });
+            }
+
+            return filtered;
         }
 
         function setTimeWindow(window) {
@@ -2698,9 +2912,53 @@
             drawTimeline();
         }
 
+        // Auto-refresh functions
+        function setRefreshInterval(interval) {
+            currentRefreshInterval = parseInt(interval);
+
+            // Clear existing timer
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+
+            // Start new timer if not manual
+            if (currentRefreshInterval > 0) {
+                refreshTimer = setInterval(() => {
+                    fetchRelayActivations();
+                }, currentRefreshInterval);
+                console.log(`Auto-refresh enabled: ${currentRefreshInterval}ms`);
+            } else {
+                console.log('Auto-refresh disabled (manual mode)');
+            }
+        }
+
+        function refreshTimelineNow() {
+            console.log('Manual refresh triggered');
+            fetchRelayActivations();
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date(Date.now() + serverTimeOffset);
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const lastUpdateElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateElement) {
+                lastUpdateElement.textContent = `Last updated: ${timeString}`;
+            }
+        }
+
         function drawTimeline() {
             const svg = document.getElementById('timelineSvg');
             const filteredEvents = getFilteredEvents();
+            console.log(`drawTimeline: Drawing ${filteredEvents.length} events for ${appState.timeWindow}`);
+            if (filteredEvents.length > 0) {
+                console.log('First event timestamp:', filteredEvents[0].timestamp);
+                console.log('Last event timestamp:', filteredEvents[filteredEvents.length - 1].timestamp);
+            }
             const components = ['Processor', 'Screen', 'Lights'];
 
             const width = 1000;
@@ -2709,7 +2967,8 @@
             const plotWidth = width - padding.left - padding.right;
             const plotHeight = height - padding.top - padding.bottom;
 
-            const now = new Date();
+            // Use server time for timeline calculations
+            const now = new Date(Date.now() + serverTimeOffset);
             let startTime;
 
             switch(appState.timeWindow) {
@@ -2742,10 +3001,16 @@
             };
 
             const formatTimeLabel = (date) => {
+                // Format time without timezone conversion - show the time as-is
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const month = date.toLocaleDateString('en-US', { month: 'short' });
+                const day = date.getDate();
+
                 if (appState.timeWindow === '1H' || appState.timeWindow === '1D') {
-                    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    return `${hours}:${minutes}`;
                 } else {
-                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    return `${month} ${day}`;
                 }
             };
 
@@ -2832,16 +3097,19 @@
                 const eventType = event.type === 'auto' ? 'Automatic' : 'Manual';
                 const action = event.action ? event.action.toUpperCase() : 'N/A';
                 const user = event.username || 'System';
-                const time = event.timestamp.toLocaleString();
+                // Use the original timestamp string from server to show server's local time
+                const time = event.timestampString || event.timestamp.toLocaleString();
                 title.textContent = `${event.component} - ${eventType}\nAction: ${action}\nUser: ${user}\nTime: ${time}`;
                 circle.appendChild(title);
 
                 svg.appendChild(circle);
             });
 
-            // Update event count
+            // Update event count with breakdown
             const eventCount = document.getElementById('eventCount');
-            eventCount.textContent = `Showing ${filteredEvents.length} event${filteredEvents.length !== 1 ? 's' : ''} in the last ${appState.timeWindow}`;
+            const manualCount = filteredEvents.filter(e => e.type === 'manual').length;
+            const autoCount = filteredEvents.filter(e => e.type === 'auto').length;
+            eventCount.textContent = `Showing ${filteredEvents.length} event${filteredEvents.length !== 1 ? 's' : ''} in the last ${appState.timeWindow}, ${manualCount} manual and ${autoCount} jebi-switchboard`;
         }
 
         // Settings Edit Mode
@@ -3065,14 +3333,14 @@
                                 appState.systemInfo.location = location;
                                 updateSystemInfoUI();
 
-                                alert('System information saved successfully!');
+                                showToast('System information saved successfully', 'success', 4000);
                             } else {
-                                alert('Failed to save system information: ' + (data.error || 'Unknown error'));
+                                showToast('Failed to save system information', 'error', 6000);
                             }
                         })
                         .catch(error => {
                             console.error('Error saving system info:', error);
-                            alert('Error saving system information: ' + error.message);
+                            showToast('Network error: Unable to save system information', 'error', 6000);
                         });
                     }
                     
@@ -3615,8 +3883,30 @@
                 });
         }
 
+        // Floating Back to Top Button
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show/hide back to top button based on scroll position
+        window.addEventListener('scroll', () => {
+            const backToTopBtn = document.getElementById('backToTopBtn');
+            if (window.scrollY > 300) {
+                backToTopBtn.style.display = 'flex';
+                backToTopBtn.style.alignItems = 'center';
+                backToTopBtn.style.justifyContent = 'center';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+
         // Initialize
         function init() {
+            // Set initial history state to prevent back button from going to login
+            if (!window.history.state) {
+                window.history.replaceState({ screen: 'dashboard' }, 'Dashboard - Bradken SwitchOS', '#dashboard');
+            }
+
             // Set default dates for logs
             const today = new Date();
             const weekAgo = new Date(today);
@@ -3627,6 +3917,9 @@
 
             // Fetch and draw initial timeline with real data
             fetchRelayActivations();
+
+            // Initialize auto-refresh (default 10s)
+            setRefreshInterval(currentRefreshInterval);
 
             // Update UI
             updateAutoPowerCycleUI();
@@ -3801,14 +4094,20 @@
             const timezone = select.value;
 
             if (!timezone) {
-                alert('Please select a timezone');
+                showToast('Please select a timezone', 'warning', 4000);
                 return;
             }
 
-            // Confirm
-            if (!confirm(`Set system timezone to ${timezone}?\n\nThis will update the system time and hardware clock (RTC).`)) {
-                return;
-            }
+            // Confirm using modal instead of browser confirm
+            showConfirmation(
+                'Set Timezone',
+                `Set system timezone to ${timezone}?\n\nThis will update the system time and hardware clock (RTC).`,
+                () => applyTimezoneChange(timezone, select, btn),
+                'Set Timezone'
+            );
+        }
+
+        function applyTimezoneChange(timezone, select, btn) {
 
             // Disable controls
             select.disabled = true;
@@ -3827,7 +4126,7 @@
                 if (result.success) {
                     const ntpStatus = result.ntp_synced ? '✓ Time synced from internet' : '⚠ Time sync may be pending';
                     const rtcStatus = result.rtc_updated ? '✓ RTC updated' : '⚠ RTC update failed';
-                    alert(`Timezone set to ${result.timezone}\n\n${ntpStatus}\n${rtcStatus}`);
+                    showToast(`Timezone set to ${result.timezone}. ${ntpStatus}`, 'success', 6000);
                     loadCurrentTimezone();
                     // Update time display immediately and continue refreshing
                     updateSystemTime();
@@ -3835,12 +4134,12 @@
                     setTimeout(() => updateSystemTime(), 1000);
                     setTimeout(() => updateSystemTime(), 2000);
                 } else {
-                    alert('Failed to set timezone: ' + (result.error || 'Unknown error'));
+                    showToast(`Failed to set timezone: ${result.error || 'Unknown error'}`, 'error', 6000);
                 }
             })
             .catch(error => {
                 console.error('Error setting timezone:', error);
-                alert('Error setting timezone: ' + error.message);
+                showToast('Network error: Unable to set timezone', 'error', 6000);
             })
             .finally(() => {
                 select.disabled = false;
