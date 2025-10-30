@@ -81,7 +81,7 @@ def create_app(environment: str = None) -> Flask:
     def inject_config():
         return {'config': config}
     
-    # Add security headers
+    # Add security headers and cache control
     @app.after_request
     def add_security_headers(response):
         response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -89,6 +89,14 @@ def create_app(environment: str = None) -> Flask:
         response.headers['X-XSS-Protection'] = '1; mode=block'
         if not config.DEBUG:
             response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        
+        # Add cache control headers for authenticated pages to prevent back button issues
+        from flask import request, session
+        if session.get('user_id') and request.endpoint != 'static':
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        
         return response
     
     # Log application startup

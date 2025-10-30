@@ -1,0 +1,984 @@
+/**
+ * Jebi Brand Theme - Dark Blue Marine
+ * A sophisticated oceanic palette inspired by deep seas, navy vessels, and coastal waters
+ * Professional, trustworthy, and immersive dark theme with WCAG 2.1 AA accessibility
+ */
+
+:root {
+    /* Primary Brand Colors - JEBI Dark Marine Scale */
+    --brand-primary: #0d3b66;          /* Deep Navy - Ocean Depths */
+    --brand-secondary: #1a5490;        /* Rich Marine Blue */
+    --brand-accent: #2171b5;           /* Vibrant Ocean Blue */
+    --brand-highlight: #348ac7;        /* Coastal Blue */
+    --brand-glow: #4ea5d9;             /* Light Sky Blue */
+    --brand-dark: #071e33;             /* Deepest Ocean Trench */
+    --brand-darker: #041220;           /* Midnight Abyss */
+    --brand-light: #5fb3e0;            /* Bright Tropical Waters */
+    --brand-lighter: #a8d5f2;          /* Pale Sky Blue */
+
+    /* Marine Scale - Deep Ocean to Coastal Waters Gradient */
+    --scale-1: #041220;                /* Midnight Abyss (darkest) */
+    --scale-2: #071e33;                /* Deepest Ocean Trench */
+    --scale-3: #0d3b66;                /* Deep Navy - Ocean Depths */
+    --scale-4: #124a7a;                /* Deep Marine */
+    --scale-5: #1a5490;                /* Rich Marine Blue */
+    --scale-6: #2171b5;                /* Vibrant Ocean Blue */
+    --scale-7: #348ac7;                /* Coastal Blue */
+    --scale-8: #4ea5d9;                /* Light Sky Blue */
+    --scale-9: #76bfe6;                /* Soft Aqua */
+    --scale-10: #a8d5f2;               /* Pale Sky Blue */
+
+    /* UI Background Colors - Dark Marine Theme */
+    --bg-primary: #0d3b66;             /* Deep Navy base */
+    --bg-secondary: #124a7a;           /* Deep Marine secondary */
+    --bg-card: #1a5490;                /* Rich Marine Blue for cards */
+    --bg-card-hover: #1f6099;          /* Lighter hover state */
+    --bg-sidebar: #041220;             /* Midnight Abyss sidebar */
+    --bg-topbar: #071e33;              /* Deepest Ocean topbar */
+    --bg-accent: #2171b5;              /* Vibrant Ocean accent */
+
+    /* Text Colors - Light on Dark for WCAG AA Contrast */
+    --text-primary: #e8f4fa;           /* Soft White with blue tint */
+    --text-secondary: #a8d5f2;         /* Pale Sky Blue for secondary */
+    --text-light: #ffffff;             /* Pure white for emphasis */
+    --text-accent: #5fb3e0;            /* Bright Tropical Waters */
+    --text-muted: #76bfe6;             /* Soft Aqua for muted text */
+    --text-highlight: #4ea5d9;         /* Light Sky Blue highlights */
+    --text-dark-bg: #e8f4fa;           /* Light text on darkest backgrounds */
+
+    /* Status Colors - Marine Adjusted for Dark Backgrounds */
+    --status-success: #4ecdc4;         /* Turquoise Green */
+    --status-error: #ff6b6b;           /* Coral Red */
+    --status-warning: #ffd93d;         /* Bright Yellow */
+    --status-info: #6dd5ed;            /* Cyan Blue */
+
+    /* Card Variants - Layered Marine Depths */
+    --card-primary: #1a5490;           /* Rich Marine Blue */
+    --card-secondary: #1f6099;         /* Slightly lighter marine */
+    --card-tertiary: #2171b5;          /* Vibrant Ocean Blue */
+    --card-light: #2680c4;             /* Lighter coastal blue */
+    --card-dark: #124a7a;              /* Deep Marine */
+
+    /* Shadows and Borders - Blue Glows and Depths */
+    --shadow-sm: 0 2px 8px rgba(4, 18, 32, 0.4);
+    --shadow-md: 0 4px 16px rgba(4, 18, 32, 0.5);
+    --shadow-lg: 0 8px 24px rgba(4, 18, 32, 0.6);
+    --shadow-soft: 0 2px 12px rgba(33, 113, 181, 0.3);
+    --shadow-glow: 0 4px 16px rgba(78, 165, 217, 0.25);
+    --shadow-marine: 0 0 20px rgba(33, 113, 181, 0.4);
+    --border-color: #2171b5;           /* Vibrant Ocean border */
+    --border-medium: #1a5490;          /* Rich Marine border */
+    --border-dark: #124a7a;            /* Deep Marine border */
+    --border-light: #348ac7;           /* Coastal Blue border */
+    --border-radius: 12px;
+
+    /* Fonts */
+    --font-heading: 'Oswald', sans-serif;
+    --font-body: 'Raleway', sans-serif;
+    --font-system: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Body and Background - Solid Deep Marine Ocean */
+body {
+    background: var(--scale-2);             /* Solid Deepest Ocean Trench */
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+/* Sidebar Styling - Solid Deep Ocean Abyss */
+.colorside {
+    background: var(--scale-1) !important;  /* Solid Midnight Abyss */
+    box-shadow: 2px 0 16px rgba(4, 18, 32, 0.6),
+                inset -1px 0 0 rgba(33, 113, 181, 0.15),
+                0 0 40px rgba(13, 59, 102, 0.3);
+    border-right: 1px solid var(--scale-4);
+}
+
+/* Topbar Styling - Solid Deep Marine Header with Glow */
+.colortop {
+    background: var(--scale-2) !important;  /* Solid Deepest Ocean Trench */
+    box-shadow: 0 2px 12px rgba(4, 18, 32, 0.6),
+                0 0 20px rgba(33, 113, 181, 0.2);
+    border-bottom: 1px solid var(--scale-5);
+}
+
+/* Card Variants - Elevated Marine Layers */
+.colorcard {
+    background: var(--card-primary) !important;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md), var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-primary);
+}
+
+.colorcard:hover {
+    box-shadow: var(--shadow-lg), var(--shadow-glow), var(--shadow-marine);
+    transform: translateY(-2px);
+    border-color: var(--brand-accent);
+    background: var(--card-secondary) !important;
+}
+
+.colorcard2 {
+    background: var(--card-secondary) !important;
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--brand-accent);
+    box-shadow: var(--shadow-sm), var(--shadow-soft);
+    color: var(--text-primary);
+}
+
+.colorcard3 {
+    background: var(--scale-6) !important;  /* Solid Vibrant Ocean Blue */
+    border-radius: var(--border-radius);
+    color: var(--text-light);
+    box-shadow: var(--shadow-glow), var(--shadow-marine);
+}
+
+.colorcard4 {
+    background: var(--card-primary) !important;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-medium);
+    color: var(--text-primary);
+}
+
+.colorcard5 {
+    background: var(--card-tertiary) !important;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-soft), var(--shadow-glow);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Text Styles - Light Text on Dark Marine Backgrounds */
+.text-title {
+    color: var(--text-accent) !important;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgba(78, 165, 217, 0.3);
+}
+
+.text-title2 {
+    color: var(--text-light) !important;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-shadow: 0 2px 8px rgba(13, 59, 102, 0.5);
+}
+
+.text-second {
+    font-family: var(--font-body);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.text-second2 {
+    font-family: var(--font-body);
+    color: var(--text-light) !important;
+    line-height: 1.6;
+}
+
+.text-second-title {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--brand-light) !important;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 4px 16px rgba(78, 165, 217, 0.4),
+                 0 0 40px rgba(33, 113, 181, 0.3);
+}
+
+.text-user {
+    color: var(--text-light) !important;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(4, 18, 32, 0.5);
+}
+
+.text-user2 {
+    color: var(--brand-light) !important;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 0 2px 8px rgba(78, 165, 217, 0.4);
+}
+
+.text-login {
+    color: var(--status-error) !important;
+    font-family: var(--font-body);
+    text-align: center;
+    font-weight: 500;
+}
+
+.text2-login {
+    color: var(--text-secondary) !important;
+    font-family: var(--font-body);
+    text-align: center;
+    font-weight: 300;
+}
+
+/* Buttons - Solid Marine Blue with Glow */
+.btn-primary,
+.btn-primary:visited,
+.btn-primary.active {
+    color: white;
+    background: var(--scale-5) !important;  /* Solid Rich Marine Blue */
+    border: 1px solid var(--brand-accent) !important;
+    box-shadow: var(--shadow-soft), var(--shadow-glow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+    background: var(--scale-6) !important;  /* Solid Vibrant Ocean Blue on hover */
+    box-shadow: var(--shadow-md), var(--shadow-glow), var(--shadow-marine);
+    transform: translateY(-2px);
+    border-color: var(--brand-highlight);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    background: var(--scale-7) !important;  /* Solid Coastal Blue on active */
+}
+
+.btn-secondary {
+    background: var(--scale-6) !important;  /* Solid Vibrant Ocean Blue */
+    border: 1px solid var(--brand-accent) !important;
+    color: var(--text-light) !important;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-soft), var(--shadow-glow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover {
+    box-shadow: var(--shadow-md), var(--shadow-glow), var(--shadow-marine);
+    border-color: var(--brand-highlight);
+    transform: translateY(-1px);
+    background: var(--scale-7) !important;  /* Solid Coastal Blue on hover */
+}
+
+/* Navigation Tabs - Marine Active States */
+.nav-tabs .nav-link:not(.active) {
+    border-color: transparent !important;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:not(.active):hover {
+    color: var(--text-accent);
+    background: rgba(33, 113, 181, 0.15);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--brand-light) !important;
+    border-bottom: 2px solid var(--brand-accent) !important;
+    font-weight: 700;
+    background: rgba(33, 113, 181, 0.25);
+    box-shadow: 0 2px 8px rgba(33, 113, 181, 0.3);
+}
+
+/* Service Status Card - Marine Borders with Glow */
+.service-card {
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-color);
+    background: var(--card-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    color: var(--text-primary);
+}
+
+.service-card.active {
+    border-color: var(--status-success);
+    background: var(--card-primary);        /* Solid background */
+    box-shadow: var(--shadow-md),
+                0 0 20px rgba(78, 205, 196, 0.4),
+                var(--shadow-glow);
+    border-left: 4px solid var(--status-success);  /* Visual indicator */
+}
+
+.service-card.inactive {
+    border-color: var(--status-error);
+    background: var(--card-primary);        /* Solid background */
+    box-shadow: var(--shadow-md),
+                0 0 20px rgba(255, 107, 107, 0.4),
+                var(--shadow-glow);
+    border-left: 4px solid var(--status-error);    /* Visual indicator */
+}
+
+/* Status Indicators - Glowing Marine Dots */
+.status-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+}
+
+.status-active {
+    background-color: var(--status-success);
+    animation: pulse-marine-success 2s ease-in-out infinite;
+    box-shadow: 0 0 12px rgba(78, 205, 196, 0.6);
+}
+
+.status-active::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--status-success);
+    animation: ripple-marine 2s ease-out infinite;
+}
+
+.status-inactive {
+    background-color: var(--status-error);
+    box-shadow: 0 0 12px rgba(255, 107, 107, 0.6);
+}
+
+.status-unknown {
+    background-color: var(--status-warning);
+    box-shadow: 0 0 12px rgba(255, 217, 61, 0.6);
+}
+
+@keyframes pulse-marine-success {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(78, 205, 196, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(78, 205, 196, 0.9);
+    }
+}
+
+@keyframes ripple-marine {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* Form Controls - Dark Marine Style */
+input, select, textarea {
+    background: var(--scale-4);
+    color: var(--text-primary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    background: var(--card-primary);
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px rgba(33, 113, 181, 0.25),
+                var(--shadow-soft),
+                var(--shadow-glow);
+    outline: none;
+    color: var(--text-light);
+}
+
+input::placeholder, select::placeholder, textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Modal Styles - Solid Dark Marine with Glow */
+.modal-content {
+    background: var(--card-primary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg), var(--shadow-marine);
+    overflow: hidden;
+    color: var(--text-primary);
+}
+
+.modal-header {
+    background: var(--scale-4);             /* Solid Deep Marine */
+    color: var(--text-light);
+    border: none;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(33, 113, 181, 0.3);
+}
+
+.modal-header .close {
+    color: var(--text-light);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(78, 165, 217, 0.6);
+}
+
+.modal-body {
+    color: var(--text-primary);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* Loading Spinner - Marine Blue with Glow */
+.spinner-border-jebi {
+    border-color: var(--brand-accent);
+    border-right-color: transparent;
+    animation: spin 0.8s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(33, 113, 181, 0.5));
+}
+
+/* Badges - Solid Marine Colors */
+.badge-primary {
+    background: var(--scale-5) !important;  /* Solid Rich Marine Blue */
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft), var(--shadow-glow);
+    border: 1px solid var(--brand-accent);
+}
+
+.badge-secondary {
+    background: var(--scale-6) !important;  /* Solid Vibrant Ocean Blue */
+    color: var(--text-light) !important;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-sm), var(--shadow-glow);
+    border: 1px solid var(--brand-highlight);
+}
+
+/* Sidebar Brand - Deep Abyss with Marine Glow */
+.sidebar-brand {
+    background: var(--brand-darker);
+    padding: 2rem 1.5rem;
+    border-bottom: 2px solid var(--scale-4);
+    box-shadow: 0 2px 16px rgba(4, 18, 32, 0.6),
+                0 0 20px rgba(33, 113, 181, 0.3);
+}
+
+/* Custom Scrollbar - Solid Marine Blue */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scale-2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scale-5);             /* Solid Rich Marine Blue */
+    border-radius: 6px;
+    box-shadow: var(--shadow-sm), 0 0 8px rgba(33, 113, 181, 0.4);
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scale-6);             /* Solid Vibrant Ocean Blue on hover */
+    box-shadow: var(--shadow-glow);
+}
+
+/* Progress Bar - Solid Marine with Glow */
+.progress-bar {
+    background: var(--scale-6);             /* Solid Vibrant Ocean Blue */
+    box-shadow: var(--shadow-soft), var(--shadow-glow);
+}
+
+/* Tables - Dark Marine Style */
+.table {
+    background: var(--card-primary);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    color: var(--text-primary);
+}
+
+.table thead th {
+    background: var(--scale-4);             /* Solid Deep Marine */
+    color: var(--text-light);
+    border: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(33, 113, 181, 0.3);
+}
+
+.table tbody {
+    background: var(--card-primary);
+    color: var(--text-primary);
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(33, 113, 181, 0.15);
+    box-shadow: 0 0 8px rgba(33, 113, 181, 0.2);
+}
+
+.table td, .table th {
+    color: var(--text-primary);
+}
+
+/* Alert Styles - Marine with Glow */
+.alert {
+    background: var(--card-primary);
+    border-radius: var(--border-radius);
+    border-left: 3px solid;
+    color: var(--text-primary);
+}
+
+.alert-success {
+    border-left-color: var(--status-success);
+    background: rgba(78, 205, 196, 0.15);
+    color: var(--status-success);
+    box-shadow: var(--shadow-soft), 0 0 12px rgba(78, 205, 196, 0.3);
+}
+
+.alert-danger {
+    border-left-color: var(--status-error);
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--status-error);
+    box-shadow: var(--shadow-soft), 0 0 12px rgba(255, 107, 107, 0.3);
+}
+
+.alert-info {
+    border-left-color: var(--status-info);
+    background: rgba(109, 213, 237, 0.15);
+    color: var(--status-info);
+    box-shadow: var(--shadow-soft), 0 0 12px rgba(109, 213, 237, 0.3);
+}
+
+.alert-warning {
+    border-left-color: var(--status-warning);
+    background: rgba(255, 217, 61, 0.15);
+    color: var(--status-warning);
+    box-shadow: var(--shadow-soft), 0 0 12px rgba(255, 217, 61, 0.3);
+}
+
+/* Links - Marine Blue Tone */
+a {
+    color: var(--text-accent);
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--brand-light);
+    text-decoration: none;
+    text-shadow: 0 0 8px rgba(78, 165, 217, 0.5);
+}
+
+/* Additional Marine Components and Utilities */
+
+/* Dropdown Menus - Dark Marine */
+.dropdown-menu {
+    background: var(--card-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg), var(--shadow-marine);
+    border-radius: var(--border-radius);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(33, 113, 181, 0.2);
+    color: var(--text-light);
+}
+
+/* List Groups - Marine Style */
+.list-group-item {
+    background: var(--card-primary);
+    border: 1px solid var(--border-dark);
+    color: var(--text-primary);
+}
+
+.list-group-item:hover {
+    background: var(--card-secondary);
+}
+
+.list-group-item.active {
+    background: var(--scale-6);             /* Solid Vibrant Ocean Blue */
+    border-color: var(--brand-accent);
+    color: var(--text-light);
+}
+
+/* Code Blocks - Deep Marine */
+pre, code {
+    background: var(--scale-2);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+}
+
+pre {
+    padding: 1rem;
+    box-shadow: var(--shadow-soft);
+}
+
+code {
+    padding: 0.2rem 0.4rem;
+}
+
+/* Tooltips - Marine Glow */
+.tooltip-inner {
+    background: var(--scale-4);
+    color: var(--text-light);
+    box-shadow: var(--shadow-glow);
+    border: 1px solid var(--border-color);
+}
+
+/* Popovers - Dark Marine */
+.popover {
+    background: var(--card-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg), var(--shadow-marine);
+}
+
+.popover-header {
+    background: var(--scale-4);
+    color: var(--text-light);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.popover-body {
+    color: var(--text-primary);
+}
+
+/* Breadcrumb - Marine Path */
+.breadcrumb {
+    background: rgba(33, 113, 181, 0.1);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+}
+
+.breadcrumb-item {
+    color: var(--text-secondary);
+}
+
+.breadcrumb-item.active {
+    color: var(--text-light);
+}
+
+.breadcrumb-item a {
+    color: var(--text-accent);
+}
+
+/* Pagination - Marine Navigation */
+.pagination .page-item .page-link {
+    background: var(--card-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.pagination .page-item .page-link:hover {
+    background: var(--card-secondary);
+    border-color: var(--brand-accent);
+    color: var(--text-light);
+    box-shadow: var(--shadow-glow);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--scale-6);             /* Solid Vibrant Ocean Blue */
+    border-color: var(--brand-accent);
+    color: var(--text-light);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Cards with Oceanic Depth */
+.card {
+    background: var(--card-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    background: var(--scale-4);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-light);
+}
+
+.card-footer {
+    background: var(--scale-4);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* Toggle Switches - Marine Blue */
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+    background: var(--brand-accent);
+    border-color: var(--brand-accent);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Radio and Checkbox - Marine Accents */
+.custom-control-input:checked ~ .custom-control-label::before {
+    background: var(--brand-accent);
+    border-color: var(--brand-accent);
+    box-shadow: var(--shadow-glow);
+}
+
+/* File Input - Dark Marine */
+.custom-file-label {
+    background: var(--scale-4);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.custom-file-input:focus ~ .custom-file-label {
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px rgba(33, 113, 181, 0.25);
+}
+
+/* Range Input - Marine Slider */
+input[type="range"] {
+    background: transparent;
+}
+
+input[type="range"]::-webkit-slider-track {
+    background: var(--scale-4);
+    border-radius: 4px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    background: var(--brand-accent);
+    box-shadow: var(--shadow-glow);
+}
+
+input[type="range"]::-moz-range-track {
+    background: var(--scale-4);
+    border-radius: 4px;
+}
+
+input[type="range"]::-moz-range-thumb {
+    background: var(--brand-accent);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Floating Action Button - Solid Marine Glow */
+.fab {
+    background: var(--scale-5);             /* Solid Rich Marine Blue */
+    color: var(--text-light);
+    box-shadow: var(--shadow-lg), var(--shadow-glow), var(--shadow-marine);
+    border: 1px solid var(--brand-accent);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab:hover {
+    background: var(--scale-6);             /* Solid Vibrant Ocean Blue on hover */
+    box-shadow: var(--shadow-lg), var(--shadow-glow), var(--shadow-marine),
+                0 0 30px rgba(33, 113, 181, 0.6);
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Atmospheric Oceanic Effects - Removed for solid color theme */
+/* Background depth is now created through layered solid colors and shadows */
+
+/* Content wrapper to ensure proper layering */
+.content-wrapper,
+.page-wrapper,
+main,
+.container-fluid {
+    position: relative;
+    z-index: 1;
+}
+
+/* Login Page - Solid Blue Marine Theme */
+/* Professional ocean-inspired palette for login experience */
+[data-brand="JEBI"] body.login-page {
+    /* Solid Marine Blue - Deep Ocean */
+    background: #0B2533;        /* Solid Rich Marine Blue */
+    background-attachment: fixed;
+}
+
+/* Login Container - Elevated Glass Card with Marine Accent */
+[data-brand="JEBI"] body.login-page .login-container {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    box-shadow:
+        0 20px 60px rgba(13, 59, 102, 0.35),
+        0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 8px 32px rgba(33, 113, 181, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Solid Marine Accent Border Effect */
+[data-brand="JEBI"] body.login-page .login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #2171b5;        /* Solid Vibrant Ocean Blue */
+    opacity: 0.8;
+}
+
+/* Login Title - Marine Blue Accent */
+[data-brand="JEBI"] body.login-page .login-title {
+    color: #F53A1E;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(13, 59, 102, 0.1);
+}
+
+/* Form Labels - Ocean Blue */
+[data-brand="JEBI"] body.login-page .form-label {
+    color: #1a5490;
+    font-weight: 600;
+    font-family: var(--font-body);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+/* Form Inputs - Clean with Marine Blue Focus */
+[data-brand="JEBI"] body.login-page .form-input {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #d1e3f0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: #0d3b66;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(13, 59, 102, 0.05);
+}
+
+[data-brand="JEBI"] body.login-page .form-input:focus {
+    background: #ffffff;
+    border-color: #2171b5;
+    box-shadow:
+        0 0 0 4px rgba(33, 113, 181, 0.15),
+        0 4px 16px rgba(13, 59, 102, 0.1);
+    outline: none;
+}
+
+[data-brand="JEBI"] body.login-page .form-input::placeholder {
+    color: #7ca5c4;
+}
+
+/* Login Button - Solid Marine Blue */
+[data-brand="JEBI"] body.login-page .login-button {
+    background: #1a5490;        /* Solid Rich Marine Blue */
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 4px 16px rgba(13, 59, 102, 0.25),
+        0 2px 8px rgba(33, 113, 181, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+[data-brand="JEBI"] body.login-page .login-button:hover {
+    background: #2171b5;        /* Solid Vibrant Ocean Blue on hover */
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 24px rgba(13, 59, 102, 0.35),
+        0 4px 16px rgba(33, 113, 181, 0.3);
+}
+
+[data-brand="JEBI"] body.login-page .login-button:active {
+    transform: translateY(0);
+    background: #0d3b66;        /* Solid Deep Navy on active */
+}
+
+/* Logo Styling */
+[data-brand="JEBI"] body.login-page .logo {
+    filter: drop-shadow(0 4px 12px rgba(13, 59, 102, 0.15));
+    transition: transform 0.3s ease;
+}
+
+[data-brand="JEBI"] body.login-page .logo:hover {
+    transform: scale(1.02);
+}
+
+/* Error Message - Warm Alert on Cool Background */
+[data-brand="JEBI"] body.login-page .error-message {
+    background: rgba(255, 107, 107, 0.12);
+    border-left: 4px solid #ff6b6b;
+    color: #c92a2a;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(201, 42, 42, 0.15);
+    font-weight: 500;
+}
+
+/* Footer Text - Light Marine */
+[data-brand="JEBI"] body.login-page .footer-text {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    margin-top: 32px;
+    text-shadow: 0 2px 4px rgba(13, 59, 102, 0.3);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+}
+
+/* Floating Marine Elements - Removed for solid color theme */
+/* Login page now uses clean solid marine blue background */
+
+[data-brand="JEBI"] body.login-page .login-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive Login Page Adjustments */
+@media (max-width: 768px) {
+    [data-brand="JEBI"] body.login-page .login-container {
+        padding: 32px 24px;
+        border-radius: 20px;
+    }
+
+    [data-brand="JEBI"] body.login-page .login-title {
+        font-size: 26px;
+        margin-bottom: 24px;
+    }
+
+    [data-brand="JEBI"] body.login-page .login-button {
+        font-size: 16px;
+        padding: 14px 20px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .text-second-title {
+        font-size: 26px;
+    }
+
+    :root {
+        --border-radius: 8px;
+    }
+}

@@ -6,11 +6,13 @@ from .main_controller import MainController
 from .revpi_controller import RevPiController
 from .service_monitor_controller import ServiceMonitorController
 from .config_editor_controller import ConfigEditorController
+from .analytics_controller import AnalyticsController
 
 __all__ = [
     'BaseController',
-    'MainController', 
+    'MainController',
     'RevPiController',
     'ServiceMonitorController',
-    'ConfigEditorController'
+    'ConfigEditorController',
+    'AnalyticsController'
 ]

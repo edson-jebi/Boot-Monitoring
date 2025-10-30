@@ -140,11 +140,17 @@ class ConfigEditorController(BaseController):
                 if os.path.isfile(file_path):
                     try:
                         stat = os.stat(file_path)
+
+                        # Extract logging period (first and last timestamp) from log file
+                        log_period = self._extract_log_period(file_path)
+
                         files.append({
                             'name': filename,
                             'size': stat.st_size,
                             'modified': stat.st_mtime,
-                            'readable': os.access(file_path, os.R_OK)
+                            'readable': os.access(file_path, os.R_OK),
+                            'log_period_start': log_period['start'],
+                            'log_period_end': log_period['end']
                         })
                     except OSError as e:
                         self.logger.warning(f"Could not get stats for {filename}: {e}")
@@ -152,7 +158,9 @@ class ConfigEditorController(BaseController):
                             'name': filename,
                             'size': None,
                             'modified': None,
-                            'readable': False
+                            'readable': False,
+                            'log_period_start': None,
+                            'log_period_end': None
                         })
             
             # Sort files by modification time (newest first)
@@ -283,3 +291,128 @@ class ConfigEditorController(BaseController):
                 'success': False,
                 'error': f'Failed to create download: {str(e)}'
             }), 500
+
+    def _extract_log_period(self, file_path):
+        """
+        Extract the logging period (first and last timestamp) from a log file.
+
+        Args:
+            file_path: Path to the log file
+
+        Returns:
+            Dict with 'start' and 'end' timestamps (ISO format) or None if not found
+        """
+        import re
+        from datetime import datetime
+
+        # Common log timestamp patterns
+        patterns = [
+            # ISO format: 2025-10-22 20:31:33
+            r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})',
+            # ISO format with milliseconds: 2025-10-22 20:31:33.123
+            r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+)',
+            # ISO format with timezone: 2025-10-22T20:31:33+00:00
+            r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})',
+            # Standard log format: [2025-10-22 20:31:33]
+            r'\[(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\]',
+            # Common format: 22/Oct/2025:20:31:33
+            r'(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2})',
+        ]
+
+        first_timestamp = None
+        last_timestamp = None
+
+        try:
+            # Check if file is readable and not too large (max 100MB for scanning)
+            if not os.access(file_path, os.R_OK) or os.path.getsize(file_path) > 100 * 1024 * 1024:
+                return {'start': None, 'end': None}
+
+            # Read first few lines for start timestamp
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                for _ in range(50):  # Check first 50 lines
+                    try:
+                        line = f.readline()
+                        if not line:
+                            break
+
+                        # Try each pattern
+                        for pattern in patterns:
+                            match = re.search(pattern, line)
+                            if match:
+                                timestamp_str = match.group(1)
+                                first_timestamp = self._parse_timestamp(timestamp_str)
+                                if first_timestamp:
+                                    break
+
+                        if first_timestamp:
+                            break
+                    except Exception:
+                        continue
+
+            # Read last few lines for end timestamp
+            # Use tail-like approach for large files
+            with open(file_path, 'rb') as f:
+                # Seek to end of file
+                f.seek(0, 2)
+                file_size = f.tell()
+
+                # Read last 8KB (should contain plenty of log lines)
+                chunk_size = min(8192, file_size)
+                f.seek(max(0, file_size - chunk_size))
+                last_chunk = f.read().decode('utf-8', errors='ignore')
+
+                # Split into lines and check last 50 lines
+                lines = last_chunk.split('\n')
+                for line in reversed(lines[-50:]):
+                    if not line.strip():
+                        continue
+
+                    # Try each pattern
+                    for pattern in patterns:
+                        match = re.search(pattern, line)
+                        if match:
+                            timestamp_str = match.group(1)
+                            last_timestamp = self._parse_timestamp(timestamp_str)
+                            if last_timestamp:
+                                break
+
+                    if last_timestamp:
+                        break
+
+            return {
+                'start': first_timestamp.isoformat() if first_timestamp else None,
+                'end': last_timestamp.isoformat() if last_timestamp else None
+            }
+
+        except Exception as e:
+            self.logger.debug(f"Could not extract log period from {file_path}: {e}")
+            return {'start': None, 'end': None}
+
+    def _parse_timestamp(self, timestamp_str):
+        """
+        Parse various timestamp formats.
+
+        Args:
+            timestamp_str: Timestamp string to parse
+
+        Returns:
+            datetime object or None if parsing fails
+        """
+        from datetime import datetime
+
+        # Common datetime formats
+        formats = [
+            '%Y-%m-%d %H:%M:%S',
+            '%Y-%m-%d %H:%M:%S.%f',
+            '%Y-%m-%dT%H:%M:%S%z',
+            '%Y-%m-%dT%H:%M:%S.%f%z',
+            '%d/%b/%Y:%H:%M:%S',
+        ]
+
+        for fmt in formats:
+            try:
+                return datetime.strptime(timestamp_str, fmt)
+            except ValueError:
+                continue
+
+        return None

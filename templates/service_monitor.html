@@ -118,6 +118,59 @@
         margin-bottom: 20px;
         padding-bottom: 10px;
         border-bottom: 3px solid #005596;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.3s;
+        position: relative;
+    }
+    .column-title:hover {
+        background-color: #f8f9fc;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .column-toggle-btn {
+        background-color: #005596;
+        color: white;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        transition: all 0.3s;
+        flex-shrink: 0;
+    }
+    .column-toggle-btn:hover {
+        background-color: #004080;
+        transform: scale(1.1);
+    }
+    .column-toggle-btn.collapsed {
+        transform: rotate(180deg);
+    }
+    .column-content {
+        transition: all 0.3s ease;
+        max-height: 5000px;
+        overflow: hidden;
+        opacity: 1;
+    }
+    .column-content.collapsed {
+        max-height: 0;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+    }
+    .service-column.minimal,
+    .config-column.minimal {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 300px;
     }
     .service-card {
         background-color: #f8f9fc;
@@ -329,6 +382,11 @@
         border-color: #005596;
         box-shadow: 0 0 0 2px rgba(0,85,150,0.25);
     }
+    .form-control[readonly] {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+        color: #6c757d;
+    }
     .button-container {
         text-align: center;
         margin: 20px 0;
@@ -429,6 +487,13 @@
         font-weight: bold;
         color: #005596;
         margin-bottom: 5px;
+    }
+    .log-file-period {
+        font-size: 13px;
+        color: #28a745;
+        font-weight: 500;
+        margin: 3px 0;
+        padding: 3px 0;
     }
     .log-file-details {
         font-size: 12px;
@@ -558,9 +623,14 @@
 
 <div class="container">
     <!-- Service Monitor Column -->
-    <div class="service-column">
-        <h2 class="column-title">Service Monitor</h2>
+    <div class="service-column minimal" id="service-column">
+        <h2 class="column-title" onclick="toggleColumn('service')">
+            <span class="status-indicator status-unknown" id="title-status-indicator"></span>
+            Service Monitor
+            <button class="column-toggle-btn collapsed" id="service-toggle">▲</button>
+        </h2>
 
+        <div class="column-content collapsed" id="service-content">
         <div id="service-container">
             <div class="service-card" id="service-card">
                 <div class="service-name">jebi-switchboard-guard.service</div>
@@ -610,12 +680,18 @@
         <div class="last-updated" id="last-updated">
             Last updated: Never
         </div>
+        </div>
     </div>
 
     <!-- Configuration Editor Column -->
-    <div class="config-column">
+    <div class="config-column minimal" id="config-column">
+        <h2 class="column-title" onclick="toggleColumn('config')">
+            Configuration Editor
+            <button class="column-toggle-btn collapsed" id="config-toggle">▲</button>
+        </h2>
+
+        <div class="column-content collapsed" id="config-content">
         <div class="config-section">
-            <h2 class="column-title">Configuration Editor</h2>
 
         <div class="config-info" style="display: none;">
             <strong>Configuration File:</strong>
@@ -633,7 +709,7 @@
                 <div class="form-group">
                     <div class="form-row">
                         <label for="relayProcessorName">Device Name:</label>
-                        <input type="text" id="relayProcessorName" class="form-control" value="RelayProcessor">
+                        <input type="text" id="relayProcessorName" class="form-control" value="RelayProcessor" readonly>
                     </div>
                 </div>
                 <div class="form-group">
@@ -647,7 +723,7 @@
                 <div class="form-group">
                     <div class="form-row">
                         <label for="relayScreenName">Device Name:</label>
-                        <input type="text" id="relayScreenName" class="form-control" value="RelayScreen">
+                        <input type="text" id="relayScreenName" class="form-control" value="RelayScreen" readonly>
                     </div>
                 </div>
                 <div class="form-group">
@@ -751,6 +827,7 @@
             <div id="config-status-message" class="status-message"></div>
         </div>
         </div>
+        </div>
     </div>
 </div>
 
@@ -806,15 +883,24 @@ function updateServiceStatus() {
                 // Update card style and indicator based on status
                 serviceCard.className = 'service-card';
                 statusIndicator.className = 'status-indicator';
-                
+
+                // Also update title status indicator
+                const titleStatusIndicator = document.getElementById('title-status-indicator');
+                if (titleStatusIndicator) {
+                    titleStatusIndicator.className = 'status-indicator';
+                }
+
                 if (data.active && data.status === 'active') {
                     serviceCard.classList.add('active');
                     statusIndicator.classList.add('status-active');
+                    if (titleStatusIndicator) titleStatusIndicator.classList.add('status-active');
                 } else if (data.status === 'inactive' || data.status === 'failed') {
                     serviceCard.classList.add('inactive');
                     statusIndicator.classList.add('status-inactive');
+                    if (titleStatusIndicator) titleStatusIndicator.classList.add('status-inactive');
                 } else {
                     statusIndicator.classList.add('status-unknown');
+                    if (titleStatusIndicator) titleStatusIndicator.classList.add('status-unknown');
                 }
                 
                 // Update other status fields
@@ -1230,10 +1316,22 @@ function loadLogDirectory() {
                     data.files.forEach(file => {
                         const sizeText = file.size !== null ? formatFileSize(file.size) : 'Unknown';
                         const dateText = file.modified !== null ? new Date(file.modified * 1000).toLocaleString() : 'Unknown';
+
+                        // Format logging period
+                        let logPeriodText = '';
+                        if (file.log_period_start && file.log_period_end) {
+                            const startDate = new Date(file.log_period_start);
+                            const endDate = new Date(file.log_period_end);
+                            logPeriodText = `<div class="log-file-period">Logging Period: ${startDate.toLocaleString()} to ${endDate.toLocaleString()}</div>`;
+                        } else if (file.log_period_start || file.log_period_end) {
+                            const availableDate = file.log_period_start ? new Date(file.log_period_start) : new Date(file.log_period_end);
+                            logPeriodText = `<div class="log-file-period">Logging Period: ${availableDate.toLocaleString()}</div>`;
+                        }
+
                         const downloadButton = file.readable
                             ? `<a href="/download-log-file/${encodeURIComponent(file.name)}" class="log-file-download">Download</a>`
                             : `<span class="log-file-download disabled">Not Readable</span>`;
-                        
+
                         const checkbox = file.readable
                             ? `<input type="checkbox" class="file-checkbox" data-file-name="${escapeHtml(file.name)}" data-readable="true" onchange="toggleFileSelection('${escapeHtml(file.name)}', this)">`
                             : `<input type="checkbox" class="file-checkbox" disabled data-readable="false">`;
@@ -1244,6 +1342,7 @@ function loadLogDirectory() {
                                     ${checkbox}
                                     <div class="log-file-info">
                                         <div class="log-file-name">${escapeHtml(file.name)}</div>
+                                        ${logPeriodText}
                                         <div class="log-file-details">Size: ${sizeText} | Modified: ${dateText}</div>
                                     </div>
                                 </div>
@@ -1291,6 +1390,70 @@ window.onclick = function(event) {
 // Load configuration on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadConfig();
+    // Don't load column states - always start collapsed
+    // loadColumnStates();
 });
+
+// Column Toggle Functionality
+function toggleColumn(columnName) {
+    const content = document.getElementById(`${columnName}-content`);
+    const toggleBtn = document.getElementById(`${columnName}-toggle`);
+    const column = document.getElementById(`${columnName}-column`);
+
+    if (content && toggleBtn) {
+        const isCollapsed = content.classList.contains('collapsed');
+
+        if (isCollapsed) {
+            // Expand
+            content.classList.remove('collapsed');
+            toggleBtn.classList.remove('collapsed');
+            toggleBtn.textContent = '▼';
+            column.classList.remove('minimal');
+        } else {
+            // Collapse
+            content.classList.add('collapsed');
+            toggleBtn.classList.add('collapsed');
+            toggleBtn.textContent = '▲';
+            column.classList.add('minimal');
+        }
+
+        // Save state to localStorage
+        saveColumnState(columnName, !isCollapsed);
+    }
+}
+
+function saveColumnState(columnName, isExpanded) {
+    const columnStates = JSON.parse(localStorage.getItem('columnStates') || '{}');
+    columnStates[columnName] = isExpanded;
+    localStorage.setItem('columnStates', JSON.stringify(columnStates));
+}
+
+function loadColumnStates() {
+    const columnStates = JSON.parse(localStorage.getItem('columnStates') || '{}');
+
+    // Apply saved states
+    Object.keys(columnStates).forEach(columnName => {
+        const isExpanded = columnStates[columnName];
+        const content = document.getElementById(`${columnName}-content`);
+        const toggleBtn = document.getElementById(`${columnName}-toggle`);
+        const column = document.getElementById(`${columnName}-column`);
+
+        if (content && toggleBtn && column) {
+            if (!isExpanded) {
+                // Collapsed
+                content.classList.add('collapsed');
+                toggleBtn.classList.add('collapsed');
+                toggleBtn.textContent = '▲';
+                column.classList.add('minimal');
+            } else {
+                // Expanded
+                content.classList.remove('collapsed');
+                toggleBtn.classList.remove('collapsed');
+                toggleBtn.textContent = '▼';
+                column.classList.remove('minimal');
+            }
+        }
+    });
+}
 </script>
 {% endblock %}

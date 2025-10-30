@@ -12,12 +12,19 @@ class MainController(BaseController):
     def _register_routes(self):
         """Register main routes."""
         self.blueprint.add_url_rule('/', 'home', self.home, methods=['GET'])
+        self.blueprint.add_url_rule('/dashboard', 'dashboard', self.dashboard, methods=['GET'])
         self.blueprint.add_url_rule('/execute', 'execute_command', self.execute_command, methods=['GET'])
+        self.blueprint.add_url_rule('/api/session-check', 'session_check', self.session_check, methods=['GET'])
     
     @login_required
     def home(self):
-        """Home page route - redirects to service monitor."""
-        return redirect(url_for('main.service_monitor'))
+        """Home page route - redirects to Bradken SwitchOS dashboard."""
+        return redirect(url_for('main.dashboard'))
+    
+    @login_required
+    def dashboard(self):
+        """Dashboard page - shows Bradken SwitchOS interface."""
+        return render_template('bradken-switchos-mockup.html')
     
     @login_required
     def execute_command(self):
@@ -31,3 +38,13 @@ class MainController(BaseController):
             return render_template('home.html', result=result['output'])
         else:
             return render_template('home.html', result=result['error'])
+    
+    def session_check(self):
+        """API endpoint to check session validity."""
+        from app.auth import AuthManager
+        
+        auth_manager = AuthManager()
+        if auth_manager.is_authenticated():
+            return jsonify({'status': 'authenticated'}), 200
+        else:
+            return jsonify({'status': 'unauthenticated'}), 401

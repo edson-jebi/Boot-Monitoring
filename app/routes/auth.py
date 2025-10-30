@@ -32,9 +32,17 @@ def login():
     return render_template('login.html')
 
 
-@auth_bp.route('/logout')
+@auth_bp.route('/logout', methods=['GET', 'POST'])
 def logout():
-    """User logout route."""
+    """User logout route with enhanced security."""
     auth_manager = AuthManager()
     auth_manager.logout_user()
-    return redirect(url_for('auth.login'))
+    
+    # Create response with cache control headers
+    response = redirect(url_for('auth.login'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    
+    flash('You have been logged out successfully.', 'info')
+    return response

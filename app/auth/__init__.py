@@ -35,8 +35,17 @@ class AuthManager:
         
         user = self.user_model.verify_user(username, password)
         if user:
+            import uuid
+            import time
+            
+            # Generate a unique session token
+            session_token = str(uuid.uuid4())
+            session_timestamp = time.time()
+            
             session['user_id'] = user['id']
             session['username'] = user['username']
+            session['session_token'] = session_token
+            session['session_timestamp'] = session_timestamp
             session.permanent = True
             
             logger.info(f"User '{username}' logged in successfully from {request.remote_addr}")
@@ -47,10 +56,16 @@ class AuthManager:
             return False
     
     def logout_user(self) -> None:
-        """Logout current user."""
+        """Logout current user and invalidate session completely."""
         username = session.get('username', 'Unknown')
+        
+        # Clear all session data
         session.clear()
-        logger.info(f"User '{username}' logged out")
+        
+        # Force session regeneration
+        session.permanent = False
+        
+        logger.info(f"User '{username}' logged out and session invalidated")
     
     def get_current_user(self) -> Optional[Dict[str, Any]]:
         """Get current authenticated user."""
@@ -60,8 +75,23 @@ class AuthManager:
         return None
     
     def is_authenticated(self) -> bool:
-        """Check if current user is authenticated."""
-        return 'user_id' in session and 'username' in session
+        """Check if current user is authenticated with valid session."""
+        # Check basic session data
+        if not ('user_id' in session and 'username' in session and 'session_token' in session):
+            return False
+        
+        # Check session timestamp for additional security
+        session_timestamp = session.get('session_timestamp')
+        if session_timestamp:
+            import time
+            current_time = time.time()
+            # If session is older than the configured timeout, invalidate it
+            session_timeout = current_app.config.get('SESSION_TIMEOUT', 3600)  # Default 1 hour
+            if current_time - session_timestamp > session_timeout:
+                self.logout_user()
+                return False
+        
+        return True
 
 
 # Authentication decorators

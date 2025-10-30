@@ -63,3 +63,6 @@ coverage.xml
 # Backup files
 *~
 *.bak
+
+# Archive directory (historical documentation)
+docs/archive/

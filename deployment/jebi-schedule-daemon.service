@@ -1,0 +1,19 @@
+[Unit]
+Description=JEBI Light Schedule Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/Boot-Monitoring_Mockup/Boot-Monitoring
+ExecStart=/usr/bin/python3 /home/pi/Boot-Monitoring_Mockup/Boot-Monitoring/schedule_daemon.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment variables
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target

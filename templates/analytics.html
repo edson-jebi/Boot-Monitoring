@@ -1,0 +1,514 @@
+{% extends "base.html" %}
+
+{% block title %}Relay Analytics - {{ super() }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+    body {
+        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #005596;
+        min-height: 100vh;
+    }
+    .header {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+        max-height: 50px;
+        height: auto;
+    }
+    .user-info {
+        color: #005596;
+        font-weight: bold;
+    }
+    .logout-button {
+        background-color: #e74a3b;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        margin-left: 15px;
+    }
+    .logout-button:hover {
+        background-color: #c0392b;
+        text-decoration: none;
+        color: white;
+    }
+    .nav-tabs {
+        background-color: white;
+        padding: 0;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .tab-button {
+        flex: 1;
+        padding: 15px 20px;
+        background-color: white;
+        color: #005596;
+        text-decoration: none;
+        text-align: center;
+        font-weight: bold;
+        border-right: 1px solid #e3e6f0;
+        transition: all 0.3s;
+    }
+    .tab-button:last-child {
+        border-right: none;
+    }
+    .tab-button:hover {
+        background-color: #f8f9fc;
+        text-decoration: none;
+        color: #005596;
+    }
+    .tab-button.active {
+        background-color: #005596;
+        color: white;
+    }
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    .page-title {
+        color: #005596;
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .controls {
+        background-color: #f8f9fc;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .time-range-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .time-range-btn {
+        background-color: #e3e6f0;
+        color: #005596;
+        padding: 10px 20px;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .time-range-btn:hover {
+        background-color: #d4d7e0;
+    }
+    .time-range-btn.active {
+        background-color: #005596;
+        color: white;
+        border-color: #003d6b;
+    }
+    .stats-summary {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+    .stat-box {
+        background-color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #e3e6f0;
+        text-align: center;
+    }
+    .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    .stat-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #005596;
+    }
+    .chart-container {
+        position: relative;
+        height: 500px;
+        margin-bottom: 30px;
+    }
+    .legend {
+        background-color: #f8f9fc;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+    .legend-title {
+        font-weight: bold;
+        color: #005596;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+    .legend-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .legend-marker {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 3px solid #2196F3;
+    }
+    .legend-marker.hollow {
+        background-color: white;
+    }
+    .legend-marker.solid {
+        background-color: #2196F3;
+    }
+    .legend-text {
+        font-size: 14px;
+        color: #2d3436;
+    }
+    .loading {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        padding: 40px;
+        font-size: 18px;
+    }
+    .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    <div>
+        <span class="user-info">Welcome, {{ session.username }}!</span>
+        <a href="{{ url_for('auth.logout') }}" class="logout-button">Logout</a>
+    </div>
+</div>
+
+<div class="nav-tabs">
+    <a href="{{ url_for('main.service_monitor') }}" class="tab-button">Service Monitor & Config</a>
+    <a href="{{ url_for('main.revpi_control') }}" class="tab-button">RevPi Control</a>
+    <a href="{{ url_for('main.analytics') }}" class="tab-button active">Analytics</a>
+</div>
+
+<div class="container">
+    <h1 class="page-title">Relay Activation Timeline</h1>
+
+    <div class="controls">
+        <div class="time-range-buttons">
+            <button class="time-range-btn" data-range="1h">1 Hour</button>
+            <button class="time-range-btn active" data-range="24h">24 Hours</button>
+            <button class="time-range-btn" data-range="1w">1 Week</button>
+            <button class="time-range-btn" data-range="1m">1 Month</button>
+        </div>
+        <div class="stats-summary">
+            <div class="stat-box">
+                <div class="stat-label">Total Events</div>
+                <div class="stat-value" id="totalEvents">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Manual</div>
+                <div class="stat-value" id="manualEvents">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Automatic</div>
+                <div class="stat-value" id="automaticEvents">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" class="loading">Loading activation data...</div>
+    <div id="error" class="error-message" style="display: none;"></div>
+
+    <div id="chartSection" style="display: none;">
+        <div class="chart-container">
+            <canvas id="activationChart"></canvas>
+        </div>
+
+        <div class="legend">
+            <div class="legend-title">Legend</div>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-marker solid"></div>
+                    <span class="legend-text">Manual Activation</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker hollow"></div>
+                    <span class="legend-text">Automatic (Scheduled)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let activationChart = null;
+let currentTimeRange = '24h';
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setupTimeRangeButtons();
+    loadActivationData(currentTimeRange);
+});
+
+function setupTimeRangeButtons() {
+    const buttons = document.querySelectorAll('.time-range-btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active state
+            buttons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Load data for selected range
+            currentTimeRange = this.dataset.range;
+            loadActivationData(currentTimeRange);
+        });
+    });
+}
+
+function loadActivationData(timeRange) {
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const chartSection = document.getElementById('chartSection');
+
+    loading.style.display = 'block';
+    error.style.display = 'none';
+    chartSection.style.display = 'none';
+
+    fetch(`/analytics/relay-activations?time_range=${timeRange}`)
+        .then(response => response.json())
+        .then(data => {
+            loading.style.display = 'none';
+
+            if (data.success) {
+                document.getElementById('totalEvents').textContent = data.count;
+
+                chartSection.style.display = 'block';
+                renderChart(data.data, timeRange);
+            } else {
+                error.textContent = `Error: ${data.error}`;
+                error.style.display = 'block';
+            }
+        })
+        .catch(err => {
+            loading.style.display = 'none';
+            error.textContent = `Network error: ${err.message}`;
+            error.style.display = 'block';
+        });
+}
+
+function simplifyComponentName(name) {
+    // Map device names to simplified display names
+    const nameMap = {
+        'RelayProcessor': 'Processor',
+        'RelayScreen': 'Screen',
+        'RelayLight': 'Light'
+    };
+    return nameMap[name] || name;
+}
+
+function renderChart(data, timeRange) {
+    const ctx = document.getElementById('activationChart').getContext('2d');
+
+    // Destroy existing chart if it exists
+    if (activationChart) {
+        activationChart.destroy();
+    }
+
+    // Get components list and simplify names
+    const components = (data.components || []).map(simplifyComponentName);
+    const activations = data.activations || {};
+
+    // Prepare datasets - one for manual (solid), one for automatic (hollow)
+    const manualData = [];
+    const automaticData = [];
+
+    // Get original component names for data lookup
+    const originalComponents = data.components || [];
+
+    originalComponents.forEach((originalComponent, index) => {
+        const componentActivations = activations[originalComponent] || {};
+        const displayName = simplifyComponentName(originalComponent);
+
+        // Add manual activations
+        (componentActivations.manual || []).forEach(act => {
+            manualData.push({
+                x: act.x,
+                y: index,
+                component: displayName,
+                action: act.action,
+                username: act.username
+            });
+        });
+
+        // Add automatic activations
+        (componentActivations.automatic || []).forEach(act => {
+            automaticData.push({
+                x: act.x,
+                y: index,
+                component: displayName,
+                action: act.action,
+                username: act.username
+            });
+        });
+    });
+
+    // Update stats with manual/automatic counts
+    document.getElementById('manualEvents').textContent = manualData.length;
+    document.getElementById('automaticEvents').textContent = automaticData.length;
+
+    // Configure time axis based on range
+    let timeUnit, displayFormats;
+    switch(timeRange) {
+        case '1h':
+            timeUnit = 'minute';
+            displayFormats = { minute: 'HH:mm' };
+            break;
+        case '24h':
+            timeUnit = 'hour';
+            displayFormats = { hour: 'MMM d, HH:mm' };
+            break;
+        case '1w':
+            timeUnit = 'day';
+            displayFormats = { day: 'MMM d' };
+            break;
+        case '1m':
+            timeUnit = 'day';
+            displayFormats = { day: 'MMM d' };
+            break;
+        default:
+            timeUnit = 'hour';
+            displayFormats = { hour: 'MMM d, HH:mm' };
+    }
+
+    activationChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Manual',
+                    data: manualData,
+                    backgroundColor: '#2196F3',
+                    borderColor: '#2196F3',
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointStyle: 'circle'
+                },
+                {
+                    label: 'Automatic',
+                    data: automaticData,
+                    backgroundColor: 'white',
+                    borderColor: '#2196F3',
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointStyle: 'circle'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false  // Using custom legend below
+                },
+                title: {
+                    display: true,
+                    text: 'Relay Activation Events',
+                    font: {
+                        size: 20,
+                        weight: 'bold'
+                    },
+                    color: '#005596'
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const date = new Date(context[0].parsed.x);
+                            return date.toLocaleString();
+                        },
+                        label: function(context) {
+                            const point = context.raw;
+                            return [
+                                `Component: ${point.component}`,
+                                `Action: ${point.action}`,
+                                `User: ${point.username}`,
+                                `Type: ${context.dataset.label}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: timeUnit,
+                        displayFormats: displayFormats
+                    },
+                    title: {
+                        display: true,
+                        text: 'Time',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        color: '#e3e6f0'
+                    }
+                },
+                y: {
+                    type: 'category',
+                    labels: components,
+                    title: {
+                        display: true,
+                        text: 'Component',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        color: '#e3e6f0'
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
