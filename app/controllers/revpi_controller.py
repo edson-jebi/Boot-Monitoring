@@ -398,6 +398,17 @@ class RevPiController(BaseController):
                 # Light should be ON but it's OFF - turn it ON
                 toggle_result = revpi_service.toggle_device('RelayLight', DeviceAction.ON)
                 if toggle_result.get('success'):
+                    # Log the scheduled activation event
+                    from app.models import RelayActivation
+                    relay_activation = RelayActivation()
+                    relay_activation.log_activation(
+                        device_id='RelayLight',
+                        action='on',
+                        user_id=None,
+                        username='light-schedule',
+                        is_automatic=True,
+                        success=True
+                    )
                     self.logger.info("Schedule check: Turned RelayLight ON")
                     return jsonify({'success': True, 'action': 'turned_on', 'message': 'Light turned ON per schedule'})
                 else:
@@ -407,6 +418,17 @@ class RevPiController(BaseController):
                 # Light should be OFF but it's ON - turn it OFF
                 toggle_result = revpi_service.toggle_device('RelayLight', DeviceAction.OFF)
                 if toggle_result.get('success'):
+                    # Log the scheduled activation event
+                    from app.models import RelayActivation
+                    relay_activation = RelayActivation()
+                    relay_activation.log_activation(
+                        device_id='RelayLight',
+                        action='off',
+                        user_id=None,
+                        username='light-schedule',
+                        is_automatic=True,
+                        success=True
+                    )
                     self.logger.info("Schedule check: Turned RelayLight OFF")
                     return jsonify({'success': True, 'action': 'turned_off', 'message': 'Light turned OFF per schedule'})
                 else:
