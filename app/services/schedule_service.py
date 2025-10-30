@@ -86,13 +86,9 @@ class ScheduleService:
             validate_time_format(start_time, "start_time")
             validate_time_format(end_time, "end_time")
 
-            # Validate that end time is after start time
-            if start_time >= end_time:
-                return ServiceResponse.error_response(
-                    message='End time must be after start time',
-                    error_code=ErrorCode.INVALID_DATE_RANGE.value,
-                    details=f"start_time={start_time}, end_time={end_time}"
-                ).to_dict()
+            # Note: Overnight schedules are supported (e.g., 18:00 to 06:00)
+            # So we do NOT validate that end_time must be after start_time
+            # If end_time < start_time, it means the schedule crosses midnight
 
             # Validate days
             valid_days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']

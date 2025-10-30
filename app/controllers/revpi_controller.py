@@ -34,6 +34,10 @@ class RevPiController(BaseController):
 
         # Relay activation events endpoint
         self.blueprint.add_url_rule('/api/relay-activations', 'get_relay_activations', self.get_relay_activations, methods=['GET'])
+
+        # Service logging endpoint (no auth required - called by system service)
+        self.blueprint.add_url_rule('/api/log-service-activation', 'log_service_activation', self.log_service_activation, methods=['POST'])
+        self.blueprint.add_url_rule('/log-service-activation', 'log_service_activation_legacy', self.log_service_activation, methods=['POST'])
     
     @login_required
     def revpi_control(self):
@@ -309,66 +313,86 @@ class RevPiController(BaseController):
         Check schedule and enforce relay state for RelayLight.
         This endpoint is called periodically by the frontend to maintain schedule.
         No login required as it's called automatically by the app.
+
+        Supports overnight schedules that cross midnight (e.g., ON 18:00 Wed, OFF 06:00 Thu).
         """
         try:
-            from datetime import datetime, time as dt_time
-            
+            from datetime import datetime, time as dt_time, timedelta
+
             schedule_service = self.service_factory.get_schedule_service()
             result = schedule_service.get_schedule('RelayLight')
-            
+
             if not result.get('success') or not result.get('data'):
                 return jsonify({'success': True, 'action': 'none', 'message': 'No schedule configured'})
-            
+
             schedule = result['data']
-            
+
             # Check if schedule is enabled
             if not schedule.get('enabled'):
                 return jsonify({'success': True, 'action': 'none', 'message': 'Schedule disabled'})
-            
-            # Check if today is a scheduled day
-            day_map = {0: 'mon', 1: 'tue', 2: 'wed', 3: 'thu', 4: 'fri', 5: 'sat', 6: 'sun'}
-            today = datetime.now().weekday()
-            today_abbr = day_map.get(today, '')
-            
-            scheduled_days = schedule.get('days', [])
-            if scheduled_days and today_abbr not in scheduled_days:
-                return jsonify({'success': True, 'action': 'none', 'message': f'Not scheduled for {today_abbr}'})
-            
+
             # Get current time and schedule times
             start_time_str = schedule.get('start_time')
             end_time_str = schedule.get('end_time')
-            
+
             if not start_time_str or not end_time_str:
                 return jsonify({'success': False, 'message': 'Invalid schedule times'})
-            
+
             # Parse times
             # start_time = lights ON time
             # end_time = lights OFF time
             start_hour, start_min = map(int, start_time_str.split(':'))
             end_hour, end_min = map(int, end_time_str.split(':'))
-            
+
             on_time = dt_time(start_hour, start_min)
             off_time = dt_time(end_hour, end_min)
-            current_time = datetime.now().time()
-            
-            # Determine if light should be on
-            # Handle both daytime and overnight schedules
-            if on_time < off_time:
-                # Normal daytime schedule (e.g., ON at 08:00, OFF at 17:00)
-                should_be_on = on_time <= current_time < off_time
-            else:
+
+            now = datetime.now()
+            current_time = now.time()
+
+            # Determine if this is an overnight schedule
+            is_overnight_schedule = on_time > off_time
+
+            # Check if today/yesterday is a scheduled day
+            day_map = {0: 'mon', 1: 'tue', 2: 'wed', 3: 'thu', 4: 'fri', 5: 'sat', 6: 'sun'}
+            today = now.weekday()
+            yesterday = (now - timedelta(days=1)).weekday()
+            today_abbr = day_map.get(today, '')
+            yesterday_abbr = day_map.get(yesterday, '')
+
+            scheduled_days = schedule.get('days', [])
+
+            # Determine if light should be on based on schedule type
+            if is_overnight_schedule:
                 # Overnight schedule (e.g., ON at 18:00, OFF at 06:00)
-                # Light should be ON if current time >= on_time OR current time < off_time
-                should_be_on = current_time >= on_time or current_time < off_time
-            
+                # Light should be ON if:
+                # 1. Current time >= on_time AND today is scheduled, OR
+                # 2. Current time < off_time AND yesterday was scheduled
+                if current_time >= on_time:
+                    # We're in the evening/night portion - check if today is scheduled
+                    if scheduled_days and today_abbr not in scheduled_days:
+                        return jsonify({'success': True, 'action': 'none', 'message': f'Not scheduled for {today_abbr}'})
+                    should_be_on = True
+                else:
+                    # We're in the early morning portion - check if yesterday was scheduled
+                    if scheduled_days and yesterday_abbr not in scheduled_days:
+                        return jsonify({'success': True, 'action': 'none', 'message': f'Not scheduled (yesterday was {yesterday_abbr})'})
+                    should_be_on = current_time < off_time
+            else:
+                # Normal daytime schedule (e.g., ON at 08:00, OFF at 17:00)
+                # Check if today is scheduled
+                if scheduled_days and today_abbr not in scheduled_days:
+                    return jsonify({'success': True, 'action': 'none', 'message': f'Not scheduled for {today_abbr}'})
+                should_be_on = on_time <= current_time < off_time
+
             # Get current relay status
             revpi_service = self.service_factory.get_revpi_service()
             status_data = revpi_service.get_all_devices_status()
-            
+
             relay_light = status_data.get('RelayLight', {})
             current_status = relay_light.get('status', 'UNKNOWN')
             is_currently_on = current_status == 'ON'
-            
+
             # Determine if we need to toggle
             if should_be_on and not is_currently_on:
                 # Light should be ON but it's OFF - turn it ON
@@ -378,7 +402,7 @@ class RevPiController(BaseController):
                     return jsonify({'success': True, 'action': 'turned_on', 'message': 'Light turned ON per schedule'})
                 else:
                     return jsonify({'success': False, 'action': 'failed', 'message': 'Failed to turn light ON'})
-            
+
             elif not should_be_on and is_currently_on:
                 # Light should be OFF but it's ON - turn it OFF
                 toggle_result = revpi_service.toggle_device('RelayLight', DeviceAction.OFF)
@@ -387,12 +411,12 @@ class RevPiController(BaseController):
                     return jsonify({'success': True, 'action': 'turned_off', 'message': 'Light turned OFF per schedule'})
                 else:
                     return jsonify({'success': False, 'action': 'failed', 'message': 'Failed to turn light OFF'})
-            
+
             else:
                 # Light is in correct state
                 return jsonify({
-                    'success': True, 
-                    'action': 'none', 
+                    'success': True,
+                    'action': 'none',
                     'message': f'Light already {"ON" if is_currently_on else "OFF"} (correct state)'
                 })
         

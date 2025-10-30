@@ -420,8 +420,8 @@
         }
 
         .legend-dot {
-            width: 0.75rem;
-            height: 0.75rem;
+            width: 0.875rem;
+            height: 0.875rem;
             border-radius: 9999px;
         }
 
@@ -431,7 +431,9 @@
 
         .legend-dot-manual {
             background-color: white;
-            border: 2px solid #2563eb;
+            border: 3px solid #f59e0b;
+            width: 1rem;
+            height: 1rem;
         }
 
         /* Table Styles */
@@ -1404,11 +1406,11 @@
                             <div class="form-group">
                                 <label class="form-label">Lights OFF Time (24-hour format)</label>
                                 <div class="time-picker-container">
-                                    <input type="text" 
-                                           id="lightsOffTime" 
-                                           class="time-picker-input" 
-                                           value="06:00" 
-                                           readonly 
+                                    <input type="text"
+                                           id="lightsOffTime"
+                                           class="time-picker-input"
+                                           value="06:00"
+                                           readonly
                                            disabled
                                            placeholder="HH:MM">
                                     <svg class="time-picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1418,6 +1420,9 @@
                                     <div id="lightsOffTimeDropdown" class="time-picker-dropdown"></div>
                                 </div>
                                 <p class="form-help">Time when lights automatically turn off (HH:MM format)</p>
+                                <p class="form-help" style="margin-top: 0.25rem; color: #10b981;">
+                                    <strong>💡 Tip:</strong> Overnight schedules are supported! Example: ON at 18:00 (6 PM), OFF at 06:00 (6 AM next day)
+                                </p>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Active Days</label>
@@ -1452,6 +1457,10 @@
                                     </label>
                                 </div>
                                 <p class="form-help">Select days when the light schedule should be active</p>
+                                <p class="form-help" style="margin-top: 0.25rem; color: #6b7280; font-size: 0.875rem;">
+                                    <strong>Note for overnight schedules:</strong> The day refers to when lights turn ON.
+                                    Example: If you select "Wed" with ON at 18:00 and OFF at 06:00, lights will turn on Wednesday at 6 PM and off Thursday at 6 AM.
+                                </p>
                             </div>
                             <div class="alert alert-info">
                                 <svg class="icon-sm alert-info-icon" viewBox="0 0 24 24">
@@ -3083,15 +3092,21 @@
                 const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 circle.setAttribute('cx', xScale(event.timestamp));
                 circle.setAttribute('cy', yScale(event.component));
-                circle.setAttribute('r', '6');
 
                 if (event.type === 'auto') {
+                    // Automatic events: filled blue circle
+                    circle.setAttribute('r', '6');
                     circle.setAttribute('fill', '#2563eb');
                 } else {
-                    circle.setAttribute('fill', 'none');
-                    circle.setAttribute('stroke', '#2563eb');
-                    circle.setAttribute('stroke-width', '2');
+                    // Manual events: larger, hollow orange circle for better visibility
+                    circle.setAttribute('r', '7');
+                    circle.setAttribute('fill', 'white');
+                    circle.setAttribute('stroke', '#f59e0b');
+                    circle.setAttribute('stroke-width', '3');
                 }
+
+                // Add hover effect
+                circle.style.cursor = 'pointer';
 
                 const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
                 const eventType = event.type === 'auto' ? 'Automatic' : 'Manual';
